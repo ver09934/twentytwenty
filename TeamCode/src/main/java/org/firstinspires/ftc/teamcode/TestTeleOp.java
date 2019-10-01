@@ -2,8 +2,11 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @TeleOp(name="Test Tele-Op", group="TeleOp OpMode")
 public class TestTeleOp extends OpMode {
@@ -12,12 +15,15 @@ public class TestTeleOp extends OpMode {
 
     private Servo testServo;
 
+    private DistanceSensor testSensor;
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         testServo = hardwareMap.servo.get("testServo");
+        testSensor = hardwareMap.get(DistanceSensor.class, "lidar");
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -42,6 +48,11 @@ public class TestTeleOp extends OpMode {
             testServo.setPosition(0);
             telemetry.addData("Servo Position", "Position 2");
         }
+
+        telemetry.addData("range", String.format("%.01f mm", testSensor.getDistance(DistanceUnit.MM)));
+        telemetry.addData("range", String.format("%.01f cm", testSensor.getDistance(DistanceUnit.CM)));
+        telemetry.addData("range", String.format("%.01f m", testSensor.getDistance(DistanceUnit.METER)));
+        telemetry.addData("range", String.format("%.01f in", testSensor.getDistance(DistanceUnit.INCH)));
 
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();
