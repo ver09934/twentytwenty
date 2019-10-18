@@ -8,8 +8,8 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-@TeleOp(name="Test Tele-Op", group="TeleOp OpMode")
-public class TestTeleOp extends OpMode {
+@TeleOp(name="Sensor Test Tele-Op", group="TeleOp OpMode")
+public class SensorTestTeleOp extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
