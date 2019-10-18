@@ -9,6 +9,7 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
  * Encapsulates Robot Driving Functionality
  */
 public class DriverFunction {
+
     public DrivingMotor lf; // stands for left front
     public DrivingMotor lb; // stands for left back
     public DrivingMotor rf; // stands for right front
