@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
@@ -16,6 +18,12 @@ public class DriveTestTeleOp extends OpMode {
     private DriverFunction driverFunction;
     private DriverFunction.Steering steering;
 
+    private boolean bToggleLock = false;
+    private boolean runGulper = false;
+
+    DcMotor motor1;
+    DcMotor motor2;
+
     private final static double TURNING_SPEED_BOOST = 0.3;
 
     // Code to run ONCE when the driver hits INIT
@@ -26,6 +34,17 @@ public class DriveTestTeleOp extends OpMode {
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
+
+        motor1 = hardwareMap.dcMotor.get("intake1");
+        motor2 = hardwareMap.dcMotor.get("intake2");
+
+        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        motor1.setPower(0);
+        motor2.setPower(0);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -42,20 +61,43 @@ public class DriveTestTeleOp extends OpMode {
     @Override
     public void loop() {
 
+        if (this.gamepad1.b) {
+            if (!bToggleLock) {
+                bToggleLock = true;
+                runGulper = !runGulper;
+            }
+            telemetry.addData("B Pressed", "True");
+        }
+        else {
+            bToggleLock = false;
+            telemetry.addData("B Pressed", "False");
+        }
+
+        if (runGulper) {
+            telemetry.addData("Gulpers", "True");
+            motor1.setPower(1);
+            motor2.setPower(1);
+        }
+        else {
+            telemetry.addData("Gulpers", "False");
+            motor1.setPower(0);
+            motor2.setPower(0);
+        }
+
         // ----- Gamepad 1: Driving Functions -----
 
         // D-Pad: Compass rose drive
         if (this.gamepad1.dpad_right) {
-            steering.moveDegrees(0, MIN_SPEED_RATIO);
-        }
-        if (this.gamepad1.dpad_up) {
-            steering.moveDegrees(90, MIN_SPEED_RATIO);
-        }
-        if (this.gamepad1.dpad_left) {
             steering.moveDegrees(180, MIN_SPEED_RATIO);
         }
-        if (this.gamepad1.dpad_down) {
+        if (this.gamepad1.dpad_up) {
             steering.moveDegrees(270, MIN_SPEED_RATIO);
+        }
+        if (this.gamepad1.dpad_left) {
+            steering.moveDegrees(0, MIN_SPEED_RATIO);
+        }
+        if (this.gamepad1.dpad_down) {
+            steering.moveDegrees(90, MIN_SPEED_RATIO);
         }
 
         // Left/Right Triggers: Set driving speed ratio
@@ -71,17 +113,17 @@ public class DriveTestTeleOp extends OpMode {
 
         // Right Stick: Turn/Rotate
         if (this.gamepad1.right_stick_x > 0.1) {
-            steering.turnClockwise();
+            steering.turnCounterclockwise();
             steering.setSpeedRatio(Math.min(1, steering.getSpeedRatio() + TURNING_SPEED_BOOST));
         }
         else if (this.gamepad1.right_stick_x < -0.1) {
-            steering.turnCounterclockwise();
+            steering.turnClockwise();
             steering.setSpeedRatio(Math.min(1, steering.getSpeedRatio() + TURNING_SPEED_BOOST));
         }
 
         // Left Stick: Drive/Strafe
         if (Math.abs(this.gamepad1.left_stick_x) > 0.1 || Math.abs(this.gamepad1.left_stick_y) > 0.1) {
-            double angle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+            double angle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x);
             telemetry.addData("Angle", angle);
             steering.moveRadians(angle);
         }
