@@ -24,6 +24,8 @@ public class DriveTestTeleOp extends OpMode {
     DcMotor motor1;
     DcMotor motor2;
 
+    DcMotor winchMotor;
+
     private final static double TURNING_SPEED_BOOST = 0.3;
 
     // Code to run ONCE when the driver hits INIT
@@ -37,14 +39,17 @@ public class DriveTestTeleOp extends OpMode {
 
         motor1 = hardwareMap.dcMotor.get("intake1");
         motor2 = hardwareMap.dcMotor.get("intake2");
+        winchMotor = hardwareMap.dcMotor.get(""); // TODO
 
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motor1.setPower(0);
         motor2.setPower(0);
+        winchMotor.setPower(0);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -60,6 +65,8 @@ public class DriveTestTeleOp extends OpMode {
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
     @Override
     public void loop() {
+
+        // --- gulper motors ---
 
         if (this.gamepad1.b) {
             if (!bToggleLock) {
@@ -82,6 +89,19 @@ public class DriveTestTeleOp extends OpMode {
             telemetry.addData("Gulpers", "False");
             motor1.setPower(0);
             motor2.setPower(0);
+        }
+
+        // --- winch motor ---
+
+        double winchMotorSpeed = 0.5;
+        if (this.gamepad1.left_bumper) {
+            winchMotor.setPower(winchMotorSpeed);
+        }
+        else if (this.gamepad1.right_bumper) {
+            winchMotor.setPower(-winchMotorSpeed);
+        }
+        else {
+            winchMotor.setPower(0);
         }
 
         // ----- Gamepad 1: Driving Functions -----
