@@ -15,7 +15,15 @@ public class SensorTestTeleOp extends OpMode {
 
     private Servo testServo;
 
-    private DistanceSensor testSensor;
+    // private DistanceSensor testSensor;
+
+    private double targetPosition = 0;
+
+    private double servoIncrement = 0.2;
+
+    private boolean bToggleLock = false;
+    private double position1 = 1;
+    private double position2 = 0.6;
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -23,7 +31,8 @@ public class SensorTestTeleOp extends OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         testServo = hardwareMap.servo.get("testServo");
-        testSensor = hardwareMap.get(DistanceSensor.class, "lidar");
+        // testSensor = hardwareMap.get(DistanceSensor.class, "lidar");
+        testServo.setPosition(position1);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -40,19 +49,43 @@ public class SensorTestTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        if (this.gamepad1.right_trigger > 0.5) {
-            testServo.setPosition(1);
-            telemetry.addData("Servo Position", "Position 1");
+        /*
+        if (this.gamepad1.right_stick_x > 0.5) {
+            if (targetPosition < 2) {
+                targetPosition += servoIncrement;
+            }
+        }
+        else if (this.gamepad1.right_stick_x < -0.5) {
+            if (targetPosition > -1) {
+                targetPosition -= servoIncrement;
+            }
+        }
+        testServo.setPosition(targetPosition);
+        telemetry.addData("Servo Position", testServo.getPosition());
+        */
+
+        if (this.gamepad1.b) {
+            if (!bToggleLock) {
+                bToggleLock = true;
+                if (testServo.getPosition() == position1) {
+                    testServo.setPosition(position2);
+                }
+                else {
+                    testServo.setPosition(position1);
+                }
+            }
         }
         else {
-            testServo.setPosition(0);
-            telemetry.addData("Servo Position", "Position 2");
+            bToggleLock = false;
         }
+        telemetry.addData("Servo Position", testServo.getPosition());
 
+        /*
         telemetry.addData("range", String.format("%.01f mm", testSensor.getDistance(DistanceUnit.MM)));
         telemetry.addData("range", String.format("%.01f cm", testSensor.getDistance(DistanceUnit.CM)));
         telemetry.addData("range", String.format("%.01f m", testSensor.getDistance(DistanceUnit.METER)));
         telemetry.addData("range", String.format("%.01f in", testSensor.getDistance(DistanceUnit.INCH)));
+         */
 
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();

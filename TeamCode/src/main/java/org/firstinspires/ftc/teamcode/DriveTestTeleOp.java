@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
@@ -24,7 +25,13 @@ public class DriveTestTeleOp extends OpMode {
     DcMotor motor1;
     DcMotor motor2;
 
-    DcMotor winchMotor;
+    DcMotor winchMotor1;
+    DcMotor winchMotor2;
+
+    private Servo testServo;
+    private boolean xToggleLock = false;
+    private double position1 = 1;
+    private double position2 = 0.6;
 
     private final static double TURNING_SPEED_BOOST = 0.3;
 
@@ -39,17 +46,30 @@ public class DriveTestTeleOp extends OpMode {
 
         motor1 = hardwareMap.dcMotor.get("intake1");
         motor2 = hardwareMap.dcMotor.get("intake2");
-        winchMotor = hardwareMap.dcMotor.get(""); // TODO
+        winchMotor1 = hardwareMap.dcMotor.get("winch1"); // TODO
+        winchMotor2 = hardwareMap.dcMotor.get("winch2"); // TODO
 
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winchMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
+        winchMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+
         motor1.setPower(0);
         motor2.setPower(0);
-        winchMotor.setPower(0);
+        winchMotor1.setPower(0);
+        winchMotor2.setPower(0);
+
+        testServo = hardwareMap.servo.get("testServo");
+        testServo.setPosition(position1);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -93,16 +113,39 @@ public class DriveTestTeleOp extends OpMode {
 
         // --- winch motor ---
 
-        double winchMotorSpeed = 0.5;
+        double winchMotor1Speed = 0.5;
+        double winchMotor2Speed = winchMotor1Speed;
+
         if (this.gamepad1.left_bumper) {
-            winchMotor.setPower(winchMotorSpeed);
+            winchMotor1.setPower(winchMotor1Speed);
+            winchMotor2.setPower(winchMotor2Speed);
         }
         else if (this.gamepad1.right_bumper) {
-            winchMotor.setPower(-winchMotorSpeed);
+            winchMotor1.setPower(-winchMotor1Speed);
+            winchMotor2.setPower(-winchMotor2Speed);
         }
         else {
-            winchMotor.setPower(0);
+            winchMotor1.setPower(0);
+            winchMotor2.setPower(0);
         }
+
+        // --- Gripper Servo ---
+
+        if (this.gamepad1.x) {
+            if (!xToggleLock) {
+                xToggleLock = true;
+                if (testServo.getPosition() == position1) {
+                    testServo.setPosition(position2);
+                }
+                else {
+                    testServo.setPosition(position1);
+                }
+            }
+        }
+        else {
+            xToggleLock = false;
+        }
+        telemetry.addData("Servo Position", testServo.getPosition());
 
         // ----- Gamepad 1: Driving Functions -----
 
