@@ -1,4 +1,6 @@
+package org.firstinspires.ftc.teamcode.Navigation.Geometry;
 import java.util.Arrays;
+
 
 public class Coord {
     private double x;
@@ -96,6 +98,13 @@ public class Coord {
         }
 
         return output;
+    }
+
+    public double xDist(Coord a) {
+        return Math.abs(a.x - this.x);
+    }
+    public double yDist(Coord a) {
+        return Math.abs(a.y - this.y);
     }
 
 }

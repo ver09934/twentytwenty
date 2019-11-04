@@ -1,3 +1,5 @@
+package org.firstinspires.ftc.teamcode.Navigation.Geometry;
+
 public class LineSegment extends Line implements Comparable<LineSegment>{
     private double length;
 
@@ -33,7 +35,7 @@ public class LineSegment extends Line implements Comparable<LineSegment>{
 
     static boolean lineIntersectsSeg(LineSegment A, Line B) {
         Coord intersect = intersection(A, B);
-        return A.onSegment(intersect) && B.onLine(intersect);
+        return A.onSegment(intersect) && B.coordOnLine(intersect);
     }
 
     @Override
