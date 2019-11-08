@@ -11,7 +11,6 @@ import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
 
 @Autonomous(name = "CoordPlaneTest")
 public class TestCoordPlane extends LinearOpMode {
-    private ElapsedTime runtime;
     private DriverFunction driverFunction;
     private DriverFunction.Steering steering;
 
@@ -21,38 +20,41 @@ public class TestCoordPlane extends LinearOpMode {
         // --- Init ---
         Coord[] field_points = new Coord[]{new Coord(-50, 50), new Coord(50, 50), new Coord(-50, 50), new Coord(-50, -50)};
         Field field = new Field(field_points, 3.6576);
-        Robot robot = new Robot(field);
+        driverFunction = new DriverFunction(hardwareMap, telemetry);
+        ElapsedTime elapsedTime = new ElapsedTime();
+        elapsedTime.reset();
+        Robot robot = new Robot(field, driverFunction, telemetry, elapsedTime);
+        steering = driverFunction.getSteering();
 
         // Initial telemetry
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        robot.moveTo(new Coord(25, 25));
-        robot.moveTo(new Coord(0, 25));
-        robot.moveTo(new Coord(0, 0));
-        robot.moveTo(new Coord(25, 0));
-        robot.moveTo(new Coord(25, 25));
-        robot.moveTo(new Coord(0, 0));
-
-        // Initialize utilities
-        runtime = new ElapsedTime();
-        driverFunction = new DriverFunction(hardwareMap, telemetry);
-        steering = driverFunction.getSteering();
-
-
         // Reset encoders
         driverFunction.resetAllEncoders();
         while (!this.isStarted()) {
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
+            telemetry.addData("Status", "Run Time: ");
             telemetry.update();
         }
         // waitForStart();
 
         // --- Start ---
 
+        telemetry.addData("Status", "Test move...");
+        telemetry.update();
+        steering.moveDegrees(0);
+        steering.finishSteering();
+        sleep(200); // 600
+        steering.stopAllMotors();
+
+        telemetry.addData("Status", "Starting drive");
+        telemetry.update();
+        robot.moveTo(new Coord(50, 50), 0.5);
+
+
         // Potentially reset the encoders here
 
-        runtime.reset();
+        elapsedTime.reset();
 
         telemetry.addData("Status", "Started");
         telemetry.update();

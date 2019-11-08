@@ -16,27 +16,35 @@ public class Robot {
     private ElapsedTime drive_time;
 
 
-    public Robot(Field currentField) {
+    public Robot(Field currentField, DriverFunction driverFunction, Telemetry telemetry, ElapsedTime time) {
         this.currentField = currentField;
-        //DIST_BTW_SENSORS = dist_btw_sensors;
+        this.driverFunction = driverFunction;
+        this.steering = driverFunction.getSteering();
+        this.telemetry = telemetry;
+        this.drive_time = time;
     }
 
     private void addDegrees(double deg_add) {
         this.direction_deg = (direction_deg + deg_add) % 360;
     }
 
-    public void moveTo(Coord end_point) {
+    public void moveTo(Coord end_point, double speed) {
+        telemetry.addData("Status", "Starting move");
+        telemetry.update();
+        // Checks the point is possible
+        double distance = position.distance(end_point);
+        // Gets the angle for the robot to move
+        double angle = Math.asin(position.yDist(end_point) / distance);
+
+        try {
+            //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
+            steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 100, 2, drive_time);
+        } catch (Exception InterruptedException){
+            telemetry.addData("Status", "Failed");
+            telemetry.update();
+        }
         if (currentField.coordInRectangle(end_point)) {
-            double distance = position.distance(end_point);
-            double angle = Math.asin(position.yDist(end_point) / distance);
-            try {
-                steering.encoderDrive(0, currentField.convertToMeters(distance), angle, 30, 4);
-            } catch (Exception InterruptedException){
-                telemetry.addData("Status", "Failed");
-                telemetry.update();
-            }
-            steering.finishSteering();
-            steering.stopAllMotors();
+
         }
     }
 

@@ -126,7 +126,6 @@ public class DriverFunction {
 
     // An inner class that manages the repeated recalculation of motor powers.
     public class Steering {
-        private ElapsedTime drive_time;
         private double powerLF = 0;
         private double powerLB = 0;
         private double powerRF = 0;
@@ -200,12 +199,14 @@ public class DriverFunction {
         }
 
 
-        public void encoderDrive(double speed, double meters, double angle, double timeoutS, double rampup) throws InterruptedException {
+        public void encoderDrive(double speed, double meters, double angle, double timeoutS, double rampup, ElapsedTime drive_time) throws InterruptedException {
+            String telem_stuff = "";
             double COUNTS_PER_MOTOR_REV = 1120;    //Set for NevRest 20 drive. For 40's change to 1120. For 60's 1680
             double DRIVE_GEAR_REDUCTION = 1.0;     // This is the ratio between the motor axle and the wheel
             double WHEEL_DIAMETER_METERS = 0.1016;     // For figuring circumference
             double COUNTS_PER_METER = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_METERS * Math.PI);
 
+            angle = Math.toRadians(angle);
             double Rspeed = speed;
             double Lspeed = speed;
 
@@ -214,6 +215,8 @@ public class DriverFunction {
             // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
             int newLeftTarget = (getLfPosition() + getLbPosition()) / 2 + (int) (meters * COUNTS_PER_METER);
             int newRightTarget = (getRfPosition() + getRbPosition()) / 2 + (int) (meters * COUNTS_PER_METER);
+            telemetry.addData("Left Target: ", newLeftTarget);
+            telemetry.addData("Right Target: ", newLeftTarget);
 
             // reset the timeout time and start motion.
             drive_time.reset();
@@ -222,61 +225,66 @@ public class DriverFunction {
 
 
             // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-            while ((drive_time.seconds() < timeoutS) && (lessThanLeftTarget && lessThanRightTarget)) {
-                double averagePositions = (double)(Math.abs(getLfPosition()) + Math.abs(getLbPosition()) + Math.abs(getRfPosition()) + Math.abs(getRbPosition())) / 4;
+            while ((drive_time.time() < timeoutS) && (lessThanLeftTarget && lessThanRightTarget)) {
+                double averagePositions = (double) (Math.abs(getLfPosition()) + Math.abs(getLbPosition()) + Math.abs(getRfPosition()) + Math.abs(getRbPosition())) / 4;
                 double newLeftSpeed;
                 double newRightSpeed;
+
                 //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over the amount of time you set for this SubRun
-                double seconds = drive_time.seconds();
+                double seconds = drive_time.time();
+
+                // ramps up in the beginning based on the number of seconds specified
                 if (seconds < rampup) {
                     double ramp = seconds / rampup;
                     newLeftSpeed = Lspeed * ramp;
                     newRightSpeed = Rspeed * ramp;
-                }
 
                 //Keep running until you are about two rotations out
-                else if (averagePositions > (COUNTS_PER_MOTOR_REV * 2)) {
+                } else if (averagePositions > (COUNTS_PER_MOTOR_REV * 2)) {
                     newLeftSpeed = Lspeed;
                     newRightSpeed = Rspeed;
-                }
+
                 //start slowing down as you get close to the target
-                else if (averagePositions > (200) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
+                } else if (averagePositions > (200) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
                     newLeftSpeed = Lspeed * (averagePositions / 1000);
                     newRightSpeed = Rspeed * (averagePositions / 1000);
-                }
+
                 //minimum speed
-                else {
+                } else {
                     newLeftSpeed = Lspeed * .2;
                     newRightSpeed = Rspeed * .2;
 
                 }
 
+                // calculates the ratio for the wheels to spin to achieve the angle of motion
                 double speedX = Math.cos(angle - Math.toRadians(45));
                 double speedY = Math.sin(angle - Math.toRadians(45));
 
-
-                //  Pass the seed values to the motors
-                // applies the calculated speeds to work with our wheels
-
+                // Applies the calculated value to move and the angle calculation
                 powerLF += speedX * newLeftSpeed;
                 powerRB -= speedX * newRightSpeed;
                 powerLB += speedX * newLeftSpeed;
                 powerRF -= speedX * newRightSpeed;
+                finishSteering();
 
-                //Recalculates the booleans
+                telemetry.addData("Power LF", powerLF);
+                telemetry.addData("Power RB", powerRB);
+                telemetry.addData("Power LB", powerLB);
+                telemetry.addData("Power RF", powerRF);
+
+
+                // Recalculates the target value booleans
                 lessThanLeftTarget = Math.abs(getLfPosition() + getLbPosition()) / 2 < newLeftTarget;
                 lessThanRightTarget = Math.abs(getRfPosition() + getRbPosition()) / 2 < newRightTarget;
+                telemetry.update();
             }
 
             // Stop all motion;
             //Note: This is outside our while statement, this will only activate once the time, or distance has been met
-            stopAllMotors();
-            finishSteering();
+            telemetry.addData("Status: ", "Stopping steering");
 
-            // show the driver how close they got to the last target
-            telemetry.addData("Path1", "Running to %7d :%7d", newLeftTarget, newRightTarget);
-            telemetry.addData("Path2", "Running at %7d :%7d", getLfPosition(), getRfPosition());
-            telemetry.update();
+            stopAllMotors();
+
 
         }
 
