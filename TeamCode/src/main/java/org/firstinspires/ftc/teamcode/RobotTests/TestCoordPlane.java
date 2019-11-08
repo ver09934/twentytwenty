@@ -27,7 +27,12 @@ public class TestCoordPlane extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        robot.moveTo(new Coord(10, 10));
+        robot.moveTo(new Coord(25, 25));
+        robot.moveTo(new Coord(0, 25));
+        robot.moveTo(new Coord(0, 0));
+        robot.moveTo(new Coord(25, 0));
+        robot.moveTo(new Coord(25, 25));
+        robot.moveTo(new Coord(0, 0));
 
         // Initialize utilities
         runtime = new ElapsedTime();

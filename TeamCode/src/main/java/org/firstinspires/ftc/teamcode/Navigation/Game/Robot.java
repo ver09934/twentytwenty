@@ -17,7 +17,6 @@ public class Robot {
 
 
     public Robot(Field currentField) {
-        this.position = position;
         this.currentField = currentField;
         //DIST_BTW_SENSORS = dist_btw_sensors;
     }
@@ -31,7 +30,7 @@ public class Robot {
             double distance = position.distance(end_point);
             double angle = Math.asin(position.yDist(end_point) / distance);
             try {
-                encoderDrive(0.5, 0.5, currentField.convertToMeters(distance), angle, 30, 4);
+                steering.encoderDrive(0, currentField.convertToMeters(distance), angle, 30, 4);
             } catch (Exception InterruptedException){
                 telemetry.addData("Status", "Failed");
                 telemetry.update();
@@ -75,12 +74,15 @@ public class Robot {
         double diff_length = Math.abs(sensor1 - sensor2);
         return Math.atan(diff_length / DIST_BTW_SENSORS);
     }*/
-
-    public void encoderDrive(double Lspeed, double Rspeed, double meters, double angle, double timeoutS, double rampup) throws InterruptedException {
+/*
+    public void encoderDrive(double speed, double meters, double angle, double timeoutS, double rampup) throws InterruptedException {
         double COUNTS_PER_MOTOR_REV = 1120;    //Set for NevRest 20 drive. For 40's change to 1120. For 60's 1680
         double DRIVE_GEAR_REDUCTION = 1.0;     // This is the ratio between the motor axle and the wheel
         double WHEEL_DIAMETER_METERS = 0.1016;     // For figuring circumference
         double COUNTS_PER_METER = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) / (WHEEL_DIAMETER_METERS * 3.1415);
+
+        double Rspeed = speed;
+        double Lspeed = speed;
 
         //initialise some variables for the subroutine
         // Ensure that the opmode is still active
@@ -151,7 +153,7 @@ public class Robot {
         telemetry.update();
 
     }
-
+*/
 
 
 }
