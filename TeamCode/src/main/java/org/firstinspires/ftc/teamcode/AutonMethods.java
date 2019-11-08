@@ -6,14 +6,14 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-public class TestMethods {
+public class AutonMethods {
 
     HardwareMap hardwareMap;
     Telemetry telemetry;
     DriveTrain drivetrain;
     Sensors sensors;
 
-    TestMethods(HardwareMap hardwareMap, Telemetry telemetry) {
+    AutonMethods(HardwareMap hardwareMap, Telemetry telemetry) {
         this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
         this.sensors = new Sensors(hardwareMap);
@@ -22,7 +22,7 @@ public class TestMethods {
         drivetrain.setZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
-    // -------------------- START TESTS --------------------
+    // --- Start tests ---
 
     public void moveForwards(double power, double distance) {
         drivetrain.resetEncoders();
@@ -36,7 +36,7 @@ public class TestMethods {
     public static void getDistance(int distIndex) {}
     public static void move(double angle, double velocity) {}
 
-    // -------------------- END TESTS --------------------
+    // --- End tests ---
 
     static class Sensors {
 

@@ -11,8 +11,8 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 import static org.firstinspires.ftc.teamcode.DriverFunction.MIN_SPEED_RATIO;
 import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
 
-@TeleOp(name="Drive Test Tele-Op", group="TeleOp OpMode")
-public class DriveTestTeleOp extends OpMode {
+@TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
+public class SkystoneTeleOp extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
@@ -46,8 +46,8 @@ public class DriveTestTeleOp extends OpMode {
 
         motor1 = hardwareMap.dcMotor.get("intake1");
         motor2 = hardwareMap.dcMotor.get("intake2");
-        winchMotor1 = hardwareMap.dcMotor.get("winch1"); // TODO
-        winchMotor2 = hardwareMap.dcMotor.get("winch2"); // TODO
+        winchMotor1 = hardwareMap.dcMotor.get("winch1");
+        winchMotor2 = hardwareMap.dcMotor.get("winch2");
 
         motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -86,50 +86,53 @@ public class DriveTestTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        // --- gulper motors ---
+        // --- Gulper motors ---
+        // TODO: Potentially add reversing to the toggle
 
         if (this.gamepad1.b) {
             if (!bToggleLock) {
                 bToggleLock = true;
                 runGulper = !runGulper;
             }
-            telemetry.addData("B Pressed", "True");
         }
         else {
             bToggleLock = false;
-            telemetry.addData("B Pressed", "False");
         }
-
         if (runGulper) {
-            telemetry.addData("Gulpers", "True");
             motor1.setPower(1);
             motor2.setPower(1);
         }
         else {
-            telemetry.addData("Gulpers", "False");
             motor1.setPower(0);
             motor2.setPower(0);
         }
+        telemetry.addData("Gulpers running", runGulper);
 
-        // --- winch motor ---
+        // --- Winch motors ---
+        // TODO: Check if telemetry shows correct direction
+        // TODO: Add a multi-stepped run to position
 
-        double winchMotor1Speed = 0.5;
-        double winchMotor2Speed = winchMotor1Speed;
+        double winchSpeed = 0.5;
+        double winchMotor1Speed = winchSpeed;
+        double winchMotor2Speed = winchSpeed;
 
         if (this.gamepad1.left_bumper) {
             winchMotor1.setPower(winchMotor1Speed);
             winchMotor2.setPower(winchMotor2Speed);
+            telemetry.addData("Winch running", "Up");
         }
         else if (this.gamepad1.right_bumper) {
             winchMotor1.setPower(-winchMotor1Speed);
             winchMotor2.setPower(-winchMotor2Speed);
+            telemetry.addData("Winch running", "Down");
         }
         else {
             winchMotor1.setPower(0);
             winchMotor2.setPower(0);
+            telemetry.addData("Winch running", "False");
         }
 
-        // --- Gripper Servo ---
+        // --- Block Gripper Servo ---
 
         if (this.gamepad1.x) {
             if (!xToggleLock) {
@@ -146,6 +149,9 @@ public class DriveTestTeleOp extends OpMode {
             xToggleLock = false;
         }
         telemetry.addData("Servo Position", testServo.getPosition());
+
+        // --- Build Plate Clamper Servos ---
+        // TODO
 
         // ----- Gamepad 1: Driving Functions -----
 
