@@ -23,7 +23,8 @@ public class SensorTestTeleOp extends OpMode {
 
     private boolean bToggleLock = false;
     private double position1 = 1;
-    private double position2 = 0.6;
+    // private double position2 = 0.6;
+    private double position2 = 0;
 
     // Code to run ONCE when the driver hits INIT
     @Override
