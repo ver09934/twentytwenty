@@ -14,26 +14,35 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
 
+    // Important things
     private ElapsedTime runtime = new ElapsedTime();
-
     private DriverFunction driverFunction;
     private DriverFunction.Steering steering;
 
-    private boolean bToggleLock = false;
-    private boolean runGulper = false;
+    // Driving variables
+    private final static double TURNING_SPEED_BOOST = 0.3;
 
+    // DC Motors
     DcMotor motor1;
     DcMotor motor2;
-
     DcMotor winchMotor1;
     DcMotor winchMotor2;
 
+    // Servos
     private Servo testServo;
-    private boolean xToggleLock = false;
-    private double position1 = 1;
-    private double position2 = 0.6;
 
-    private final static double TURNING_SPEED_BOOST = 0.3;
+    // Toggle locks
+    private boolean gamepad1XToggleLock = false;
+    private boolean gamepad2XToggleLock = false;
+    private boolean gamepad2BToggleLock = false;
+
+    // Boolean state variables
+    private boolean directionReverse = false;
+    private boolean runGulper = false;
+
+    // Motor/servo speeds and positions
+    private double testServoPosition1 = 1;
+    private double testServoPosition2 = 0.6;
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -60,7 +69,6 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         motor1.setDirection(DcMotorSimple.Direction.REVERSE);
-
         winchMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
         motor1.setPower(0);
@@ -69,7 +77,7 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor2.setPower(0);
 
         testServo = hardwareMap.servo.get("testServo");
-        testServo.setPosition(position1);
+        testServo.setPosition(testServoPosition1);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -86,87 +94,49 @@ public class SkystoneTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        // --- Gulper motors ---
-        // TODO: Potentially add reversing to the toggle
+        // --------------------------------------------------
+        // ---------- Gamepad 1: Driving Functions ----------
+        // --------------------------------------------------
 
-        if (this.gamepad1.b) {
-            if (!bToggleLock) {
-                bToggleLock = true;
-                runGulper = !runGulper;
-            }
-        }
-        else {
-            bToggleLock = false;
-        }
-        if (runGulper) {
-            motor1.setPower(1);
-            motor2.setPower(1);
-        }
-        else {
-            motor1.setPower(0);
-            motor2.setPower(0);
-        }
-        telemetry.addData("Gulpers running", runGulper);
-
-        // --- Winch motors ---
-        // TODO: Check if telemetry shows correct direction
-        // TODO: Add a multi-stepped run to position
-
-        double winchSpeed = 0.5;
-        double winchMotor1Speed = winchSpeed;
-        double winchMotor2Speed = winchSpeed;
-
-        if (this.gamepad1.left_bumper) {
-            winchMotor1.setPower(winchMotor1Speed);
-            winchMotor2.setPower(winchMotor2Speed);
-            telemetry.addData("Winch running", "Up");
-        }
-        else if (this.gamepad1.right_bumper) {
-            winchMotor1.setPower(-winchMotor1Speed);
-            winchMotor2.setPower(-winchMotor2Speed);
-            telemetry.addData("Winch running", "Down");
-        }
-        else {
-            winchMotor1.setPower(0);
-            winchMotor2.setPower(0);
-            telemetry.addData("Winch running", "False");
-        }
-
-        // --- Block Gripper Servo ---
-
+        // X Button: Toggle direction reverse
         if (this.gamepad1.x) {
-            if (!xToggleLock) {
-                xToggleLock = true;
-                if (testServo.getPosition() == position1) {
-                    testServo.setPosition(position2);
-                }
-                else {
-                    testServo.setPosition(position1);
-                }
+            if (!gamepad1XToggleLock) {
+                gamepad1XToggleLock = true;
+                directionReverse = !directionReverse;
             }
         }
         else {
-            xToggleLock = false;
+            gamepad1XToggleLock = false;
         }
-        telemetry.addData("Servo Position", testServo.getPosition());
-
-        // --- Build Plate Clamper Servos ---
-        // TODO
-
-        // ----- Gamepad 1: Driving Functions -----
 
         // D-Pad: Compass rose drive
-        if (this.gamepad1.dpad_right) {
-            steering.moveDegrees(180, MIN_SPEED_RATIO);
+        if (!directionReverse) {
+            if (this.gamepad1.dpad_right) {
+                steering.moveDegrees(180, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_up) {
+                steering.moveDegrees(270, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_left) {
+                steering.moveDegrees(0, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_down) {
+                steering.moveDegrees(90, MIN_SPEED_RATIO);
+            }
         }
-        if (this.gamepad1.dpad_up) {
-            steering.moveDegrees(270, MIN_SPEED_RATIO);
-        }
-        if (this.gamepad1.dpad_left) {
-            steering.moveDegrees(0, MIN_SPEED_RATIO);
-        }
-        if (this.gamepad1.dpad_down) {
-            steering.moveDegrees(90, MIN_SPEED_RATIO);
+        else {
+            if (this.gamepad1.dpad_right) {
+                steering.moveDegrees(0, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_up) {
+                steering.moveDegrees(90, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_left) {
+                steering.moveDegrees(180, MIN_SPEED_RATIO);
+            }
+            if (this.gamepad1.dpad_down) {
+                steering.moveDegrees(270, MIN_SPEED_RATIO);
+            }
         }
 
         // Left/Right Triggers: Set driving speed ratio
@@ -192,13 +162,87 @@ public class SkystoneTeleOp extends OpMode {
 
         // Left Stick: Drive/Strafe
         if (Math.abs(this.gamepad1.left_stick_x) > 0.1 || Math.abs(this.gamepad1.left_stick_y) > 0.1) {
-            double angle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x);
+            double angle;
+            if (!directionReverse) {
+                angle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x);
+            }
+            else {
+                angle = Math.atan2(-gamepad1.left_stick_y, gamepad1.left_stick_x);
+            }
             telemetry.addData("Angle", angle);
             steering.moveRadians(angle);
         }
         else {
             telemetry.addData("Angle", 0);
         }
+
+        // --------------------------------------------------
+        // ---------- Gamepad 2: Gunner Functions -----------
+        // --------------------------------------------------
+
+        // --- B Button: Gulper motors ---
+        // TODO: Add reversing to the toggle
+        if (this.gamepad2.b) {
+            if (!gamepad2BToggleLock) {
+                gamepad2BToggleLock = true;
+                runGulper = !runGulper;
+            }
+        }
+        else {
+            gamepad2BToggleLock = false;
+        }
+        if (runGulper) {
+            motor1.setPower(1);
+            motor2.setPower(1);
+        }
+        else {
+            motor1.setPower(0);
+            motor2.setPower(0);
+        }
+        telemetry.addData("Gulpers running", runGulper);
+
+        // --- Left/Right Bumpers: Winch motors ---
+        // TODO: Check if telemetry shows correct direction
+        // TODO: Add a multi-stepped run to position
+        double winchSpeed = 0.5;
+        double winchMotor1Speed = winchSpeed;
+        double winchMotor2Speed = winchSpeed;
+        if (this.gamepad2.left_bumper) {
+            winchMotor1.setPower(winchMotor1Speed);
+            winchMotor2.setPower(winchMotor2Speed);
+            telemetry.addData("Winch running", "Up");
+        }
+        else if (this.gamepad2.right_bumper) {
+            winchMotor1.setPower(-winchMotor1Speed);
+            winchMotor2.setPower(-winchMotor2Speed);
+            telemetry.addData("Winch running", "Down");
+        }
+        else {
+            winchMotor1.setPower(0);
+            winchMotor2.setPower(0);
+            telemetry.addData("Winch running", "False");
+        }
+
+        // --- X Button: Block Gripper Servo ---
+        // TODO: How should this be changed?
+        if (this.gamepad2.x) {
+            if (!gamepad2XToggleLock) {
+                gamepad2XToggleLock = true;
+                if (testServo.getPosition() == testServoPosition1) {
+                    testServo.setPosition(testServoPosition2);
+                }
+                else {
+                    testServo.setPosition(testServoPosition1);
+                }
+            }
+        }
+        else {
+            gamepad2XToggleLock = false;
+        }
+        telemetry.addData("Servo Position", testServo.getPosition());
+
+        // --- Build Plate Clamper Servos ---
+        // TODO
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
