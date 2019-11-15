@@ -51,14 +51,22 @@ public class TestServoTeleOp extends OpMode {
 
         if (this.gamepad1.dpad_right) {
             if (!dpadRightLeftToggleLock) {
+                boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
                 lowPosition += positionAdjustIncrement;
+                if (updatePosition) {
+                    testServo.setPosition(lowPosition);
+                }
             }
         }
         else if (this.gamepad1.dpad_left) {
             if (!dpadRightLeftToggleLock) {
+                boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
                 lowPosition -= positionAdjustIncrement;
+                if (updatePosition) {
+                    testServo.setPosition(lowPosition);
+                }
             }
         }
         else {
@@ -67,14 +75,22 @@ public class TestServoTeleOp extends OpMode {
 
         if (this.gamepad1.dpad_up) {
             if (!dpadUpDownToggleLock) {
+                boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
                 highPosition += positionAdjustIncrement;
+                if (updatePosition) {
+                    testServo.setPosition(highPosition);
+                }
             }
         }
         else if (this.gamepad1.dpad_down) {
             if (!dpadUpDownToggleLock) {
+                boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
                 highPosition -= positionAdjustIncrement;
+                if (updatePosition) {
+                    testServo.setPosition(highPosition);
+                }
             }
         }
         else {
