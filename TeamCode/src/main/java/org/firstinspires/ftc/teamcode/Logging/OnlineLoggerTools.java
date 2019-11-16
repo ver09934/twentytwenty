@@ -8,7 +8,7 @@ public class OnlineLoggerTools implements LoggerTools {
         tel = telemetry;
     }
 
-    public void o(String text) {
+    public void log(String text) {
         tel.addData("Status", text);
         tel.update();
     }

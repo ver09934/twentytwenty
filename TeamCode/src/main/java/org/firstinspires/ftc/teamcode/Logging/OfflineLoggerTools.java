@@ -4,7 +4,7 @@ public class OfflineLoggerTools implements LoggerTools {
     public OfflineLoggerTools() {
     }
 
-    public void o(String text) {
+    public void log(String text) {
         System.out.println(text);
     }
 }
