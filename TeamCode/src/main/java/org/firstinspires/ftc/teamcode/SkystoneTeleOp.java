@@ -29,7 +29,7 @@ public class SkystoneTeleOp extends OpMode {
     DcMotor winchMotor2;
 
     // Servos
-    private Servo testServo;
+    private Servo blockServo;
 
     // Toggle locks
     private boolean gamepad1XToggleLock = false;
@@ -40,9 +40,18 @@ public class SkystoneTeleOp extends OpMode {
     private boolean directionReverse = false;
     private boolean runGulper = false;
 
-    // Motor/servo speeds and positions
+    // Test servo positions
     private double testServoPosition1 = 1;
     private double testServoPosition2 = 0.6;
+
+    // Winch motor speeds
+    private double winchSpeed = 0.5;
+    private double winchMotor1Speed = winchSpeed;
+    private double winchMotor2Speed = winchSpeed;
+
+    // Gulper motor speeds
+    private double gulperForwardPower = 1;
+    private double gulperOffPower = 0;
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -76,8 +85,8 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor1.setPower(0);
         winchMotor2.setPower(0);
 
-        testServo = hardwareMap.servo.get("testServo");
-        testServo.setPosition(testServoPosition1);
+        blockServo = hardwareMap.servo.get("testServo");
+        blockServo.setPosition(testServoPosition1);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -108,6 +117,7 @@ public class SkystoneTeleOp extends OpMode {
         else {
             gamepad1XToggleLock = false;
         }
+        telemetry.addData("Direction Reverse", directionReverse);
 
         // D-Pad: Compass rose drive
         if (!directionReverse) {
@@ -192,30 +202,26 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2BToggleLock = false;
         }
         if (runGulper) {
-            motor1.setPower(1);
-            motor2.setPower(1);
+            motor1.setPower(gulperForwardPower);
+            motor2.setPower(gulperForwardPower);
         }
         else {
-            motor1.setPower(0);
-            motor2.setPower(0);
+            motor1.setPower(gulperOffPower);
+            motor2.setPower(gulperOffPower);
         }
         telemetry.addData("Gulpers running", runGulper);
 
         // --- Left/Right Bumpers: Winch motors ---
-        // TODO: Check if telemetry shows correct direction
         // TODO: Add a multi-stepped run to position
-        double winchSpeed = 0.5;
-        double winchMotor1Speed = winchSpeed;
-        double winchMotor2Speed = winchSpeed;
         if (this.gamepad2.left_bumper) {
             winchMotor1.setPower(winchMotor1Speed);
             winchMotor2.setPower(winchMotor2Speed);
-            telemetry.addData("Winch running", "Up");
+            telemetry.addData("Winch running", "Down");
         }
         else if (this.gamepad2.right_bumper) {
             winchMotor1.setPower(-winchMotor1Speed);
             winchMotor2.setPower(-winchMotor2Speed);
-            telemetry.addData("Winch running", "Down");
+            telemetry.addData("Winch running", "Up");
         }
         else {
             winchMotor1.setPower(0);
@@ -224,22 +230,21 @@ public class SkystoneTeleOp extends OpMode {
         }
 
         // --- X Button: Block Gripper Servo ---
-        // TODO: How should this be changed?
         if (this.gamepad2.x) {
             if (!gamepad2XToggleLock) {
                 gamepad2XToggleLock = true;
-                if (testServo.getPosition() == testServoPosition1) {
-                    testServo.setPosition(testServoPosition2);
+                if (blockServo.getPosition() == testServoPosition1) {
+                    blockServo.setPosition(testServoPosition2);
                 }
                 else {
-                    testServo.setPosition(testServoPosition1);
+                    blockServo.setPosition(testServoPosition1);
                 }
             }
         }
         else {
             gamepad2XToggleLock = false;
         }
-        telemetry.addData("Servo Position", testServo.getPosition());
+        telemetry.addData("Block Servo Position", blockServo.getPosition());
 
         // --- Build Plate Clamper Servos ---
         // TODO
