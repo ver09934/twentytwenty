@@ -1,16 +1,15 @@
 package org.firstinspires.ftc.teamcode.RobotTests;
 
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.Driving.DriverFunction;
+import org.firstinspires.ftc.teamcode.Logging.LoggerTools;
+import org.firstinspires.ftc.teamcode.Logging.OnlineLoggerTools;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Field;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
 
-
-@Autonomous(name = "CoordPlaneTest")
-public class TestCoordPlane extends LinearOpMode {
+public class TestOffline extends LinearOpMode {
     private DriverFunction driverFunction;
     private DriverFunction.Steering steering;
 

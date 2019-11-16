@@ -31,20 +31,24 @@ public class Robot {
     public void moveTo(Coord end_point, double speed) {
         telemetry.addData("Status", "Starting move");
         telemetry.update();
-        // Checks the point is possible
-        double distance = position.distance(end_point);
-        // Gets the angle for the robot to move
-        double angle = Math.asin(position.yDist(end_point) / distance);
 
-        try {
-            //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
-            steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 100, 2, drive_time);
-        } catch (Exception InterruptedException){
-            telemetry.addData("Status", "Failed");
-            telemetry.update();
-        }
+
+            // Checks the point is possible
+            double distance = position.distance(end_point);
+            // Gets the angle for the robot to move
+            double angle = Math.asin(position.yDist(end_point) / distance);
+
+
+            try {
+                //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
+                steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 3, 2, drive_time);
+                position = end_point;
+            } catch (Exception InterruptedException){
+                telemetry.addData("Status", "Failed");
+                telemetry.update();
+            }
+        // test
         if (currentField.coordInRectangle(end_point)) {
-
         }
     }
 
