@@ -7,6 +7,8 @@ import org.firstinspires.ftc.teamcode.Driving.DriverFunction;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Field;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
+import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
+import org.firstinspires.ftc.teamcode.Tools.Logger.OfflineLoggerTools;
 
 
 @Autonomous(name = "CoordPlaneTest")
@@ -22,7 +24,8 @@ public class TestCoordPlane extends LinearOpMode {
         driverFunction = new DriverFunction(hardwareMap, telemetry);
         ElapsedTime elapsedTime = new ElapsedTime();
         elapsedTime.reset();
-        Robot robot = new Robot(field, driverFunction, telemetry, elapsedTime);
+        LoggerTools logger = new OfflineLoggerTools();
+        Robot robot = new Robot(logger);
         steering = driverFunction.getSteering();
 
         sleep(500);

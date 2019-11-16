@@ -1,27 +1,30 @@
 package org.firstinspires.ftc.teamcode.Navigation.Game;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
+
 import org.firstinspires.ftc.teamcode.Driving.DriverFunction;
+import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.*;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 
 public class Robot {
+    private Field currentField;
     private Coord position = new Coord(0, 0);
     private double direction_deg = 0;
-    private Field currentField;
-    Telemetry telemetry;
+
+    LoggerTools logger;
     public DriverFunction driverFunction;
     public DriverFunction.Steering steering;
     private ElapsedTime drive_time;
 
 
-    public Robot(Field currentField, DriverFunction driverFunction, Telemetry telemetry, ElapsedTime time) {
+    public Robot(LoggerTools logger) {
+        this.logger = logger;
         this.currentField = currentField;
         this.driverFunction = driverFunction;
+
         this.steering = driverFunction.getSteering();
-        this.telemetry = telemetry;
-        this.drive_time = time;
+        //this.drive_time = time;
     }
 
     private void addDegrees(double deg_add) {
@@ -29,25 +32,24 @@ public class Robot {
     }
 
     public void moveTo(Coord end_point, double speed) {
-        telemetry.addData("Status", "Starting move");
-        telemetry.update();
+        logger.add("Status", "Starting movement", true);
 
 
-            // Checks the point is possible
-            double distance = position.distance(end_point);
-            // Gets the angle for the robot to move
-            double angle = Math.asin(position.yDist(end_point) / distance);
+        // Checks the point is possible
+        double distance = position.distance(end_point);
+        // Gets the angle for the robot to move
+        double angle = Math.asin(position.yDist(end_point) / distance);
+        addDegrees(angle);
 
 
-            try {
-                //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
-                steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 3, 2, drive_time);
-                position = end_point;
-            } catch (Exception InterruptedException){
-                telemetry.addData("Status", "Failed");
-                telemetry.update();
-            }
-        // test
+        try {
+            //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
+            steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 3, 2, drive_time);
+            position = end_point;
+        } catch (Exception InterruptedException) {
+            logger.add("Status:", "Failed", true);
+        }
+        // TODO fix coord in rectangle check
         if (currentField.coordInRectangle(end_point)) {
         }
     }
