@@ -60,15 +60,20 @@ public class Coord {
         boolean outside_pt1_bounds = (x <= line.pt1.x && y <= line.pt1.y);
         boolean outside_pt2_bounds = (x >= line.pt1.x && y >= line.pt2.x);
 
-            double segment_dist = line.getLength();
-            double dist_a = line.pt1.distance(this);
-            double dist_b = line.pt2.distance(this);
+        if (outside_pt1_bounds) {
+            return this.distance(line.pt1);
+        } else if (outside_pt2_bounds) {
+            return this.distance(line.pt2);
+        }
 
-            // Calculates angle between actual line segment and segment "a"
-            double angle_theta = Math.acos((Math.pow(dist_b, 2) - Math.pow(dist_a, 2) - Math.pow(segment_dist, 2)) / (-2 * dist_a * segment_dist));
-            // calculate distance from point to line (aka height of triangle made)
-            return dist_a * Math.sin(angle_theta);
-            //Actual formula
+        double segment_dist = line.getLength();
+        double dist_a = line.pt1.distance(this);
+        double dist_b = line.pt2.distance(this);
+
+        // Calculates angle between actual line segment and segment "a"
+        double angle_theta = Math.acos((Math.pow(dist_b, 2) - Math.pow(dist_a, 2) - Math.pow(segment_dist, 2)) / (-2 * dist_a * segment_dist));
+        // calculate distance from point to line (aka height of triangle made)
+        return dist_a * Math.sin(angle_theta);
 
     }
 

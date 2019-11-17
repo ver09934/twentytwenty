@@ -21,8 +21,8 @@ public class Field extends Rectangle {
     }
 
     //Sorry for the long names, please don't shoot me
-    double convertToCoord(double meters) {
-        return meters / UNIT_CONV_FACTOR;
+    double convertToCoord(double length) {
+        return length / UNIT_CONV_FACTOR;
     }
 
 }

@@ -7,30 +7,21 @@ public interface MoveTools {
     Steering getSteering();
     LoggerTools getLogger();
 
-    double MAX_SPEED_RATIO = 1;
-    double NORMAL_SPEED_RATIO = 0.5;
-    double MIN_SPEED_RATIO = 0.3;
-    double DEFAULT_SMOOTHNESS = 2;
+    DrivingMotor[] getAllMotors();
+    DrivingMotor getMotor(String motor_name);
+    DrivingMotor getMotor(int motor_index);
+    public void resetAllEncoders();
 
-    public DrivingMotor getLf();
-    public DrivingMotor getLb();
-    public DrivingMotor getRf();
-    public DrivingMotor getRb();
 
-    public int lfPosition();
-    public int lbPosition();
-    public int rfPosition();
-    public int rbPosition();
-
-    public void getMotor();
-
-    public interface DrivingMotor {
+    interface DrivingMotor {
         void applyPower(double power);
-        void resetEncoders();
-        int getPosition();
+
+        void resetEncoder();
+
+        int position();
 
         // Nested class providing a weighted value
-        public class WeightedValue {
+        class WeightedValue {
 
             private double value = 0;
             private double smoothness;
@@ -50,23 +41,25 @@ public interface MoveTools {
         }
     }
 
-    public interface Steering {
-        double powerLF = 0;
-        double powerLB = 0;
-        double powerRF = 0;
-        double powerRB = 0;
+    interface Steering {
 
-        double speedRatio = NORMAL_SPEED_RATIO;
-        public void setSpeedRatio(double speedRatio);
-        public double getSpeedRatio();
+        void setSpeedRatio(double speedRatio);
 
-        public void addToAllPowers(double power);
-        public void stopAllMotors();
+        double getSpeedRatio();
 
-        public void moveSeconds(double seconds, double angle);
-        public void moveDistance(double distance, double angle);
+        void addToAllPowers(double power);
 
-        public void finishSteering();
+        void setAllPowers(double power);
+
+        void stopAllMotors();
+
+        void moveSeconds(double seconds, double angle, double power);
+
+        void moveDistance(double distance, double angle, double power);
+
+        void moveDistance(double distance, double angle, double power, double rampup, double timeoutSeconds);
+
+        void finishSteering();
     }
 
 }
