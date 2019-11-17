@@ -54,6 +54,8 @@ public class SkystoneTeleOp extends OpMode {
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
     private int[] winchMotorPositions = {0, 500, 1000, 1500};
+    private int[] winchMotor1Offsets = {0, 0, 0, 0};
+    private int[] winchMotor2Offsets = {0, 0, 0, 0};
     private int currentWinchIndex = 0;
 
     // Gulper motor speeds
@@ -121,8 +123,8 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor1.setPower(winchMotor1Power);
         winchMotor2.setPower(winchMotor2Power);
         winchesPowered = true;
-        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
-        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
+        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -280,8 +282,8 @@ public class SkystoneTeleOp extends OpMode {
                 gamepad2BumperToggleLock = true;
                 if (currentWinchIndex > 0) {
                     currentWinchIndex -= 1;
-                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
-                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
+                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
                 }
             }
         }
@@ -290,8 +292,8 @@ public class SkystoneTeleOp extends OpMode {
                 gamepad2BumperToggleLock = true;
                 if (currentWinchIndex < winchMotorPositions.length - 1) {
                     currentWinchIndex += 1;
-                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
-                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
+                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
                 }
             }
         }
