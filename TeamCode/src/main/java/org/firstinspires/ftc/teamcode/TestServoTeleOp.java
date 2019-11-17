@@ -9,18 +9,26 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 public class TestServoTeleOp extends OpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
-
     private Servo testServo;
 
     private double lowPosition = 0;
     private double highPosition = 1;
 
-    private double positionAdjustIncrement = 0.05;
+    private double fineAdjustIncrement = 0.01;
+    private double coarseAdjustIncrement = 0.1;
 
     private boolean dpadRightLeftToggleLock = false;
     private boolean dpadUpDownToggleLock = false;
-
     private boolean bToggleLock = false;
+
+    private double getIncrement() {
+        if (this.gamepad1.left_trigger > 0.5 || this.gamepad2.right_trigger > 0.5) {
+            return fineAdjustIncrement;
+        }
+        else {
+            return coarseAdjustIncrement;
+        }
+    }
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -45,15 +53,12 @@ public class TestServoTeleOp extends OpMode {
     @Override
     public void loop() {
 
-        // TODO: Right and Left Triggers: Adjust increment
-
-        // D-Pad: Adjust low and high positions
-
+        // D-Pad Right/Left: Adjust low position
         if (this.gamepad1.dpad_right) {
             if (!dpadRightLeftToggleLock) {
                 boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
-                lowPosition += positionAdjustIncrement;
+                lowPosition += getIncrement();
                 if (updatePosition) {
                     testServo.setPosition(lowPosition);
                 }
@@ -63,7 +68,7 @@ public class TestServoTeleOp extends OpMode {
             if (!dpadRightLeftToggleLock) {
                 boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
-                lowPosition -= positionAdjustIncrement;
+                lowPosition -= getIncrement();
                 if (updatePosition) {
                     testServo.setPosition(lowPosition);
                 }
@@ -73,11 +78,12 @@ public class TestServoTeleOp extends OpMode {
             dpadRightLeftToggleLock = false;
         }
 
+        // D-Pad Up/Down: Adjust high position
         if (this.gamepad1.dpad_up) {
             if (!dpadUpDownToggleLock) {
                 boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
-                highPosition += positionAdjustIncrement;
+                highPosition += getIncrement();
                 if (updatePosition) {
                     testServo.setPosition(highPosition);
                 }
@@ -87,7 +93,7 @@ public class TestServoTeleOp extends OpMode {
             if (!dpadUpDownToggleLock) {
                 boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
-                highPosition -= positionAdjustIncrement;
+                highPosition -= getIncrement();
                 if (updatePosition) {
                     testServo.setPosition(highPosition);
                 }
@@ -97,6 +103,7 @@ public class TestServoTeleOp extends OpMode {
             dpadUpDownToggleLock = false;
         }
 
+        // B Button: Toggle Servo Position
         if (this.gamepad1.b) {
             if (!bToggleLock) {
                 bToggleLock = true;
@@ -112,7 +119,8 @@ public class TestServoTeleOp extends OpMode {
             bToggleLock = false;
         }
 
-        telemetry.addData("Position Adjust Increment", positionAdjustIncrement);
+        telemetry.addData("Fine Adjust Increment", fineAdjustIncrement);
+        telemetry.addData("Coarse Adjust Increment", coarseAdjustIncrement);
         telemetry.addData("Low Position", lowPosition);
         telemetry.addData("High Position", highPosition);
         telemetry.addData("Servo Position", testServo.getPosition());
@@ -125,5 +133,4 @@ public class TestServoTeleOp extends OpMode {
     @Override
     public void stop() {
     }
-
 }
