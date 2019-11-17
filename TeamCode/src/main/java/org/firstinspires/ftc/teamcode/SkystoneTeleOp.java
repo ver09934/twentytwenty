@@ -23,8 +23,8 @@ public class SkystoneTeleOp extends OpMode {
     private final static double TURNING_SPEED_BOOST = 0.3;
 
     // DC Motors
-    DcMotor motor1;
-    DcMotor motor2;
+    DcMotor gulperMotor1;
+    DcMotor gulperMotor2;
     DcMotor winchMotor1;
     DcMotor winchMotor2;
 
@@ -33,11 +33,13 @@ public class SkystoneTeleOp extends OpMode {
 
     // Toggle locks
     private boolean gamepad1XToggleLock = false;
-    private boolean gamepad2XToggleLock = false;
+    private boolean gamepad2AToggleLock = false;
     private boolean gamepad2BToggleLock = false;
+    private boolean gamepad2XToggleLock = false;
 
     // Boolean state variables
-    private boolean directionReverse = false;
+    private boolean driveDirectionReverse = false;
+    private boolean gulperReverse = false;
     private boolean runGulper = false;
 
     // Test servo positions
@@ -51,6 +53,7 @@ public class SkystoneTeleOp extends OpMode {
 
     // Gulper motor speeds
     private double gulperForwardPower = 1;
+    private double gulperReversePower = -1;
     private double gulperOffPower = 0;
 
     // Code to run ONCE when the driver hits INIT
@@ -62,26 +65,26 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
 
-        motor1 = hardwareMap.dcMotor.get("intake1");
-        motor2 = hardwareMap.dcMotor.get("intake2");
+        gulperMotor1 = hardwareMap.dcMotor.get("intake1");
+        gulperMotor2 = hardwareMap.dcMotor.get("intake2");
         winchMotor1 = hardwareMap.dcMotor.get("winch1");
         winchMotor2 = hardwareMap.dcMotor.get("winch2");
 
-        motor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        motor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        gulperMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        motor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        gulperMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        gulperMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         winchMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
-        motor1.setDirection(DcMotorSimple.Direction.REVERSE);
+        gulperMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
         winchMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
 
-        motor1.setPower(0);
-        motor2.setPower(0);
+        gulperMotor1.setPower(0);
+        gulperMotor2.setPower(0);
         winchMotor1.setPower(0);
         winchMotor2.setPower(0);
 
@@ -111,16 +114,16 @@ public class SkystoneTeleOp extends OpMode {
         if (this.gamepad1.x) {
             if (!gamepad1XToggleLock) {
                 gamepad1XToggleLock = true;
-                directionReverse = !directionReverse;
+                driveDirectionReverse = !driveDirectionReverse;
             }
         }
         else {
             gamepad1XToggleLock = false;
         }
-        telemetry.addData("Direction Reverse", directionReverse);
+        telemetry.addData("Direction Reverse", driveDirectionReverse);
 
         // D-Pad: Compass rose drive
-        if (!directionReverse) {
+        if (!driveDirectionReverse) {
             if (this.gamepad1.dpad_right) {
                 steering.moveDegrees(180, MIN_SPEED_RATIO);
             }
@@ -173,7 +176,7 @@ public class SkystoneTeleOp extends OpMode {
         // Left Stick: Drive/Strafe
         if (Math.abs(this.gamepad1.left_stick_x) > 0.1 || Math.abs(this.gamepad1.left_stick_y) > 0.1) {
             double angle;
-            if (!directionReverse) {
+            if (!driveDirectionReverse) {
                 angle = Math.atan2(gamepad1.left_stick_y, -gamepad1.left_stick_x);
             }
             else {
@@ -190,8 +193,18 @@ public class SkystoneTeleOp extends OpMode {
         // ---------- Gamepad 2: Gunner Functions -----------
         // --------------------------------------------------
 
+        // --- A Button: Toggle Gulper Direction ---
+        if (this.gamepad2.a) {
+            if (!gamepad2AToggleLock) {
+                gamepad2AToggleLock = true;
+                gulperReverse = !gulperReverse;
+            }
+        }
+        else {
+            gamepad2AToggleLock = false;
+        }
+
         // --- B Button: Gulper motors ---
-        // TODO: Add reversing to the toggle
         if (this.gamepad2.b) {
             if (!gamepad2BToggleLock) {
                 gamepad2BToggleLock = true;
@@ -202,13 +215,20 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2BToggleLock = false;
         }
         if (runGulper) {
-            motor1.setPower(gulperForwardPower);
-            motor2.setPower(gulperForwardPower);
+            if (!gulperReverse) {
+                gulperMotor1.setPower(gulperForwardPower);
+                gulperMotor2.setPower(gulperForwardPower);
+            }
+            else {
+                gulperMotor1.setPower(gulperReversePower);
+                gulperMotor2.setPower(gulperReversePower);
+            }
         }
         else {
-            motor1.setPower(gulperOffPower);
-            motor2.setPower(gulperOffPower);
+            gulperMotor1.setPower(gulperOffPower);
+            gulperMotor2.setPower(gulperOffPower);
         }
+        telemetry.addData("Gulper Reverse", gulperReverse);
         telemetry.addData("Gulpers running", runGulper);
 
         // --- Left/Right Bumpers: Winch motors ---
