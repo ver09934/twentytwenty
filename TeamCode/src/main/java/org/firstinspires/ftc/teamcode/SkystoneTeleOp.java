@@ -36,6 +36,7 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2AToggleLock = false;
     private boolean gamepad2BToggleLock = false;
     private boolean gamepad2XToggleLock = false;
+    private boolean gamepad2BumperToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
@@ -46,10 +47,12 @@ public class SkystoneTeleOp extends OpMode {
     private double testServoPosition1 = 1;
     private double testServoPosition2 = 0.6;
 
-    // Winch motor speeds
-    private double winchSpeed = 0.5;
-    private double winchMotor1Speed = winchSpeed;
-    private double winchMotor2Speed = winchSpeed;
+    // Winch things
+    private double winchPower = 0.3;
+    private double winchMotor1Power = winchPower;
+    private double winchMotor2Power = winchPower;
+    private int[] winchMotorPositions = {0, 500, 1000, 1500};
+    private int currentWinchIndex = 0;
 
     // Gulper motor speeds
     private double gulperForwardPower = 1;
@@ -72,8 +75,10 @@ public class SkystoneTeleOp extends OpMode {
 
         gulperMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        winchMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winchMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winchMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        winchMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         gulperMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gulperMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -85,8 +90,17 @@ public class SkystoneTeleOp extends OpMode {
 
         gulperMotor1.setPower(0);
         gulperMotor2.setPower(0);
+
         winchMotor1.setPower(0);
         winchMotor2.setPower(0);
+
+        /* The encoder functions available to us:
+        winchMotor1.setPower(0);
+        winchMotor1.setTargetPosition(0);
+        int tmp = winchMotor1.getTargetPosition();
+        boolean tmp = winchMotor1.isBusy();
+        int tmp = winchMotor1.getCurrentPosition();
+         */
 
         blockServo = hardwareMap.servo.get("testServo");
         blockServo.setPosition(testServoPosition1);
@@ -100,6 +114,10 @@ public class SkystoneTeleOp extends OpMode {
     @Override
     public void start() {
         runtime.reset();
+        winchMotor1.setPower(winchMotor1Power);
+        winchMotor2.setPower(winchMotor2Power);
+        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -231,23 +249,39 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Gulper Reverse", gulperReverse);
         telemetry.addData("Gulpers running", runGulper);
 
+        // --- Y Button: Toggle Winch Power (for safety) ---
+        // TODO
+        // telemetry.addData("Winches Powered", winchPowered);
+
         // --- Left/Right Bumpers: Winch motors ---
-        // TODO: Add a multi-stepped run to position
         if (this.gamepad2.left_bumper) {
-            winchMotor1.setPower(winchMotor1Speed);
-            winchMotor2.setPower(winchMotor2Speed);
-            telemetry.addData("Winch running", "Down");
+            if (!gamepad2BumperToggleLock) {
+                gamepad2BumperToggleLock = true;
+                if (currentWinchIndex > 0) {
+                    currentWinchIndex -= 1;
+                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                }
+            }
         }
         else if (this.gamepad2.right_bumper) {
-            winchMotor1.setPower(-winchMotor1Speed);
-            winchMotor2.setPower(-winchMotor2Speed);
-            telemetry.addData("Winch running", "Up");
+            if (!gamepad2BumperToggleLock) {
+                gamepad2BumperToggleLock = true;
+                if (currentWinchIndex < winchMotorPositions.length - 1) {
+                    currentWinchIndex += 1;
+                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+                }
+            }
         }
         else {
-            winchMotor1.setPower(0);
-            winchMotor2.setPower(0);
-            telemetry.addData("Winch running", "False");
+            gamepad2BumperToggleLock = false;
         }
+        telemetry.addData("Winch Index", currentWinchIndex);
+        telemetry.addData("Winch 1 Target", winchMotor1.getTargetPosition());
+        telemetry.addData("Winch 2 Target", winchMotor2.getTargetPosition());
+        telemetry.addData("Winch 1 Current", winchMotor1.getCurrentPosition());
+        telemetry.addData("Winch 2 Current", winchMotor2.getCurrentPosition());
 
         // --- X Button: Block Gripper Servo ---
         if (this.gamepad2.x) {
