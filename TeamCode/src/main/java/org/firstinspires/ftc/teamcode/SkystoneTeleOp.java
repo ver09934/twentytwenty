@@ -36,12 +36,14 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2AToggleLock = false;
     private boolean gamepad2BToggleLock = false;
     private boolean gamepad2XToggleLock = false;
+    private boolean gamepad2YToggleLock = false;
     private boolean gamepad2BumperToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
     private boolean gulperReverse = false;
     private boolean runGulper = false;
+    private boolean winchesPowered = false;
 
     // Test servo positions
     private double testServoPosition1 = 1;
@@ -93,9 +95,11 @@ public class SkystoneTeleOp extends OpMode {
 
         winchMotor1.setPower(0);
         winchMotor2.setPower(0);
+        winchesPowered = false;
 
         /* The encoder functions available to us:
         winchMotor1.setPower(0);
+        double tmp = winchMotor1.getPower();
         winchMotor1.setTargetPosition(0);
         int tmp = winchMotor1.getTargetPosition();
         boolean tmp = winchMotor1.isBusy();
@@ -116,6 +120,7 @@ public class SkystoneTeleOp extends OpMode {
         runtime.reset();
         winchMotor1.setPower(winchMotor1Power);
         winchMotor2.setPower(winchMotor2Power);
+        winchesPowered = true;
         winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
         winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
     }
@@ -250,8 +255,24 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Gulpers running", runGulper);
 
         // --- Y Button: Toggle Winch Power (for safety) ---
-        // TODO
-        // telemetry.addData("Winches Powered", winchPowered);
+        if (this.gamepad2.y) {
+            if (!gamepad2YToggleLock) {
+                gamepad2YToggleLock = true;
+                winchesPowered = !winchesPowered;
+            }
+        }
+        else {
+            gamepad2YToggleLock = false;
+        }
+        if (winchesPowered) {
+            winchMotor1.setPower(winchMotor1Power);
+            winchMotor2.setPower(winchMotor2Power);
+        }
+        else {
+            winchMotor1.setPower(0);
+            winchMotor2.setPower(0);
+        }
+        telemetry.addData("Winches Powered", winchesPowered);
 
         // --- Left/Right Bumpers: Winch motors ---
         if (this.gamepad2.left_bumper) {
