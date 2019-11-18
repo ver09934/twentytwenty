@@ -60,7 +60,7 @@ public class SkystoneTeleOp extends OpMode {
 
     // Gulper motor speeds
     private double gulperForwardPower = 1;
-    private double gulperReversePower = -1;
+    private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
 
     // Code to run ONCE when the driver hits INIT
