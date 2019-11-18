@@ -37,6 +37,7 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.CameraDirection;
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
+import com.qualcomm.robotcore.util.ElaspedTime;
 
 import java.util.List;
 
@@ -50,9 +51,32 @@ import java.util.List;
  * IMPORTANT: In order to use this OpMode, you need to obtain your own Vuforia license key as
  * is explained below.
  */
-@TeleOp(name = "Concept: TensorFlow Object Detection", group = "Concept")
+@TeleOp(name = "Skystone Detect Test", group = "Concept")
 // @Disabled
 public class TestTensorFlowObjectDetection extends LinearOpMode {
+
+    private ElapsedTime runtime;
+    private DriverFunction driverFunction;
+    private DriverFunction.Steering steering;
+
+    public static final double MAX_COAST_SECONDS = 6;
+
+    public static final double NORMAL_SPEED_RATIO = 0.3;
+    public static final double MEDIUM_SPEED_RATIO = 0.5;
+    public static final double FAST_SPEED_RATIO = 0.7;
+
+    public static final long MOVE_DELAY_MS = 50;
+    public static final long LONG_DELAY_MS = 300;
+
+    private static final long CRATER_ADVANCE_MS = 1100;
+    private static final long CRATER_RETREAT_MS = 850;
+
+    private static final long DEPOT_TURN_MS = 3000;
+    private static final long MARKER_DROP_DELAY_MS = 800;
+
+    private static final int CV_ITERATIONS = 5;
+    private static final long CV_LOOP_DELAY = 200;
+
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
@@ -86,6 +110,18 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+
+        // --- Init ---
+
+        // Initial telemetry
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        // Initialize utilities
+        runtime = new ElaspedTime();
+        driverFunction = new DriverFunction(hardwareMap, telemetry);
+        steering = driverFunction.getSteering();
+
         // The TFObjectDetector uses the camera frames from the VuforiaLocalizer, so we create that
         // first.
         initVuforia();
