@@ -4,7 +4,7 @@ package org.firstinspires.ftc.teamcode.Tools.Move;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 
 public interface MoveTools {
-    Steering getSteering();
+    Steering getSteeringClass();
     LoggerTools getLogger();
 
     DrivingMotor[] getAllMotors();

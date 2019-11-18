@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Tools.Logger.OnlineLogger;
 
+import static java.lang.Thread.sleep;
+
 public class OnlineMove implements MoveTools {
     private DrivingMotor lf; // stands for left front
     private DrivingMotor lb; // stands for left back
@@ -13,7 +15,7 @@ public class OnlineMove implements MoveTools {
     private DrivingMotor rb; // stands for right back
 
     private Steering steering = new Steering();
-    public Steering getSteering() {
+    public Steering getSteeringClass() {
         return steering;
     }
 
@@ -150,6 +152,11 @@ public class OnlineMove implements MoveTools {
             powerRB -= speedX * power;
             powerLB += speedY * power;
             powerRF -= speedY * power;
+
+            steering.finishSteering();
+            sleep(200); // 600
+            steering.stopAllMotors();
+
         }
         public void moveDistance(double distance, double angle, double power) {
             moveDistance(distance, angle, power, 2, 100);

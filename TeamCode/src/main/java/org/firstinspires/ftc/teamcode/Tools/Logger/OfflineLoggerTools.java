@@ -45,6 +45,14 @@ public class OfflineLoggerTools implements LoggerTools {
             return System.nanoTime();
         }
 
+        public void sleep(long milliseconds){
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
         // Returns the current time on the clock used by the timer in the proper unit
         public long now(TimeUnit unit) {
             return unit.convert(nsNow(), TimeUnit.NANOSECONDS);

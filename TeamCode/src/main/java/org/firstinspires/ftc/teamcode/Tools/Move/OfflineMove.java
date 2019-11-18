@@ -4,7 +4,7 @@ import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 /*
 public class OfflineMove implements MoveTools{
 
-    public Steering getSteering() {
+    public Steering getSteeringClass() {
         return null;
     }
 

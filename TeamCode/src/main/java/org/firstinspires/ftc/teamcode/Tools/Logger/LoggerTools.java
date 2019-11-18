@@ -16,22 +16,25 @@ public interface LoggerTools {
 
     interface RobotTime {
         // Returns the current time on the clock used by the timer in the proper unit
-        public long now(TimeUnit unit);
+        long now(TimeUnit unit);
+
+        // Tells the thread to sleep
+        void sleep(long milliseconds);
 
         // Resets the internal state of the timer to reflect the current time
-        public void reset();
+        void reset();
 
         // Returns, in resolution-dependent units, the time at which this timer was last reset.
-        public double startTime();
+        double startTime();
 
         // Returns the duration that has elapsed since the last reset of this timer in nanoseconds
-        public double time();
+        double time();
 
-        public double seconds();
+        double seconds();
 
-        public double milliseconds();
+        double milliseconds();
 
-        public long nanoseconds();
+        long nanoseconds();
 
     }
 

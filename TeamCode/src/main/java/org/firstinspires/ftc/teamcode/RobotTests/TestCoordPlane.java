@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.RobotTests;
 
+import android.util.Log;
+
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -9,6 +11,10 @@ import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Tools.Logger.OfflineLoggerTools;
+import org.firstinspires.ftc.teamcode.Tools.Move.MoveTools;
+import org.firstinspires.ftc.teamcode.Tools.Move.OnlineMove;
+
+import java.util.logging.Logger;
 
 
 @Autonomous(name = "CoordPlaneTest")
@@ -21,53 +27,43 @@ public class TestCoordPlane extends LinearOpMode {
         // --- Init ---
         Coord[] field_points = new Coord[]{new Coord(-50, 50), new Coord(50, 50), new Coord(-50, 50), new Coord(-50, -50)};
         Field field = new Field(field_points, 3.6576);
-        driverFunction = new DriverFunction(hardwareMap, telemetry);
-        ElapsedTime elapsedTime = new ElapsedTime();
-        elapsedTime.reset();
+
         LoggerTools logger = new OfflineLoggerTools();
-        Robot robot = new Robot(logger);
-        steering = driverFunction.getSteering();
+        LoggerTools.RobotTime time = logger.getRobotTimeClass();
+        MoveTools move = new OnlineMove(hardwareMap, telemetry);
+        MoveTools.Steering steering = move.getSteeringClass();
+
+        time.reset();
+        Robot robot = new Robot(logger, move);
 
         sleep(500);
 
         // Initial telemetry
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
+        logger.add("Status", "Initialized", true);
 
         sleep(500);
 
         // Reset encoders
-        driverFunction.resetAllEncoders();
+        move.resetAllEncoders();
         while (!this.isStarted()) {
-            telemetry.addData("Status", "Run Time: ");
-            telemetry.update();
+            logger.add("Status", "Run Time: ", true);
         }
-        // waitForStart();
 
         // --- Start ---
+        time.sleep(500);
+        logger.add("Status", "Test move...", true);
+        steering.moveSeconds(1, 0, 1);
 
-        sleep(500);
 
-        telemetry.addData("Status", "Test move...");
-        telemetry.update();
-        steering.moveDegrees(0);
-        steering.finishSteering();
-        sleep(200); // 600
-        steering.stopAllMotors();
-
-        telemetry.addData("Status", "Starting drive");
-        telemetry.update();
+        logger.add("Status", "Starting drive", true);
         robot.moveTo(new Coord(50, 50), 0.5);
 
 
-
-
         // Potentially reset the encoders here
+        time.reset();
+        robot.time.reset();
 
-        elapsedTime.reset();
-
-        telemetry.addData("Status", "Started");
-        telemetry.update();
+        logger.add("Status: ", "Ending program...", true);
 
         // LANDING
 

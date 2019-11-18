@@ -2,9 +2,9 @@ package org.firstinspires.ftc.teamcode.Navigation.Game;
 
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.teamcode.Driving.DriverFunction;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.*;
+import org.firstinspires.ftc.teamcode.Tools.Move.MoveTools;
 
 
 public class Robot {
@@ -13,18 +13,16 @@ public class Robot {
     private double direction_deg = 0;
 
     LoggerTools logger;
-    public DriverFunction driverFunction;
-    public DriverFunction.Steering steering;
-    private ElapsedTime drive_time;
+    public LoggerTools.RobotTime time;
+    MoveTools driverFunction;
+    MoveTools.Steering steering;
 
 
-    public Robot(LoggerTools logger) {
+    public Robot(LoggerTools logger, MoveTools moveTools) {
         this.logger = logger;
-        this.currentField = currentField;
-        this.driverFunction = driverFunction;
-
-        this.steering = driverFunction.getSteering();
-        //this.drive_time = time;
+        this.time = logger.getRobotTimeClass();
+        this.driverFunction = moveTools;
+        this.steering = moveTools.getSteeringClass();
     }
 
     private void addDegrees(double deg_add) {
@@ -44,7 +42,7 @@ public class Robot {
 
         try {
             //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
-            steering.encoderDrive(speed, currentField.convertToMeters(distance), angle, 3, 2, drive_time);
+            steering.moveDistance(currentField.convertToMeters(distance), angle, speed);
             position = end_point;
         } catch (Exception InterruptedException) {
             logger.add("Status:", "Failed", true);
@@ -105,18 +103,18 @@ public class Robot {
         int newRightTarget = (driverFunction.getRfPosition() + driverFunction.getRbPosition()) / 2 + (int) (meters * COUNTS_PER_METER);
 
         // reset the timeout time and start motion.
-        drive_time.reset();
+        time.reset();
         boolean lessThanLeftTarget = Math.abs(driverFunction.getLfPosition() + driverFunction.getLbPosition()) / 2 < newLeftTarget;
         boolean lessThanRightTarget = Math.abs(driverFunction.getRfPosition() + driverFunction.getRbPosition()) / 2 < newRightTarget;
 
 
         // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-        while ((drive_time.seconds() < timeoutS) && (lessThanLeftTarget && lessThanRightTarget)) {
+        while ((time.seconds() < timeoutS) && (lessThanLeftTarget && lessThanRightTarget)) {
             double averagePositions = (Math.abs(driverFunction.getLfPosition()) + Math.abs(driverFunction.getLbPosition()) + Math.abs(driverFunction.getRfPosition()) + Math.abs(driverFunction.getRbPosition())) / 4;
             double newLeftSpeed;
             double newRightSpeed;
             //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over the amount of time you set for this SubRun
-            double seconds = drive_time.seconds();
+            double seconds = time.seconds();
             if (seconds < rampup) {
                 double ramp = seconds / rampup;
                 newLeftSpeed = Lspeed * ramp;

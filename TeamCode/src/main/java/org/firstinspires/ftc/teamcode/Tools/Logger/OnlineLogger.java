@@ -52,6 +52,14 @@ public class OnlineLogger implements LoggerTools {
             elapsedTime.reset();
         }
 
+        public void sleep(long milliseconds){
+            try {
+                Thread.sleep(milliseconds);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
         public double startTime() {
             return elapsedTime.startTime();
         }
