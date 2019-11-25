@@ -5,134 +5,149 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class AutonDrivetrain {
 
-    // Auton will implement a move along wall method, maybe
-
     /*
+    TODO:
     3 Goal methods:
     - Move, at angle, distance
         - Sync version (1)
         - Async version (2)
     - Move at angle, speed (3)
         - Async
-        - Used in moveAlongWall method, implemented in Auton
+        - Used in moveAlongWall method, which is implemented in Auton
+    - How the "Async" will work:
+        - Have a method called runMoveIteration or something like that...
+        - Have class variables for state checking that get updated on each loop
+        - Alternatively, if all data can be grabbed from motors directly,
+        no need for the state variables
      */
 
-    /*
-    DC Motor RUN_TO_POSITION Methods:
-    isBusy()
-    - Careful, may take a long time to settle...
-    TODO: DC Motor RUN_USING_ENCODERS Methods:
+    // TODO: Get real values
+    public static final int TICKS_PER_ROTATION = 60;
+    public static final double WHEEL_DIAMETER = 8; // [cm]
+    public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // [cm]
+    public static final double DISTANCE_PER_TICK = WHEEL_CIRCUMFERENCE / TICKS_PER_ROTATION;
+
+    // TODO: Ramp up/down speed for smoothness
+    // To maintain direction, ratio of motor speeds must stay the same
+
+    // ---------- Movement methods ----------
+
+    /* Steps:
+    1. Set all motors to target power
+    2. Do nothing (or sleep) in a while loop that checks whether the average distance each motor
+    has traveled is less than the target distance
+    3. Set motor powers to zero, optionally
      */
-
-    // TODO: Improvements
-    // - Ramping up/down speed for smoothness
-
-    // TODO: Sync and Async
+    // Sync
     public void MoveCardinal(double power, double distance, int direction) {
-        // direction: {0, 1, 2, 3} --> {0, 90, 180, 270}
-        // Throw error if bad arg, because good code good
-        /* Steps:
-        1. Set all motors to target power
-        2. Do nothing (or sleep) in a while loop that checks whether the average distance each motor
-        has traveled is less than the target distance
-        3. Set motor powers to zero, optionally
-         */
-    }
 
-    public void move(double angle, double velocity) {
+        resetAllEncoders();
+
+        double targetTicks = distanceToEncoderTicks(distance);
+
+        int[] motorDirections = {1, 1, 1, 1};
+
         // TODO
+        if (direction == 0) {
+            motorDirections[0] = -1;
+            motorDirections[2] = -1;
+        }
+        else if (direction == 90) {
+            motorDirections[1] = -1;
+            motorDirections[3] = -1;
+        }
+        else if (direction == 180) {
+            motorDirections[0] = -1;
+            motorDirections[3] = -1;
+        }
+        else if (direction == 270) {
+            motorDirections[1] = -1;
+            motorDirections[4] = -1;
+        }
+        else {
+            // This is bad, I know
+            throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
+        }
+
+        lfMotor.setPower(power * motorDirections[0]);
+        rfMotor.setPower(power * motorDirections[1]);
+        lbMotor.setPower(power * motorDirections[2]);
+        rbMotor.setPower(power * motorDirections[3]);
+
+        int averageMotorTicks = 0;
+
+        while (averageMotorTicks < targetTicks) {
+            int lft = Math.abs(lfMotor.getCurrentPosition());
+            int rft = Math.abs(lfMotor.getCurrentPosition());
+            int lbt = Math.abs(lfMotor.getCurrentPosition());
+            int rbt = Math.abs(lfMotor.getCurrentPosition());
+            averageMotorTicks = (lft + rft + lbt + rbt) / 4;
+        }
+
+        setAllMotorPowers(0);
     }
 
+    // Synchronous movement
     public void move(double angle, double velocity, double distance) {
         // TODO
     }
 
-    // TODO: Remove wrapping for simplicity, probably...
-    // And then I'll probably end up putting it back in, of course...
-
-    // TODO: Is there any need to pass in telemetry?
-
-    MotorWrapper lfMotor;
-    MotorWrapper rfMotor;
-    MotorWrapper lbMotor;
-    MotorWrapper rbMotor;
-
-    public AutonDrivetrain(HardwareMap hardwareMap) {
-        lfMotor = new MotorWrapper(hardwareMap.dcMotor.get("lfMotor"));
-        rfMotor = new MotorWrapper(hardwareMap.dcMotor.get("rfMotor"));
-        lbMotor = new MotorWrapper(hardwareMap.dcMotor.get("lbMotor"));
-        rbMotor = new MotorWrapper(hardwareMap.dcMotor.get("rbMotor"));
+    // Fake asynchronous movement, with reachedTarget() or runIteration()
+    // TODO: Real asynchronous w/ multithreading?
+    public void move(double angle, double velocity) {
+        // TODO
     }
 
-    public void setRunMode(DcMotor.RunMode runMode) {
+    // ---------- Individual motor things ----------
+
+    private DcMotor lfMotor;
+    private DcMotor rfMotor;
+    private DcMotor lbMotor;
+    private DcMotor rbMotor;
+
+    public AutonDrivetrain(HardwareMap hardwareMap) {
+        lfMotor = hardwareMap.dcMotor.get("lfMotor");
+        rfMotor = hardwareMap.dcMotor.get("rfMotor");
+        lbMotor = hardwareMap.dcMotor.get("lbMotor");
+        rbMotor = hardwareMap.dcMotor.get("rbMotor");
+        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
+        setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    public void setAllRunModes(DcMotor.RunMode runMode) {
         lfMotor.setMode(runMode);
         rfMotor.setMode(runMode);
         lbMotor.setMode(runMode);
         rbMotor.setMode(runMode);
     }
 
-    public void resetEncoders() {
-        lfMotor.resetEncoder();
-        rfMotor.resetEncoder();
-        lbMotor.resetEncoder();
-        rbMotor.resetEncoder();
-    }
-
-    public void setZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+    public void setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
         lfMotor.setZeroPowerBehavior(zeroPowerBehavior);
         rfMotor.setZeroPowerBehavior(zeroPowerBehavior);
         lbMotor.setZeroPowerBehavior(zeroPowerBehavior);
         rbMotor.setZeroPowerBehavior(zeroPowerBehavior);
     }
 
-    public void setAllPowers(double power) {
+    public void resetAllEncoders() {
+        setAllRunModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setAllMotorPowers(double power) {
         lfMotor.setPower(power);
         rfMotor.setPower(power);
         lbMotor.setPower(power);
         rbMotor.setPower(power);
     }
 
-    public int getLfPosition() {
-        return lfMotor.getCurrentPosition();
-    }
-    public int getRfPosition() {
-        return rfMotor.getCurrentPosition();
-    }
-    public int getLbPosition() {
-        return lfMotor.getCurrentPosition();
-    }
-    public int getRbPosition() {
-        return rbMotor.getCurrentPosition();
+    // ---------- Other utilities ----------
+
+    public static int distanceToEncoderTicks(double distance) {
+        // Round to nearest integer by adding 0.5 and casting to int
+        return (int)((distance / DISTANCE_PER_TICK) + 0.5);
     }
 
-    class MotorWrapper {
-
-        DcMotor motor;
-
-        MotorWrapper(DcMotor motor) {
-            this.motor = motor;
-        }
-
-        public void setMode(DcMotor.RunMode runMode) {
-            motor.setMode(runMode);
-        }
-
-        public void resetEncoder() {
-            DcMotor.RunMode currentMode = motor.getMode();
-            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            motor.setMode(currentMode);
-        }
-
-        public int getCurrentPosition() {
-            return motor.getCurrentPosition();
-        }
-
-        public void setPower(double power) {
-            motor.setPower(power);
-        }
-
-        public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
-            motor.setZeroPowerBehavior(zeroPowerBehavior);
-        }
+    public static double encoderTicksToDistance(int encoderTicks) {
+        return DISTANCE_PER_TICK * encoderTicks;
     }
 }

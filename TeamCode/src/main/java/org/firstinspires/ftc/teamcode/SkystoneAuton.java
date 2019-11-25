@@ -5,6 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+// TODO: Don't forget to remove this later...
 @Disabled
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
@@ -48,8 +49,16 @@ public class SkystoneAuton extends LinearOpMode {
 
     // --- Other Methods ---
 
+    // TODO: Implement
     public static void moveAlongWall(double walldist, double stopdist) {
-        // TODO
+
+        /*
+        if (percentWideWallDistanceDifference > tolerance) {
+            setSidewaysWallDistance(targetSideWallDistance)
+        }
+        then, implement move towards wall
+         */
+
         /*
         Ideas:
         if walldist is way off; then
