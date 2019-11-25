@@ -70,10 +70,10 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor1 = hardwareMap.dcMotor.get("winch1");
         winchMotor2 = hardwareMap.dcMotor.get("winch2");
 
-        gulperMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        winchMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        gulperMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        gulperMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        winchMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        winchMotor2.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         gulperMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gulperMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -188,7 +188,10 @@ public class SkystoneTeleOp extends OpMode {
         else {
             telemetry.addData("Angle", 0);
         }
-
+        telemetry.addData(rbMotor.getPosition());
+        telemetry.addData(rfMotor.getPosition());
+        telemetry.addData(lbMotor.getPosition());
+        telemetry.addData(lfMotor.getPosition());
         // --------------------------------------------------
         // ---------- Gamepad 2: Gunner Functions -----------
         // --------------------------------------------------
