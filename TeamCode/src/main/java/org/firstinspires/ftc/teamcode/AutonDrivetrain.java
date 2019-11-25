@@ -5,41 +5,28 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 
 public class AutonDrivetrain {
 
-    /*
-    TODO:
-    3 Goal methods:
-    - Move, at angle, distance
-        - Sync version (1)
-        - Async version (2)
-    - Move at angle, speed (3)
-        - Async
-        - Used in moveAlongWall method, which is implemented in Auton
-    - How the "Async" will work:
-        - Have a method called runMoveIteration or something like that...
-        - Have class variables for state checking that get updated on each loop
-        - Alternatively, if all data can be grabbed from motors directly,
-        no need for the state variables
-     */
+    // TODO: Ramp up/down speed for smoothness
+    // To maintain direction, ratio of motor speeds must stay the same
+
+    // TODO: May want a fake "async" version of dist, angle with a function that runs a loop iteration
+    // (The same may be true of moveAlongWall)
+
+    // TODO: Potentially convert power -> ticks/s -> cm/s
+    // Thus, could specify a velocity instead of a power
+    // Power is nice, though, because is scales 0 to 1
 
     // TODO: Get real values
+    // TODO: Add gear ratio - needs to increase predicted ticks for a set distance
+    public static final double GEAR_RATIO = 1; // TODO: Value and implement
     public static final int TICKS_PER_ROTATION = 60;
     public static final double WHEEL_DIAMETER = 8; // [cm]
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // [cm]
     public static final double DISTANCE_PER_TICK = WHEEL_CIRCUMFERENCE / TICKS_PER_ROTATION;
 
-    // TODO: Ramp up/down speed for smoothness
-    // To maintain direction, ratio of motor speeds must stay the same
-
     // ---------- Movement methods ----------
 
-    /* Steps:
-    1. Set all motors to target power
-    2. Do nothing (or sleep) in a while loop that checks whether the average distance each motor
-    has traveled is less than the target distance
-    3. Set motor powers to zero, optionally
-     */
-    // Sync
-    public void MoveCardinal(double power, double distance, int direction) {
+    // Synchronous movement
+    public void moveCardinal(double power, double distance, int direction) {
 
         resetAllEncoders();
 
@@ -47,22 +34,21 @@ public class AutonDrivetrain {
 
         int[] motorDirections = {1, 1, 1, 1};
 
-        // TODO
         if (direction == 0) {
+            motorDirections[2] = -1;
+            motorDirections[3] = -1;
+        }
+        else if (direction == 90) {
             motorDirections[0] = -1;
             motorDirections[2] = -1;
         }
-        else if (direction == 90) {
-            motorDirections[1] = -1;
-            motorDirections[3] = -1;
-        }
         else if (direction == 180) {
             motorDirections[0] = -1;
-            motorDirections[3] = -1;
+            motorDirections[1] = -1;
         }
         else if (direction == 270) {
             motorDirections[1] = -1;
-            motorDirections[4] = -1;
+            motorDirections[3] = -1;
         }
         else {
             // This is bad, I know
@@ -87,41 +73,53 @@ public class AutonDrivetrain {
         setAllMotorPowers(0);
     }
 
+    // TODO
     // Synchronous movement
-    // TODO: May want a fake "async" version with a function that runs a loop iteration
-    // (The same may be true of moveAlongWall
-    public void move(double angle, double velocity, double distance) {
-        // TODO
+    public void moveDistance(double angle, double power, double distance) {
+
+        // TODO: Perhaps methodize repeatable logic
+
+        angle = Math.toRadians(angle);
+
+        double x = Math.cos(angle);
+        double y = Math.sin(angle);
+
+        double powerLF = x - y;
+        double powerRF = x + y;
+        double powerLB = -x - y;
+        double powerRB = -x + y;
+
+        // double maxPossiblePower = Math.cos(Math.PI/4) + Math.sin(Math.PI/4);
+        double maxPossiblePower = Math.sqrt(2);
+
+        powerLF /= maxPossiblePower;
+        powerRF /= maxPossiblePower;
+        powerLB /= maxPossiblePower;
+        powerRB /= maxPossiblePower;
+
+        powerLF *= power;
+        powerRF *= power;
+        powerLB *= power;
+        powerRB *= power;
+
         /*
         NOTE:
         The target distance is simply the target velocity times time!
         The target distances are thus simply proportional to the target wheel velocities!
         Target velocities are apparently a simple calculation based on angle!
         Once this is written, moveCardinal will no longer be needed!
-         */
-
-        // Must consider how scaling will work...
-        /*
-        Relevant quotes:
-
-        double divider = Math.max(Math.abs(speedX), Math.abs(speedY));
-
-        powerLF += speedX / divider * power;
-        powerRB -= speedX / divider * power;
-        powerLB += speedY / divider * power;
-        powerRF -= speedY / divider * power;
-
-        public void turn(boolean isClockwise, double power) {
-            addToAllPowers(isClockwise ? power : -power);
-        }
+        The question is, what is this constant of proportionality?
          */
     }
 
-    // Simply sets powers and leaves well enough alone
-    // DriveAlongWall may want to utilize this in a ramping up/down fashion...
-    // Velocity = 0 should be like setAllMotorPowers(0)
-    public void move(double angle, double velocity) {
+    // Simply set powers and return
+    public void moveContinuous(double angle, double power) {
         // TODO
+    }
+
+    public void turn(double angle, double power) {
+        // TODO: I doubt this will be fun...
+        // This may need to be simply empirical...
     }
 
     // ---------- Individual motor things ----------
