@@ -53,9 +53,23 @@ public class SkystoneTeleOp extends OpMode {
     private double winchPower = 0.3;
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
-    private int[] winchMotorPositions = {0, 500, 1000, 1500};
-    private int[] winchMotor1Offsets = {0, 0, 0, 0};
-    private int[] winchMotor2Offsets = {0, 0, 0, 0};
+
+    private int foundationHeight = 400;
+    private int winchMotorStep = 750;
+    private int[] winchMotorPositions = {
+            0,
+            foundationHeight + winchMotorStep,
+            foundationHeight + winchMotorStep * 1,
+            foundationHeight + winchMotorStep * 2,
+            foundationHeight + winchMotorStep * 3,
+            foundationHeight + winchMotorStep * 4,
+            foundationHeight + winchMotorStep * 5,
+            foundationHeight + winchMotorStep * 6,
+            foundationHeight + winchMotorStep * 7,
+            foundationHeight + winchMotorStep * 8
+    };
+    private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int currentWinchIndex = 0;
 
     // Gulper motor speeds
@@ -81,6 +95,8 @@ public class SkystoneTeleOp extends OpMode {
         gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         winchMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        winchMotor1.setTargetPosition(0);
+        winchMotor2.setTargetPosition(0);
         winchMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         winchMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -90,7 +106,7 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         gulperMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
-        winchMotor2.setDirection(DcMotorSimple.Direction.REVERSE);
+        winchMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
 
         gulperMotor1.setPower(0);
         gulperMotor2.setPower(0);
