@@ -88,6 +88,8 @@ public class AutonDrivetrain {
     }
 
     // Synchronous movement
+    // TODO: May want a fake "async" version with a function that runs a loop iteration
+    // (The same may be true of moveAlongWall
     public void move(double angle, double velocity, double distance) {
         // TODO
         /*
@@ -97,10 +99,27 @@ public class AutonDrivetrain {
         Target velocities are apparently a simple calculation based on angle!
         Once this is written, moveCardinal will no longer be needed!
          */
+
+        // Must consider how scaling will work...
+        /*
+        Relevant quotes:
+
+        double divider = Math.max(Math.abs(speedX), Math.abs(speedY));
+
+        powerLF += speedX / divider * power;
+        powerRB -= speedX / divider * power;
+        powerLB += speedY / divider * power;
+        powerRF -= speedY / divider * power;
+
+        public void turn(boolean isClockwise, double power) {
+            addToAllPowers(isClockwise ? power : -power);
+        }
+         */
     }
 
-    // Fake asynchronous movement, with reachedTarget() or runIteration()
-    // TODO: Real asynchronous w/ multithreading?
+    // Simply sets powers and leaves well enough alone
+    // DriveAlongWall may want to utilize this in a ramping up/down fashion...
+    // Velocity = 0 should be like setAllMotorPowers(0)
     public void move(double angle, double velocity) {
         // TODO
     }
