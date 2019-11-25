@@ -90,6 +90,13 @@ public class AutonDrivetrain {
     // Synchronous movement
     public void move(double angle, double velocity, double distance) {
         // TODO
+        /*
+        NOTE:
+        The target distance is simply the target velocity times time!
+        The target distances are thus simply proportional to the target wheel velocities!
+        Target velocities are apparently a simple calculation based on angle!
+        Once this is written, moveCardinal will no longer be needed!
+         */
     }
 
     // Fake asynchronous movement, with reachedTarget() or runIteration()
