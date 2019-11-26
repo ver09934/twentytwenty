@@ -30,6 +30,8 @@ public class SkystoneTeleOp extends OpMode {
 
     // Servos
     private Servo blockServo;
+    private Servo plateServoLeft;
+    private Servo plateServoRight;
 
     // Toggle locks
     private boolean gamepad1XToggleLock = false;
@@ -38,12 +40,14 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2XToggleLock = false;
     private boolean gamepad2YToggleLock = false;
     private boolean gamepad2BumperToggleLock = false;
+    private boolean gamepad2RightTriggerToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
     private boolean gulperReverse = false;
     private boolean runGulper = false;
     private boolean winchesPowered = false;
+    private boolean plateServosUp = false;
 
     // Test servo positions
     private double testServoPosition1 = 1;
@@ -76,6 +80,12 @@ public class SkystoneTeleOp extends OpMode {
     private double gulperForwardPower = 1;
     private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
+
+    // Build plate servo positions
+    private double plateServoLeftDown = 0.28;
+    private double plateServoLeftUp = 0.5;
+    private double plateServoRightDown = 0.82;
+    private double plateServoRightUp = 0.6;
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -126,6 +136,13 @@ public class SkystoneTeleOp extends OpMode {
 
         blockServo = hardwareMap.servo.get("testServo");
         blockServo.setPosition(testServoPosition1);
+
+        plateServoLeft = hardwareMap.servo.get("plateServo1"); // Left servo
+        plateServoRight = hardwareMap.servo.get("plateServo2"); // Right servo
+
+        plateServosUp = false;
+        plateServoLeft.setPosition(plateServoLeftDown);
+        plateServoRight.setPosition(plateServoRightDown);
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -323,6 +340,7 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Winch 2 Current", winchMotor2.getCurrentPosition());
 
         // --- X Button: Block Gripper Servo ---
+        // TODO: Add a state variable instead of checking position
         if (this.gamepad2.x) {
             if (!gamepad2XToggleLock) {
                 gamepad2XToggleLock = true;
@@ -338,9 +356,26 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2XToggleLock = false;
         }
         telemetry.addData("Block Servo Position", blockServo.getPosition());
+        // TODO: Add real and target position
 
         // --- Build Plate Clamper Servos ---
-        // TODO
+        if (this.gamepad2.right_trigger > 0.5) {
+            if (!gamepad2RightTriggerToggleLock) {
+                gamepad2RightTriggerToggleLock = true;
+                plateServosUp = !plateServosUp;
+            }
+        }
+        else {
+            gamepad2RightTriggerToggleLock = false;
+        }
+        if (plateServosUp) {
+            plateServoLeft.setPosition(plateServoLeftUp);
+            plateServoRight.setPosition(plateServoRightUp);
+        }
+        else {
+            plateServoLeft.setPosition(plateServoLeftDown);
+            plateServoRight.setPosition(plateServoRightDown);
+        }
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
