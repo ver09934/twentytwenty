@@ -48,10 +48,11 @@ public class SkystoneTeleOp extends OpMode {
     private boolean runGulper = false;
     private boolean winchesPowered = false;
     private boolean plateServosUp = false;
+    private boolean blockServoOpen = false;
 
-    // Test servo positions
-    private double testServoPosition1 = 1;
-    private double testServoPosition2 = 0.6;
+    // Block servo positions
+    private double blockServoClosedPosition = 1;
+    private double blockServoOpenPosition = 0.6;
 
     // Winch things
     private double winchPower = 0.3;
@@ -135,10 +136,12 @@ public class SkystoneTeleOp extends OpMode {
          */
 
         blockServo = hardwareMap.servo.get("testServo");
-        blockServo.setPosition(testServoPosition1);
 
-        plateServoLeft = hardwareMap.servo.get("plateServo1"); // Left servo
-        plateServoRight = hardwareMap.servo.get("plateServo2"); // Right servo
+        blockServoOpen = false;
+        blockServo.setPosition(blockServoClosedPosition);
+
+        plateServoLeft = hardwareMap.servo.get("plateServo1");
+        plateServoRight = hardwareMap.servo.get("plateServo2");
 
         plateServosUp = false;
         plateServoLeft.setPosition(plateServoLeftDown);
@@ -344,11 +347,11 @@ public class SkystoneTeleOp extends OpMode {
         if (this.gamepad2.x) {
             if (!gamepad2XToggleLock) {
                 gamepad2XToggleLock = true;
-                if (blockServo.getPosition() == testServoPosition1) {
-                    blockServo.setPosition(testServoPosition2);
+                if (blockServo.getPosition() == blockServoClosedPosition) {
+                    blockServo.setPosition(blockServoOpenPosition);
                 }
                 else {
-                    blockServo.setPosition(testServoPosition1);
+                    blockServo.setPosition(blockServoClosedPosition);
                 }
             }
         }
@@ -376,6 +379,7 @@ public class SkystoneTeleOp extends OpMode {
             plateServoLeft.setPosition(plateServoLeftDown);
             plateServoRight.setPosition(plateServoRightDown);
         }
+        telemetry.addData("Build plate servos up", plateServosUp);
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
