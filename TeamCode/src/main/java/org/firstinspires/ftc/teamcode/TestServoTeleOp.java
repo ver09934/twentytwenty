@@ -11,6 +11,8 @@ public class TestServoTeleOp extends OpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private Servo testServo;
 
+    private boolean servoHigh = false;
+
     private double lowPosition = 0;
     private double highPosition = 1;
 
@@ -30,12 +32,18 @@ public class TestServoTeleOp extends OpMode {
         }
     }
 
+    private double round(double value, double places) {
+        return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
+    }
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         testServo = hardwareMap.servo.get("testServo");
+
+        servoHigh = false;
         testServo.setPosition(lowPosition);
     }
 
@@ -56,20 +64,20 @@ public class TestServoTeleOp extends OpMode {
         // D-Pad Right/Left: Adjust low position
         if (this.gamepad1.dpad_right) {
             if (!dpadRightLeftToggleLock) {
-                boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
                 lowPosition += getIncrement();
-                if (updatePosition) {
+                lowPosition = round(lowPosition, 2);
+                if (!servoHigh) {
                     testServo.setPosition(lowPosition);
                 }
             }
         }
         else if (this.gamepad1.dpad_left) {
             if (!dpadRightLeftToggleLock) {
-                boolean updatePosition = testServo.getPosition() == lowPosition;
                 dpadRightLeftToggleLock = true;
                 lowPosition -= getIncrement();
-                if (updatePosition) {
+                lowPosition = round(lowPosition, 2);
+                if (!servoHigh) {
                     testServo.setPosition(lowPosition);
                 }
             }
@@ -81,20 +89,20 @@ public class TestServoTeleOp extends OpMode {
         // D-Pad Up/Down: Adjust high position
         if (this.gamepad1.dpad_up) {
             if (!dpadUpDownToggleLock) {
-                boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
                 highPosition += getIncrement();
-                if (updatePosition) {
+                highPosition = round(highPosition, 2);
+                if (servoHigh) {
                     testServo.setPosition(highPosition);
                 }
             }
         }
         else if (this.gamepad1.dpad_down) {
             if (!dpadUpDownToggleLock) {
-                boolean updatePosition = testServo.getPosition() == highPosition;
                 dpadUpDownToggleLock = true;
                 highPosition -= getIncrement();
-                if (updatePosition) {
+                highPosition = round(highPosition, 2);
+                if (servoHigh) {
                     testServo.setPosition(highPosition);
                 }
             }
@@ -107,7 +115,8 @@ public class TestServoTeleOp extends OpMode {
         if (this.gamepad1.b) {
             if (!bToggleLock) {
                 bToggleLock = true;
-                if (testServo.getPosition() == lowPosition) {
+                servoHigh = !servoHigh;
+                if (servoHigh) {
                     testServo.setPosition(highPosition);
                 }
                 else {
@@ -124,6 +133,7 @@ public class TestServoTeleOp extends OpMode {
         telemetry.addData("Low Position", lowPosition);
         telemetry.addData("High Position", highPosition);
         telemetry.addData("Servo Position", testServo.getPosition());
+        telemetry.addData("Target Position: ", servoHigh ? highPosition : lowPosition);
 
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();
