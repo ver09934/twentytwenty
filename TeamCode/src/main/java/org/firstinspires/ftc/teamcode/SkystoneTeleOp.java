@@ -343,23 +343,23 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Winch 2 Current", winchMotor2.getCurrentPosition());
 
         // --- X Button: Block Gripper Servo ---
-        // TODO: Add a state variable instead of checking position
         if (this.gamepad2.x) {
             if (!gamepad2XToggleLock) {
                 gamepad2XToggleLock = true;
-                if (blockServo.getPosition() == blockServoClosedPosition) {
-                    blockServo.setPosition(blockServoOpenPosition);
-                }
-                else {
-                    blockServo.setPosition(blockServoClosedPosition);
-                }
+                blockServoOpen = !blockServoOpen;
             }
         }
         else {
             gamepad2XToggleLock = false;
         }
+        if (blockServoOpen) {
+            blockServo.setPosition(blockServoOpenPosition);
+        }
+        else {
+            blockServo.setPosition(blockServoClosedPosition);
+        }
+        telemetry.addData("Block Servo Opened", blockServoOpen);
         telemetry.addData("Block Servo Position", blockServo.getPosition());
-        // TODO: Add real and target position
 
         // --- Build Plate Clamper Servos ---
         if (this.gamepad2.right_trigger > 0.5) {
