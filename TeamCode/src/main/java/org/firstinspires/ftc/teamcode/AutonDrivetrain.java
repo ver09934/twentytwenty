@@ -129,6 +129,41 @@ public class AutonDrivetrain {
         double targetLBTicks = targetTicks * (powerLB / power);
         double targetRBTicks = targetTicks * (powerRB / power);
 
+        targetLFTicks = Math.abs(targetLFTicks);
+        targetRFTicks = Math.abs(targetRFTicks);
+        targetLBTicks = Math.abs(targetLBTicks);
+        targetRBTicks = Math.abs(targetRBTicks);
+
+        boolean reachedTarget = false;
+
+        while (!reachedTarget) {
+            int lft = lfMotor.getCurrentPosition();
+            int rft = lfMotor.getCurrentPosition();
+            int lbt = lfMotor.getCurrentPosition();
+            int rbt = lfMotor.getCurrentPosition();
+
+            lft = Math.abs(lft);
+            rft = Math.abs(rft);
+            lbt = Math.abs(lbt);
+            rbt = Math.abs(rbt);
+
+            boolean[] successes = {
+                    lft > targetLFTicks,
+                    rft > targetRFTicks,
+                    lbt > targetLBTicks,
+                    rbt > targetRBTicks
+            };
+
+            int count = 0;
+            for (boolean bool : successes) {
+                count += bool ? 1 : 0;
+            }
+
+            if (count >= 2) {
+                reachedTarget = true;
+            }
+        }
+
         setAllMotorPowers(0);
 
         /*
