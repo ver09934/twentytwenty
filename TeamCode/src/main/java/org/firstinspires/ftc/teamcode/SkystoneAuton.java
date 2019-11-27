@@ -38,16 +38,18 @@ public class SkystoneAuton extends LinearOpMode {
 
         runtime.reset();
 
-        AutonDrivetrain autonDrivetrain = new AutonDrivetrain(hardwareMap);
+        AutonDrivetrain autonDrivetrain = new AutonDrivetrain(hardwareMap, telemetry);
 
         for (int angle : new int[]{0, 90, 180, 270}) {
-            autonDrivetrain.moveCardinal(1, 50, angle);
+            autonDrivetrain.moveCardinal(0.5, 200, angle);
+            sleep(1000);
         }
 
-        sleep(5000);
+        sleep(3000);
 
-        for (int angle = 0; angle < 360; angle+=45) {
-            autonDrivetrain.moveDistance(1, 30, angle);
+        for (int angle = 0; angle < 360; angle += 45) {
+            autonDrivetrain.moveDistance(0.5, 250, angle);
+            sleep(1000);
         }
 
         while (opModeIsActive()) {

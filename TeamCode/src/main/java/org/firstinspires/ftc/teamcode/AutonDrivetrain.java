@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 
 public class AutonDrivetrain {
 
@@ -45,16 +46,16 @@ public class AutonDrivetrain {
         int[] motorDirections = {1, 1, 1, 1};
 
         if (direction == 0) {
-            motorDirections[2] = -1;
-            motorDirections[3] = -1;
+            motorDirections[0] = -1;
+            motorDirections[1] = -1;
         }
         else if (direction == 90) {
             motorDirections[0] = -1;
             motorDirections[2] = -1;
         }
         else if (direction == 180) {
-            motorDirections[0] = -1;
-            motorDirections[1] = -1;
+            motorDirections[2] = -1;
+            motorDirections[3] = -1;
         }
         else if (direction == 270) {
             motorDirections[1] = -1;
@@ -98,10 +99,10 @@ public class AutonDrivetrain {
         double x = Math.cos(angle);
         double y = Math.sin(angle);
 
-        double powerLF = x - y;
-        double powerRF = x + y;
-        double powerLB = -x - y;
-        double powerRB = -x + y;
+        double powerLF = -x + y;
+        double powerRF = -x - y;
+        double powerLB = x + y;
+        double powerRB = x - y;
 
         double maxPossiblePower = Math.cos(Math.PI/4) + Math.sin(Math.PI/4);
 
@@ -129,29 +130,49 @@ public class AutonDrivetrain {
         double targetLBTicks = targetTicks * (powerLB / power);
         double targetRBTicks = targetTicks * (powerRB / power);
 
+        /*
         targetLFTicks = Math.abs(targetLFTicks);
         targetRFTicks = Math.abs(targetRFTicks);
         targetLBTicks = Math.abs(targetLBTicks);
         targetRBTicks = Math.abs(targetRBTicks);
+         */
+
+        int[] targetTicksArray = {
+                (int) (targetLFTicks + 0.5),
+                (int) (targetRFTicks + 0.5),
+                (int) (targetLBTicks + 0.5),
+                (int) (targetRBTicks + 0.5)
+        };
 
         boolean reachedTarget = false;
 
         while (!reachedTarget) {
+
             int lft = lfMotor.getCurrentPosition();
             int rft = lfMotor.getCurrentPosition();
             int lbt = lfMotor.getCurrentPosition();
             int rbt = lfMotor.getCurrentPosition();
 
+            /*
             lft = Math.abs(lft);
             rft = Math.abs(rft);
             lbt = Math.abs(lbt);
             rbt = Math.abs(rbt);
+             */
 
+            int[] currentTicksArray = {
+                    lft,
+                    rft,
+                    lbt,
+                    rbt
+            };
+
+            /*
             boolean[] successes = {
-                    lft > targetLFTicks,
-                    rft > targetRFTicks,
-                    lbt > targetLBTicks,
-                    rbt > targetRBTicks
+                    lft > targetLFTicks && targetLFTicks > 0,
+                    rft > targetRFTicks && targetRFTicks > 0,
+                    lbt > targetLBTicks && targetLBTicks > 0,
+                    rbt > targetRBTicks && targetRBTicks > 0
             };
 
             int count = 0;
@@ -162,6 +183,32 @@ public class AutonDrivetrain {
             if (count >= 2) {
                 reachedTarget = true;
             }
+             */
+
+            int count = 0;
+            for (int i = 0; i < 4; i++) {
+                int target = targetTicksArray[i];
+                int current = currentTicksArray[i];
+                if (target >= 0) {
+                    if (current >= 0.95 * target) {
+                        count++;
+                    }
+                }
+                else {
+                    if (current <= 0.95 * target) {
+                        count++;
+                    }
+                }
+            }
+            if (count == 4) {
+                reachedTarget = true;
+            }
+
+            telemetry.addLine("LF Target: " + targetLFTicks + " LF Actual: " + lft);
+            telemetry.addLine("RF Target: " + targetRFTicks + " RF Actual: " + rft);
+            telemetry.addLine("LB Target: " + targetLBTicks + " LB Actual: " + lbt);
+            telemetry.addLine("RB Target: " + targetRBTicks + " RB Actual: " + rbt);
+            telemetry.update();
         }
 
         setAllMotorPowers(0);
@@ -192,13 +239,16 @@ public class AutonDrivetrain {
     private DcMotor lbMotor;
     private DcMotor rbMotor;
 
-    public AutonDrivetrain(HardwareMap hardwareMap) {
+    Telemetry telemetry;
+
+    public AutonDrivetrain(HardwareMap hardwareMap, Telemetry telemetry) {
         lfMotor = hardwareMap.dcMotor.get("lfMotor");
         rfMotor = hardwareMap.dcMotor.get("rfMotor");
         lbMotor = hardwareMap.dcMotor.get("lbMotor");
         rbMotor = hardwareMap.dcMotor.get("rbMotor");
         setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
         setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
+        this.telemetry = telemetry;
     }
 
     public void setAllRunModes(DcMotor.RunMode runMode) {
