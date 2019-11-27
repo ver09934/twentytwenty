@@ -14,6 +14,17 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
 
+    /* The encoder functions available to us:
+    winchMotor1.setPower(0);
+    double tmp = winchMotor1.getPower();
+    winchMotor1.setTargetPosition(0);
+    int tmp = winchMotor1.getTargetPosition();
+    boolean tmp = winchMotor1.isBusy();
+    int tmp = winchMotor1.getCurrentPosition();
+    */
+
+    // TODO: Add button (left trigger?) to set winch index to zero
+
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
     private DriverFunction driverFunction;
@@ -41,6 +52,7 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2YToggleLock = false;
     private boolean gamepad2BumperToggleLock = false;
     private boolean gamepad2RightTriggerToggleLock = false;
+    private boolean gamepad2LeftTriggerToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
@@ -70,7 +82,8 @@ public class SkystoneTeleOp extends OpMode {
             foundationHeight + winchMotorStep * 4,
             foundationHeight + winchMotorStep * 5,
             foundationHeight + winchMotorStep * 6,
-            (int) ((foundationHeight + winchMotorStep * 6.8) + 0.5),
+            // foundationHeight + winchMotorStep * 7
+            (int) ((foundationHeight + winchMotorStep * 6.8) + 0.5)
     };
     private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
@@ -124,15 +137,6 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor1.setPower(0);
         winchMotor2.setPower(0);
         winchesPowered = false;
-
-        /* The encoder functions available to us:
-        winchMotor1.setPower(0);
-        double tmp = winchMotor1.getPower();
-        winchMotor1.setTargetPosition(0);
-        int tmp = winchMotor1.getTargetPosition();
-        boolean tmp = winchMotor1.isBusy();
-        int tmp = winchMotor1.getCurrentPosition();
-         */
 
         blockServo = hardwareMap.servo.get("testServo");
 
@@ -335,6 +339,20 @@ public class SkystoneTeleOp extends OpMode {
         else {
             gamepad2BumperToggleLock = false;
         }
+
+        // --- Left Trigger: Set winch all the way down ---
+        if (this.gamepad2.left_trigger > 0.5) {
+            if (!gamepad2LeftTriggerToggleLock) {
+                gamepad2LeftTriggerToggleLock = true;
+                currentWinchIndex  = 0;
+                winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
+                winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+            }
+        }
+        else {
+            gamepad2LeftTriggerToggleLock = false;
+        }
+
         telemetry.addData("Winch Index", currentWinchIndex);
         telemetry.addData("Winch 1 Target", winchMotor1.getTargetPosition());
         telemetry.addData("Winch 2 Target", winchMotor2.getTargetPosition());
@@ -360,7 +378,7 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Block Servo Opened", blockServoOpen);
         telemetry.addData("Block Servo Position", blockServo.getPosition());
 
-        // --- Build Plate Clamper Servos ---
+        // --- Right Trigger: Build Plate Clamper Servos ---
         if (this.gamepad2.right_trigger > 0.5) {
             if (!gamepad2RightTriggerToggleLock) {
                 gamepad2RightTriggerToggleLock = true;
