@@ -5,8 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-// TODO: Don't forget to remove this later...
-@Disabled
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
@@ -41,16 +39,16 @@ public class SkystoneAuton extends LinearOpMode {
         runtime.reset();
 
         AutonDrivetrain autonDrivetrain = new AutonDrivetrain(hardwareMap);
-        /*
+
         for (int angle : new int[]{0, 90, 180, 270}) {
-            autonDrivetrain.moveCardinal(0.6, 100, angle);
+            autonDrivetrain.moveCardinal(1, 50, angle);
         }
-        */
-        /*
-        for (int i = 0; i < 360; i+=45) {
-            autonDrivetrain.moveDistance(i, 1, 50);
+
+        sleep(5000);
+
+        for (int angle = 0; angle < 360; angle+=45) {
+            autonDrivetrain.moveDistance(1, 30, angle);
         }
-        */
 
         while (opModeIsActive()) {
             telemetry.addData("Status", "Run time: " + runtime.toString());

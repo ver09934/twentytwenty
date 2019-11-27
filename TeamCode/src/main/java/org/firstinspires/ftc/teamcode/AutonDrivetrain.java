@@ -89,7 +89,7 @@ public class AutonDrivetrain {
     }
 
     // Synchronous movement
-    public void moveDistance(double angle, double power, double distance) {
+    public void moveDistance(double power, double distance, double angle) {
 
         resetAllEncoders();
 
