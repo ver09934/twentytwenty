@@ -17,7 +17,7 @@ public class AutonDrivetrain {
     // Power is nice, though, because is scales 0 to 1
 
     public static final double GEAR_RATIO = 1; // output/input teeth
-    public static final int TICKS_PER_MOTOR_ROTATION = 280;
+    public static final int TICKS_PER_MOTOR_ROTATION = 1120;
     // Round to nearest integer by adding 0.5 and casting to int
     public static final int TICKS_PER_WHEEL_ROTATION = (int)((TICKS_PER_MOTOR_ROTATION * GEAR_RATIO) + 0.5);
     public static final double WHEEL_DIAMETER = 10.16; // [cm]
@@ -80,10 +80,17 @@ public class AutonDrivetrain {
 
         while (averageMotorTicks < targetTicks) {
             int lft = Math.abs(lfMotor.getCurrentPosition());
-            int rft = Math.abs(lfMotor.getCurrentPosition());
-            int lbt = Math.abs(lfMotor.getCurrentPosition());
-            int rbt = Math.abs(lfMotor.getCurrentPosition());
+            int rft = Math.abs(rfMotor.getCurrentPosition());
+            int lbt = Math.abs(lbMotor.getCurrentPosition());
+            int rbt = Math.abs(rbMotor.getCurrentPosition());
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
+
+            telemetry.addLine("Target Ticks: " + targetTicks);
+            telemetry.addLine("LF Actual: " + lft);
+            telemetry.addLine("RF Actual: " + rft);
+            telemetry.addLine("LB Actual: " + lbt);
+            telemetry.addLine("RB Actual: " + rbt);
+            telemetry.update();
         }
 
         setAllMotorPowers(0);
@@ -99,10 +106,10 @@ public class AutonDrivetrain {
         double x = Math.cos(angle);
         double y = Math.sin(angle);
 
-        double powerLF = -x + y;
-        double powerRF = -x - y;
-        double powerLB = x + y;
-        double powerRB = x - y;
+        double powerLF = -x - y;
+        double powerRF = -x + y;
+        double powerLB = x - y;
+        double powerRB = x + y;
 
         double maxPossiblePower = Math.cos(Math.PI/4) + Math.sin(Math.PI/4);
 
@@ -125,40 +132,72 @@ public class AutonDrivetrain {
 
         double targetTicks = distanceToEncoderTicks(distance);
 
+        /*
         double targetLFTicks = targetTicks * (powerLF / power);
         double targetRFTicks = targetTicks * (powerRF / power);
         double targetLBTicks = targetTicks * (powerLB / power);
         double targetRBTicks = targetTicks * (powerRB / power);
+        */
+
+        int targetLFTicks = (int) ((targetTicks * (powerLF / power)) + 0.5);
+        int targetRFTicks = (int) ((targetTicks * (powerRF / power)) + 0.5);
+        int targetLBTicks = (int) ((targetTicks * (powerLB / power)) + 0.5);
+        int targetRBTicks = (int) ((targetTicks * (powerRB / power)) + 0.5);
 
         /*
-        targetLFTicks = Math.abs(targetLFTicks);
-        targetRFTicks = Math.abs(targetRFTicks);
-        targetLBTicks = Math.abs(targetLBTicks);
-        targetRBTicks = Math.abs(targetRBTicks);
-         */
-
         int[] targetTicksArray = {
                 (int) (targetLFTicks + 0.5),
                 (int) (targetRFTicks + 0.5),
                 (int) (targetLBTicks + 0.5),
                 (int) (targetRBTicks + 0.5)
         };
+         */
 
         boolean reachedTarget = false;
 
+        boolean lfStopped = false;
+        boolean rfStopped = false;
+        boolean lbStopped = false;
+        boolean rbStopped = false;
+
+        int lft, rft, lbt, rbt;
+
         while (!reachedTarget) {
 
-            int lft = lfMotor.getCurrentPosition();
-            int rft = lfMotor.getCurrentPosition();
-            int lbt = lfMotor.getCurrentPosition();
-            int rbt = lfMotor.getCurrentPosition();
+            lft = lfMotor.getCurrentPosition();
+            rft = rfMotor.getCurrentPosition();
+            lbt = lbMotor.getCurrentPosition();
+            rbt = rbMotor.getCurrentPosition();
+
+            if (Math.abs(lft) >= Math.abs(targetLFTicks)) {
+                lfMotor.setPower(0);
+                lfStopped = true;
+            }
+
+            if (Math.abs(rft) >= Math.abs(targetRFTicks)) {
+                rfMotor.setPower(0);
+                rfStopped = true;
+            }
+
+            if (Math.abs(lbt) >= Math.abs(targetLBTicks)) {
+                lbMotor.setPower(0);
+                lbStopped = true;
+            }
+
+            if (Math.abs(rbt) >= Math.abs(targetRBTicks)) {
+                rbMotor.setPower(0);
+                rbStopped = true;
+            }
+
+            if (lfStopped && rfStopped && lbStopped && rbStopped) {
+                reachedTarget = true;
+            }
 
             /*
             lft = Math.abs(lft);
             rft = Math.abs(rft);
             lbt = Math.abs(lbt);
             rbt = Math.abs(rbt);
-             */
 
             int[] currentTicksArray = {
                     lft,
@@ -167,7 +206,6 @@ public class AutonDrivetrain {
                     rbt
             };
 
-            /*
             boolean[] successes = {
                     lft > targetLFTicks && targetLFTicks > 0,
                     rft > targetRFTicks && targetRFTicks > 0,
@@ -183,7 +221,6 @@ public class AutonDrivetrain {
             if (count >= 2) {
                 reachedTarget = true;
             }
-             */
 
             int count = 0;
             for (int i = 0; i < 4; i++) {
@@ -203,6 +240,7 @@ public class AutonDrivetrain {
             if (count == 4) {
                 reachedTarget = true;
             }
+            */
 
             telemetry.addLine("LF Target: " + targetLFTicks + " LF Actual: " + lft);
             telemetry.addLine("RF Target: " + targetRFTicks + " RF Actual: " + rft);
