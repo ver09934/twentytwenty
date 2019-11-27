@@ -51,27 +51,26 @@ public class SkystoneTeleOp extends OpMode {
     private boolean blockServoOpen = false;
 
     // Block servo positions
-    private double blockServoClosedPosition = 1;
-    private double blockServoOpenPosition = 0.6;
+    private double blockServoClosedPosition = 0;
+    private double blockServoOpenPosition = 0.5;
 
     // Winch things
     private double winchPower = 0.3;
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
 
-    private int foundationHeight = 400;
+    private int foundationHeight = 600;
     private int winchMotorStep = 750;
     private int[] winchMotorPositions = {
             0,
-            foundationHeight + winchMotorStep,
+            foundationHeight,
             foundationHeight + winchMotorStep * 1,
             foundationHeight + winchMotorStep * 2,
             foundationHeight + winchMotorStep * 3,
             foundationHeight + winchMotorStep * 4,
             foundationHeight + winchMotorStep * 5,
             foundationHeight + winchMotorStep * 6,
-            foundationHeight + winchMotorStep * 7,
-            foundationHeight + winchMotorStep * 8
+            (int) ((foundationHeight + winchMotorStep * 6.8) + 0.5),
     };
     private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
