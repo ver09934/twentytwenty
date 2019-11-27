@@ -401,6 +401,13 @@ public class SkystoneTeleOp extends OpMode {
         // Finish steering, putting power into hardware
         steering.finishSteering();
 
+        telemetry.addLine("-----------------------------");
+        telemetry.addData("LF Position", driverFunction.lf.getPosition());
+        telemetry.addData("LB Position", driverFunction.lb.getPosition());
+        telemetry.addData("RF Position", driverFunction.rf.getPosition());
+        telemetry.addData("RB Position", driverFunction.rb.getPosition());
+        telemetry.addLine("-----------------------------");
+
         // Update telemetry
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();
