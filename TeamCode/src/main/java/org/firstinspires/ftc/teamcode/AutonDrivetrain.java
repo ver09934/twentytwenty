@@ -15,13 +15,25 @@ public class AutonDrivetrain {
     // Thus, could specify a velocity instead of a power
     // Power is nice, though, because is scales 0 to 1
 
-    // TODO: Get real values
-    // TODO: Add gear ratio - needs to increase predicted ticks for a set distance
-    public static final double GEAR_RATIO = 1; // TODO: Value and implement
-    public static final int TICKS_PER_ROTATION = 60;
-    public static final double WHEEL_DIAMETER = 8; // [cm]
+    public static final double GEAR_RATIO = 1; // output/input teeth
+    public static final int TICKS_PER_MOTOR_ROTATION = 280;
+    // Round to nearest integer by adding 0.5 and casting to int
+    public static final int TICKS_PER_WHEEL_ROTATION = (int)((TICKS_PER_MOTOR_ROTATION * GEAR_RATIO) + 0.5);
+    public static final double WHEEL_DIAMETER = 10.16; // [cm]
     public static final double WHEEL_CIRCUMFERENCE = Math.PI * WHEEL_DIAMETER; // [cm]
-    public static final double DISTANCE_PER_TICK = WHEEL_CIRCUMFERENCE / TICKS_PER_ROTATION;
+    public static final double DISTANCE_PER_TICK = WHEEL_CIRCUMFERENCE / TICKS_PER_WHEEL_ROTATION;
+    // NOTE: Might it make more sense to do angle per tick?
+
+    // ---------- Distance Utilities ----------
+
+    public static int distanceToEncoderTicks(double distance) {
+        // Round to nearest integer by adding 0.5 and casting to int
+        return (int)((distance / DISTANCE_PER_TICK) + 0.5);
+    }
+
+    public static double encoderTicksToDistance(int encoderTicks) {
+        return DISTANCE_PER_TICK * encoderTicks;
+    }
 
     // ---------- Movement methods ----------
 
@@ -29,8 +41,6 @@ public class AutonDrivetrain {
     public void moveCardinal(double power, double distance, int direction) {
 
         resetAllEncoders();
-
-        double targetTicks = distanceToEncoderTicks(distance);
 
         int[] motorDirections = {1, 1, 1, 1};
 
@@ -55,10 +65,15 @@ public class AutonDrivetrain {
             throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
         }
 
-        lfMotor.setPower(power * motorDirections[0]);
-        rfMotor.setPower(power * motorDirections[1]);
-        lbMotor.setPower(power * motorDirections[2]);
-        rbMotor.setPower(power * motorDirections[3]);
+        // TODO: See if needed
+        double maxPower = Math.sqrt(2);
+
+        lfMotor.setPower(power * motorDirections[0] / maxPower);
+        rfMotor.setPower(power * motorDirections[1] / maxPower);
+        lbMotor.setPower(power * motorDirections[2] / maxPower);
+        rbMotor.setPower(power * motorDirections[3] / maxPower);
+
+        double targetTicks = distanceToEncoderTicks(distance);
 
         int averageMotorTicks = 0;
 
@@ -73,11 +88,10 @@ public class AutonDrivetrain {
         setAllMotorPowers(0);
     }
 
-    // TODO
     // Synchronous movement
     public void moveDistance(double angle, double power, double distance) {
 
-        // TODO: Perhaps methodize repeatable logic
+        resetAllEncoders();
 
         angle = Math.toRadians(angle);
 
@@ -89,8 +103,7 @@ public class AutonDrivetrain {
         double powerLB = -x - y;
         double powerRB = -x + y;
 
-        // double maxPossiblePower = Math.cos(Math.PI/4) + Math.sin(Math.PI/4);
-        double maxPossiblePower = Math.sqrt(2);
+        double maxPossiblePower = Math.cos(Math.PI/4) + Math.sin(Math.PI/4);
 
         powerLF /= maxPossiblePower;
         powerRF /= maxPossiblePower;
@@ -101,6 +114,22 @@ public class AutonDrivetrain {
         powerRF *= power;
         powerLB *= power;
         powerRB *= power;
+
+        lfMotor.setPower(powerLF);
+        rfMotor.setPower(powerRF);
+        lbMotor.setPower(powerLB);
+        rbMotor.setPower(powerRB);
+
+        // double maxOutputPower = Math.max(Math.max(Math.max(powerLF, powerRF), powerLB), powerRB);
+
+        double targetTicks = distanceToEncoderTicks(distance);
+
+        double targetLFTicks = targetTicks * (powerLF / power);
+        double targetRFTicks = targetTicks * (powerRF / power);
+        double targetLBTicks = targetTicks * (powerLB / power);
+        double targetRBTicks = targetTicks * (powerRB / power);
+
+        setAllMotorPowers(0);
 
         /*
         NOTE:
@@ -114,12 +143,11 @@ public class AutonDrivetrain {
 
     // Simply set powers and return
     public void moveContinuous(double angle, double power) {
-        // TODO
+        // TODO: This will follow simply from above driving logic
     }
 
     public void turn(double angle, double power) {
-        // TODO: I doubt this will be fun...
-        // This may need to be simply empirical...
+        // TODO: This may need to be simply empirical...
     }
 
     // ---------- Individual motor things ----------
@@ -162,16 +190,5 @@ public class AutonDrivetrain {
         rfMotor.setPower(power);
         lbMotor.setPower(power);
         rbMotor.setPower(power);
-    }
-
-    // ---------- Other utilities ----------
-
-    public static int distanceToEncoderTicks(double distance) {
-        // Round to nearest integer by adding 0.5 and casting to int
-        return (int)((distance / DISTANCE_PER_TICK) + 0.5);
-    }
-
-    public static double encoderTicksToDistance(int encoderTicks) {
-        return DISTANCE_PER_TICK * encoderTicks;
     }
 }
