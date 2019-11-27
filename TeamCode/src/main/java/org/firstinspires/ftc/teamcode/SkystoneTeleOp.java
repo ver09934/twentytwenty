@@ -23,7 +23,7 @@ public class SkystoneTeleOp extends OpMode {
     int tmp = winchMotor1.getCurrentPosition();
     */
 
-    // TODO: Add button (left trigger?) to set winch index to zero
+    // TODO: Rename variables and hardware devices from 1/2 to left/right
 
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
@@ -67,7 +67,7 @@ public class SkystoneTeleOp extends OpMode {
     private double blockServoOpenPosition = 0.5;
 
     // Winch things
-    private double winchPower = 0.3;
+    private double winchPower = 0.6;
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
 
@@ -125,8 +125,8 @@ public class SkystoneTeleOp extends OpMode {
 
         gulperMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         gulperMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winchMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        winchMotor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        winchMotor2.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
 
         gulperMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
         winchMotor1.setDirection(DcMotorSimple.Direction.REVERSE);
