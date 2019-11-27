@@ -15,7 +15,7 @@ public class TestIMUAuton extends LinearOpMode {
     private ElapsedTime runtime;
 
     BNO055IMU imu;
-    Orientation lastAngles = new Orientation();
+    // Orientation lastAngles = new Orientation();
 
     double globalAngle;
     double correction;
@@ -61,6 +61,7 @@ public class TestIMUAuton extends LinearOpMode {
 
         while (opModeIsActive()) {
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+            // imu. (see options)
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Runtime", runtime.toString());

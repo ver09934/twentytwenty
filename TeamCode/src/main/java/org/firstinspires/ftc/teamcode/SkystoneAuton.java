@@ -1,7 +1,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -10,17 +9,8 @@ public class SkystoneAuton extends LinearOpMode {
 
     private ElapsedTime runtime;
 
-    // --- "Main" Method ---
-
     @Override
     public void runOpMode() {
-
-        /*
-        Some of the control flow options:
-        waitForStart();
-        while (!this.isStarted()) {}
-        while (opModeIsActive()) {}
-         */
 
         // --- Init Section ---
 
@@ -33,6 +23,7 @@ public class SkystoneAuton extends LinearOpMode {
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.update();
         }
+        // waitForStart();
 
         // --- Run Section ---
 
@@ -40,8 +31,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         AutonDrivetrain autonDrivetrain = new AutonDrivetrain(hardwareMap, telemetry);
 
-        // autonDrivetrain.moveCardinal(0.5, 304.8, 90);
-        autonDrivetrain.moveDistance(0.5, 243.84, 60);
+        autonDrivetrain.moveCardinal(0.5, 304.8, 0);
+        // autonDrivetrain.moveDistance(0.5, 243.84, 60);
 
         /*
         for (int angle : new int[]{0, 90, 180, 270}) {

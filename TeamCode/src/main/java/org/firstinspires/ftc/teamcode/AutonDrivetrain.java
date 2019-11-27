@@ -66,6 +66,11 @@ public class AutonDrivetrain {
             throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
         }
 
+        if (direction == 0 || direction == 180) {
+            // Empirically determined values for strafing sideways
+            distance *= ((304.8) / (304.8 - 19));
+        }
+
         // TODO: See if needed
         double maxPower = Math.sqrt(2);
 
