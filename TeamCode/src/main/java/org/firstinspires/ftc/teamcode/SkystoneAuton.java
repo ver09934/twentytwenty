@@ -50,10 +50,25 @@ public class SkystoneAuton extends LinearOpMode {
             telemetry.addData("Status", "Waiting for start");
             telemetry.addData("Runtime", runtime.toString());
             telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
+            telemetry.update();
         }
 
         // ----- RUN SECTION -----
 
+        moveCardinal(0.5, inchesToCm(46), 90);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(40), 0);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(2), 90);
+
+        sleep(3000);
+
+        moveCardinal(0.5, inchesToCm(10), 270);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(10), 180);
+        sleep(1000);
+        turnDegrees(0.5, 180);
+        turnDegrees(0.5, 180);
     }
 
     // ----- DRIVING STUFF -----
@@ -67,6 +82,10 @@ public class SkystoneAuton extends LinearOpMode {
 
     public static int distanceToEncoderTicks(double distance) {
         return (int)((distance / DISTANCE_PER_TICK) + 0.5);
+    }
+
+    public static double inchesToCm(double inches) {
+        return inches * 2.54;
     }
 
     public void moveCardinal(double power, double distance, int direction) {
@@ -113,7 +132,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         int averageMotorTicks = 0;
 
-        while (averageMotorTicks < targetTicks) {
+        while (averageMotorTicks < targetTicks && !this.isStopRequested()) {
             int lft = Math.abs(lfMotor.getCurrentPosition());
             int rft = Math.abs(rfMotor.getCurrentPosition());
             int lbt = Math.abs(lbMotor.getCurrentPosition());
@@ -157,7 +176,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         double currentAngle = startAngle;
 
-        if (angleDelta > 0 && targetAngle < startAngle) {
+        if (angleDelta > 0 && targetAngle < startAngle && !isStopRequested()) {
             while (currentAngle >= startAngle || currentAngle < targetAngle) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
@@ -165,7 +184,7 @@ public class SkystoneAuton extends LinearOpMode {
                 telemetry.update();
             }
         }
-        else if (angleDelta < 0 && targetAngle > startAngle) {
+        else if (angleDelta < 0 && targetAngle > startAngle && !isStopRequested()) {
             while (currentAngle <= startAngle || currentAngle > targetAngle) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
@@ -174,7 +193,7 @@ public class SkystoneAuton extends LinearOpMode {
             }
         }
         else if (angleDelta > 0) {
-            while (currentAngle < targetAngle) {
+            while (currentAngle < targetAngle && !isStopRequested()) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
@@ -182,7 +201,7 @@ public class SkystoneAuton extends LinearOpMode {
             }
         }
         else {
-            while (currentAngle > targetAngle) {
+            while (currentAngle > targetAngle && !isStopRequested()) {
                 currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
                 currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
