@@ -4,16 +4,18 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
     private ElapsedTime runtime;
-    BNO055IMU imu;
 
     @Override
     public void runOpMode() {
@@ -25,13 +27,81 @@ public class SkystoneAuton extends LinearOpMode {
 
         runtime = new ElapsedTime();
 
-        lfMotor = hardwareMap.dcMotor.get("lfMotor");
-        rfMotor = hardwareMap.dcMotor.get("rfMotor");
-        lbMotor = hardwareMap.dcMotor.get("lbMotor");
-        rbMotor = hardwareMap.dcMotor.get("rbMotor");
-        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
-        setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
+        initMotors();
+        initServos();
+        initIMU();
 
+        while (!this.isStarted()) {
+            telemetry.addData("Status", "Waiting for start");
+            telemetry.addData("Runtime", runtime.toString());
+            telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
+            telemetry.update();
+        }
+
+        // ----- RUN SECTION -----
+
+        testMove();
+    }
+
+    // ----- META-METHODS -----
+
+    public void testMove() {
+        moveCardinal(0.5, inchesToCm(27), 270);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(41), 180);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(2), 270);
+
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+
+        sleep(3000);
+
+        moveCardinal(0.5, inchesToCm(12), 90);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(12), 0);
+        sleep(1000);
+        turnDegrees(0.5, 180);
+        sleep(500);
+        turnDegrees(0.5, -180);
+    }
+
+    // ----- SERVO STUFF -----
+
+    public Servo autonGrabberLeft;
+
+    public double AUTON_GRABBER_LEFT_PASSIVE = 0.74;
+    public double AUTON_GRABBER_LEFT_ACTIVE = 0.04;
+
+    public void initServos() {
+        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+    }
+
+    // ----- COLOR SENSOR STUFF -----
+
+
+
+    // ----- DISTANCE SENSOR STUFF -----
+
+    public DistanceSensor frontDistanceSensor;
+    public DistanceSensor leftDistanceSensor;
+    public DistanceSensor rightDistanceSensor;
+
+    public DistanceUnit distanceUnit = DistanceUnit.CM;
+
+    public void initSensors() {
+        frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistanceSensor");
+        leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
+        rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
+    }
+
+    // frontDistanceSensor.getDistance(distanceUnit);
+
+    // ----- IMU STUFF -----
+
+    public BNO055IMU imu;
+
+    public void initIMU() {
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.mode = BNO055IMU.SensorMode.IMU;
         parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
@@ -47,33 +117,50 @@ public class SkystoneAuton extends LinearOpMode {
             sleep(50);
             idle();
         }
-
-        while (!this.isStarted()) {
-            telemetry.addData("Status", "Waiting for start");
-            telemetry.addData("Runtime", runtime.toString());
-            telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
-            telemetry.update();
-        }
-
-        // ----- RUN SECTION -----
-
-        moveCardinal(0.5, inchesToCm(27), 270);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(41), 180);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(2), 270);
-
-        sleep(3000);
-
-        moveCardinal(0.5, inchesToCm(12), 90);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(12), 0);
-        sleep(1000);
-        turnDegrees(0.5, 180);
-        sleep(500);
-        turnDegrees(0.5, -180);
     }
-    
+
+    // ----- MOTOR STUFF -----
+
+    private DcMotor lfMotor;
+    private DcMotor rfMotor;
+    private DcMotor lbMotor;
+    private DcMotor rbMotor;
+
+    public void initMotors() {
+        lfMotor = hardwareMap.dcMotor.get("lfMotor");
+        rfMotor = hardwareMap.dcMotor.get("rfMotor");
+        lbMotor = hardwareMap.dcMotor.get("lbMotor");
+        rbMotor = hardwareMap.dcMotor.get("rbMotor");
+        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
+        setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    public void setAllRunModes(DcMotor.RunMode runMode) {
+        lfMotor.setMode(runMode);
+        rfMotor.setMode(runMode);
+        lbMotor.setMode(runMode);
+        rbMotor.setMode(runMode);
+    }
+
+    public void setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+        lfMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        rfMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        lbMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        rbMotor.setZeroPowerBehavior(zeroPowerBehavior);
+    }
+
+    public void resetAllEncoders() {
+        setAllRunModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
+    }
+
+    public void setAllMotorPowers(double power) {
+        lfMotor.setPower(power);
+        rfMotor.setPower(power);
+        lbMotor.setPower(power);
+        rbMotor.setPower(power);
+    }
+
     // ----- DRIVING STUFF -----
 
     public static final double GEAR_RATIO = 1; // output/input teeth
@@ -214,38 +301,4 @@ public class SkystoneAuton extends LinearOpMode {
 
         setAllMotorPowers(0);
     }
-
-    // ----- MOTOR STUFF -----
-
-    private DcMotor lfMotor;
-    private DcMotor rfMotor;
-    private DcMotor lbMotor;
-    private DcMotor rbMotor;
-
-    public void setAllRunModes(DcMotor.RunMode runMode) {
-        lfMotor.setMode(runMode);
-        rfMotor.setMode(runMode);
-        lbMotor.setMode(runMode);
-        rbMotor.setMode(runMode);
-    }
-
-    public void setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
-        lfMotor.setZeroPowerBehavior(zeroPowerBehavior);
-        rfMotor.setZeroPowerBehavior(zeroPowerBehavior);
-        lbMotor.setZeroPowerBehavior(zeroPowerBehavior);
-        rbMotor.setZeroPowerBehavior(zeroPowerBehavior);
-    }
-
-    public void resetAllEncoders() {
-        setAllRunModes(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
-    }
-
-    public void setAllMotorPowers(double power) {
-        lfMotor.setPower(power);
-        rfMotor.setPower(power);
-        lbMotor.setPower(power);
-        rbMotor.setPower(power);
-    }
-
 }
