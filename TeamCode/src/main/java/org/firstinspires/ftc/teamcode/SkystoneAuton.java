@@ -5,7 +5,6 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -40,9 +39,12 @@ public class SkystoneAuton extends LinearOpMode {
         parameters.loggingEnabled = false;
         imu = hardwareMap.get(BNO055IMU.class, "imu");
         imu.initialize(parameters);
+
+        telemetry.addData("Status", "Calibrating IMU");
+        telemetry.update();
+
         while (!isStopRequested() && !imu.isGyroCalibrated()) {
-            telemetry.addData("Status", "Calibrating IMU");
-            telemetry.update();
+            sleep(50);
             idle();
         }
 
@@ -55,22 +57,23 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        moveCardinal(0.5, inchesToCm(46), 90);
+        moveCardinal(0.5, inchesToCm(27), 270);
         sleep(1000);
-        moveCardinal(0.5, inchesToCm(40), 0);
+        moveCardinal(0.5, inchesToCm(41), 180);
         sleep(1000);
-        moveCardinal(0.5, inchesToCm(2), 90);
+        moveCardinal(0.5, inchesToCm(2), 270);
 
         sleep(3000);
 
-        moveCardinal(0.5, inchesToCm(10), 270);
+        moveCardinal(0.5, inchesToCm(12), 90);
         sleep(1000);
-        moveCardinal(0.5, inchesToCm(10), 180);
+        moveCardinal(0.5, inchesToCm(12), 0);
         sleep(1000);
         turnDegrees(0.5, 180);
-        turnDegrees(0.5, 180);
+        sleep(500);
+        turnDegrees(0.5, -180);
     }
-
+    
     // ----- DRIVING STUFF -----
 
     public static final double GEAR_RATIO = 1; // output/input teeth
@@ -218,8 +221,6 @@ public class SkystoneAuton extends LinearOpMode {
     private DcMotor rfMotor;
     private DcMotor lbMotor;
     private DcMotor rbMotor;
-
-    Telemetry telemetry;
 
     public void setAllRunModes(DcMotor.RunMode runMode) {
         lfMotor.setMode(runMode);
