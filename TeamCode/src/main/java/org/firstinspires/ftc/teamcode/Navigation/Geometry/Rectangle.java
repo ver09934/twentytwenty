@@ -65,4 +65,12 @@ public class Rectangle {
         boolean in_y_bounds = pt.get_ycor() < a.get_ycor() && pt.get_ycor() > c.get_ycor();
         return in_x_bounds && in_y_bounds;
     }
+
+    public String toString() {
+        String output = "";
+        for (Coord coord : getCorners()) {
+            output += coord.toString() + "\n";
+        }
+        return output;
+    }
 }

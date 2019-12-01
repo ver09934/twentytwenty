@@ -105,6 +105,10 @@ public class Coord {
         return output;
     }
 
+    public String toString() {
+        return "X: " + x + "\n Y: " + y;
+    }
+
     public double xDist(Coord a) {
         return Math.abs(a.x - this.x);
     }

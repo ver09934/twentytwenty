@@ -154,7 +154,7 @@ public class OnlineMove implements MoveTools {
             powerRF -= speedY * power;
 
             steering.finishSteering();
-            sleep(200); // 600
+            time.sleep(200); // 600
             steering.stopAllMotors();
 
         }
@@ -179,8 +179,8 @@ public class OnlineMove implements MoveTools {
             // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
             int newLeftTarget = (lf.position() + lb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             int newRightTarget = (rf.position() + rb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
-            logger.add("Left target:", String.valueOf(newLeftTarget));
-            logger.add("Right Target:", String.valueOf(newRightTarget));
+            logger.add("Left target:", String.valueOf(newLeftTarget), true);
+            logger.add("Right Target:", String.valueOf(newRightTarget), true);
 
             // reset the timeout time and start motion.
             boolean lessThanLeftTarget = Math.abs(lf.position() + lb.position()) / 2 < newLeftTarget;
@@ -189,9 +189,11 @@ public class OnlineMove implements MoveTools {
 
             // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
             while ((time.time() < timeoutSeconds) && (lessThanLeftTarget && lessThanRightTarget)) {
+
                 double averagePositions = (double) (Math.abs(lf.position()) + Math.abs(lb.position()) + Math.abs(rf.position()) + Math.abs(rb.position())) / 4;
                 double newLeftSpeed;
                 double newRightSpeed;
+                logger.add("average pos:  ", String.valueOf(averagePositions), true);
 
                 //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over the amount of time you set for this SubRun
                 double seconds = time.seconds();

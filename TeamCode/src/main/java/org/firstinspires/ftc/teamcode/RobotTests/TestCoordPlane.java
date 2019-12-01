@@ -11,6 +11,7 @@ import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Tools.Logger.OfflineLoggerTools;
+import org.firstinspires.ftc.teamcode.Tools.Logger.OnlineLogger;
 import org.firstinspires.ftc.teamcode.Tools.Move.MoveTools;
 import org.firstinspires.ftc.teamcode.Tools.Move.OnlineMove;
 
@@ -26,12 +27,16 @@ public class TestCoordPlane extends LinearOpMode {
     public void runOpMode() {
         // --- Init ---
         Coord[] field_points = new Coord[]{new Coord(-50, 50), new Coord(50, 50), new Coord(-50, 50), new Coord(-50, -50)};
-        Field field = new Field(field_points, 3.6576);
-
-        LoggerTools logger = new OfflineLoggerTools();
+        Field field = new Field(field_points, 300);
+        //3.6576
+        LoggerTools logger = new OnlineLogger(telemetry);
         LoggerTools.RobotTime time = logger.getRobotTimeClass();
         MoveTools move = new OnlineMove(hardwareMap, telemetry);
         MoveTools.Steering steering = move.getSteeringClass();
+
+        logger.add("field values", field.toString());
+        logger.add("actual distances: ", String.valueOf(field.getEdges()[0].getLength()));
+        logger.add("actual distances: ", String.valueOf(field.getEdges()[1].getLength()));
 
         time.reset();
         Robot robot = new Robot(logger, move);
@@ -39,24 +44,24 @@ public class TestCoordPlane extends LinearOpMode {
         sleep(500);
 
         // Initial telemetry
+        logger.add("Test telem: ", "blah");
         logger.add("Status", "Initialized", true);
 
         sleep(500);
 
         // Reset encoders
         move.resetAllEncoders();
-        while (!this.isStarted()) {
-            logger.add("Status", "Run Time: ", true);
-        }
 
         // --- Start ---
         time.sleep(500);
-        logger.add("Status", "Test move...", true);
-        steering.moveSeconds(1, 0, 1);
+        //logger.add("Status", "Test move...", true);
+        //steering.moveSeconds(1, 0, 1);
 
 
-        logger.add("Status", "Starting drive", true);
-        robot.moveTo(new Coord(50, 50), 0.5);
+ /*       logger.add("Status", "Starting drive", true);
+        robot.moveTo(new Coord(0, 50), 0.5);
+*/
+
 
 
         // Potentially reset the encoders here

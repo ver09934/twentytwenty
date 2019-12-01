@@ -30,26 +30,30 @@ public class Robot {
     }
 
     public void moveTo(Coord end_point, double speed) {
-        logger.add("Status", "Starting movement", true);
+        logger.add("Status", "Starting movement");
 
-
+        logger.add("status", "calcing coord distance");
         // Checks the point is possible
         double distance = position.distance(end_point);
         // Gets the angle for the robot to move
+        logger.add("status", "calcing angle");
+
         double angle = Math.asin(position.yDist(end_point) / distance);
         addDegrees(angle);
-
-
-        try {
+        double actual_dist = currentField.convertToMeters(distance);
+        logger.add("status", "Calcing actual dist ");
+        logger.add("value:", "calced actual dist" + String.valueOf(actual_dist));
+        logger.update(false);
+        steering.moveDistance(actual_dist, angle, speed);
+        position = end_point;
+/*        try {
             //Tells the robot to move at a speed given with the calculated angle, robot goes for a max of 100 seconds, takes 2 seconds to speed up wheels to proper speed
-            steering.moveDistance(currentField.convertToMeters(distance), angle, speed);
-            position = end_point;
+
         } catch (Exception InterruptedException) {
             logger.add("Status:", "Failed", true);
-        }
+        }*/
         // TODO fix coord in rectangle check
-        if (currentField.coordInRectangle(end_point)) {
-        }
+
     }
 
     double getDistFromWall(double test_dist) {
