@@ -16,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 
 @Autonomous(name = "Skystone Auton")
@@ -59,7 +58,12 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void testMoveTwo() {
 
-        moveCardinal(0.5, inchesToCm(27), 270);
+        double hugepow = 0.5;
+        double bigpow = 0.5;
+        double pow = 0.25;
+        double tinypow = 0.1;
+
+        moveCardinal(0.5, inchesToCm(27), 270, true);
 
         sleep(1000);
 
@@ -70,7 +74,7 @@ public class SkystoneAuton extends LinearOpMode {
             values.add(getLeftHSV()[2]);
 
             if (i < 2) {
-                moveCardinal(0.5, inchesToCm(8), 180);
+                moveCardinal(pow, inchesToCm(8), 180, true);
             }
 
             sleep(1000);
@@ -82,24 +86,57 @@ public class SkystoneAuton extends LinearOpMode {
         telemetry.addData("Min Index", minIndex);
         telemetry.update();
 
-        // moveCardinal(0.5, inchesToCm(8) * (values.size() - minIndex - 1), 0);
-        moveCardinal(0.5, inchesToCm(1), 0);
+        // moveCardinal(pow, inchesToCm(2), 0, true);
+
+        double randDist = 3;
+        if (minIndex == 2) {
+            moveCardinal(pow, inchesToCm(randDist), 0, true);
+        }
         for (int i = 0; i < values.size() - minIndex - 1; i++) {
-            moveCardinal(0.5, inchesToCm(8), 0);
+
+            if (i == 0) {
+                moveCardinal(pow, inchesToCm(8 + randDist), 0, true);
+            }
+            else {
+                moveCardinal(pow, inchesToCm(8), 0, true);
+            }
+
             sleep(1000);
         }
-        sleep(1000);
-        moveCardinal(0.25, inchesToCm(3), 270);
-        sleep(1000);
+
+        moveCardinal(tinypow, inchesToCm(1), 270, false);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        moveCardinal(tinypow, inchesToCm(1), 270, true);
         sleep(1000);
-        moveCardinal(0.5, inchesToCm(12), 90);
+
+        moveCardinal(bigpow, inchesToCm(18), 90, true);
+        sleep(1000);
+        moveCardinal(hugepow, inchesToCm(50), 0, true);
+        sleep(1000);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+        sleep(1000);
+        moveCardinal(hugepow, inchesToCm(50 + 24), 180, true);
+        sleep(1000);
+        moveCardinal(bigpow, inchesToCm(18 - 2), 270, true);
+
+        moveCardinal(tinypow, inchesToCm(1), 270, false);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        moveCardinal(tinypow, inchesToCm(1), 270, true);
+        sleep(1000);
+
+        moveCardinal(bigpow, inchesToCm(18), 90, true);
+        sleep(1000);
+        moveCardinal(hugepow, inchesToCm(50 + 24), 0, true);
+        sleep(1000);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+        sleep(1000);
 
         telemetry.addData("Values", values);
         telemetry.addData("Min Index", minIndex);
         telemetry.update();
     }
 
+    /*
     public void testMove() {
         moveCardinal(0.5, inchesToCm(27), 270);
         sleep(1000);
@@ -119,6 +156,7 @@ public class SkystoneAuton extends LinearOpMode {
         sleep(500);
         turnDegrees(0.5, -180);
     }
+     */
 
     // ----- SERVO STUFF -----
 
@@ -261,7 +299,7 @@ public class SkystoneAuton extends LinearOpMode {
         return inches * 2.54;
     }
 
-    public void moveCardinal(double power, double distance, int direction) {
+    public void moveCardinal(double power, double distance, int direction, boolean stopMotors) {
 
         resetAllEncoders();
 
@@ -320,7 +358,9 @@ public class SkystoneAuton extends LinearOpMode {
             telemetry.update();
         }
 
-        setAllMotorPowers(0);
+        if (stopMotors) {
+            setAllMotorPowers(0);
+        }
     }
 
     public void turnDegrees(double turnPower, double angleDelta) {
