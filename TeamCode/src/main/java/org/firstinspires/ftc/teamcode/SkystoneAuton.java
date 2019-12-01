@@ -1,8 +1,11 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.graphics.Color;
+
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -11,6 +14,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
@@ -29,6 +36,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         initMotors();
         initServos();
+        initColorSensors();
         initIMU();
 
         while (!this.isStarted()) {
@@ -40,10 +48,57 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        testMove();
+        testMoveTwo();
+
+        while (opModeIsActive()) {
+            idle();
+        }
     }
 
     // ----- META-METHODS -----
+
+    public void testMoveTwo() {
+
+        moveCardinal(0.5, inchesToCm(27), 270);
+
+        sleep(1000);
+
+        ArrayList values = new ArrayList<Double>();
+
+        for (int i = 0; i < 3; i++) {
+
+            values.add(getLeftHSV()[2]);
+
+            if (i < 2) {
+                moveCardinal(0.5, inchesToCm(8), 180);
+            }
+
+            sleep(1000);
+        }
+
+        int minIndex = values.indexOf(Collections.min(values));
+
+        telemetry.addData("Values", values);
+        telemetry.addData("Min Index", minIndex);
+        telemetry.update();
+
+        // moveCardinal(0.5, inchesToCm(8) * (values.size() - minIndex - 1), 0);
+        moveCardinal(0.5, inchesToCm(1), 0);
+        for (int i = 0; i < values.size() - minIndex - 1; i++) {
+            moveCardinal(0.5, inchesToCm(8), 0);
+            sleep(1000);
+        }
+        sleep(1000);
+        moveCardinal(0.25, inchesToCm(3), 270);
+        sleep(1000);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        sleep(1000);
+        moveCardinal(0.5, inchesToCm(12), 90);
+
+        telemetry.addData("Values", values);
+        telemetry.addData("Min Index", minIndex);
+        telemetry.update();
+    }
 
     public void testMove() {
         moveCardinal(0.5, inchesToCm(27), 270);
@@ -79,7 +134,35 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- COLOR SENSOR STUFF -----
 
+    public ColorSensor leftColorColorSensor;
+    public DistanceSensor leftColorDistanceSensor;
 
+    public void initColorSensors() {
+        leftColorColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        leftColorDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftColorSensor");
+    }
+
+    public float[] getLeftHSV() {
+
+        double dist = leftColorDistanceSensor.getDistance(DistanceUnit.CM);
+
+        double a = leftColorColorSensor.alpha();
+        double r = leftColorColorSensor.red();
+        double g = leftColorColorSensor.green();
+        double b = leftColorColorSensor.blue();
+
+        float hsvValues[] = {0F, 0F, 0F};
+        final double SCALE_FACTOR = 255;
+
+        Color.RGBToHSV(
+                (int) (r * SCALE_FACTOR),
+                (int) (g * SCALE_FACTOR),
+                (int) (b * SCALE_FACTOR),
+                hsvValues
+        );
+
+        return hsvValues;
+    }
 
     // ----- DISTANCE SENSOR STUFF -----
 
@@ -89,7 +172,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     public DistanceUnit distanceUnit = DistanceUnit.CM;
 
-    public void initSensors() {
+    public void initDistanceSensors() {
         frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistanceSensor");
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");

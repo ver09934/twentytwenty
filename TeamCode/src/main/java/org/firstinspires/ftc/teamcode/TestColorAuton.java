@@ -26,8 +26,8 @@ public class TestColorAuton extends LinearOpMode {
 
         runtime = new ElapsedTime();
 
-        colorSensor = hardwareMap.get(ColorSensor.class, "sensor_color_distance");
-        distanceSensor = hardwareMap.get(DistanceSensor.class, "sensor_color_distance");
+        colorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
+        distanceSensor = hardwareMap.get(DistanceSensor.class, "leftColorSensor");
 
         while (!this.isStarted()) {
             telemetry.addData("Status", "Waiting for start");
@@ -55,12 +55,15 @@ public class TestColorAuton extends LinearOpMode {
             );
 
             telemetry.addData("Distance [cm]", dist);
+            telemetry.addLine("-------------------");
             telemetry.addData("Alpha", a);
             telemetry.addData("Red", r);
             telemetry.addData("Green", g);
             telemetry.addData("Blue ", b);
+            telemetry.addLine("-------------------");
             telemetry.addData("Hue", hsvValues[0]);
-
+            telemetry.addData("Sat", hsvValues[1]);
+            telemetry.addData("Val", hsvValues[2]);
             telemetry.update();
         }
     }
