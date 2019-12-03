@@ -16,12 +16,12 @@ public class Field extends Rectangle {
         this.UNIT_CONV_FACTOR = FIELD_LENGTH / 100;
     }
 
-    double convertToMeters(double coord_distance) {
+    public double convertToMeters(double coord_distance) {
         return coord_distance * UNIT_CONV_FACTOR;
     }
 
     //Sorry for the long names, please don't shoot me
-    double convertToCoord(double length) {
+    public double convertToCoord(double length) {
         return length / UNIT_CONV_FACTOR;
     }
 

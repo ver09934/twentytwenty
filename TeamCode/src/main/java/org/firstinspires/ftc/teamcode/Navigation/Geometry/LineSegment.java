@@ -3,7 +3,7 @@ package org.firstinspires.ftc.teamcode.Navigation.Geometry;
 public class LineSegment extends Line implements Comparable<LineSegment>{
     private double length;
 
-    LineSegment(Coord a, Coord b) {
+    public LineSegment(Coord a, Coord b) {
         super(a, b);
         this.length = calculateLength();
     }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.Tools.Move;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 import org.firstinspires.ftc.teamcode.Tools.Logger.OnlineLogger;
@@ -20,8 +21,9 @@ public class OnlineMove implements MoveTools {
     }
 
     private Telemetry telemetry;
-    public LoggerTools logger = new OnlineLogger(telemetry);
-    public LoggerTools.RobotTime time = logger.getRobotTimeClass();
+    public ElapsedTime time = new ElapsedTime();
+    public LoggerTools logger;
+    public LoggerTools.RobotTime rb_time;
     public LoggerTools getLogger() {
         return logger;
     }
@@ -32,15 +34,18 @@ public class OnlineMove implements MoveTools {
     private static final double DEFAULT_SMOOTHNESS = 2;
     private static final DcMotor.RunMode DEFAULT_RUNMODE = DcMotor.RunMode.RUN_USING_ENCODER;
 
-    public OnlineMove(HardwareMap hardwareMap, Telemetry telemetry) {
+    public OnlineMove(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime time) {
         this(hardwareMap, telemetry, DEFAULT_SMOOTHNESS);
+        this.telemetry = telemetry;
+        logger = new OnlineLogger(telemetry,time);
+        rb_time = logger.getRobotTimeClass();
     }
-    public OnlineMove(HardwareMap hardwareMap, Telemetry telemetry, double smoothness) {
+    public OnlineMove(HardwareMap hardwareMap, Telemetry telemetry,  double smoothness) {
         this.lf = new DrivingMotor(hardwareMap.dcMotor.get("lfMotor"), smoothness, DEFAULT_RUNMODE);
         this.lb = new DrivingMotor(hardwareMap.dcMotor.get("lbMotor"), smoothness, DEFAULT_RUNMODE);
         this.rf = new DrivingMotor(hardwareMap.dcMotor.get("rfMotor"), smoothness, DEFAULT_RUNMODE);
         this.rb = new DrivingMotor(hardwareMap.dcMotor.get("rbMotor"), smoothness, DEFAULT_RUNMODE);
-        this.telemetry = telemetry;
+
     }
 
     public DrivingMotor[] getAllMotors() {
@@ -154,7 +159,7 @@ public class OnlineMove implements MoveTools {
             powerRF -= speedY * power;
 
             steering.finishSteering();
-            time.sleep(200); // 600
+            rb_time.sleep(200); // 600
             steering.stopAllMotors();
 
         }
@@ -175,7 +180,6 @@ public class OnlineMove implements MoveTools {
             double Lspeed = power;
 
             //initialise some variables for the subroutine
-            // Ensure that the opmode is still active
             // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
             int newLeftTarget = (lf.position() + lb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             int newRightTarget = (rf.position() + rb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
@@ -188,7 +192,7 @@ public class OnlineMove implements MoveTools {
             time.reset();
 
             // keep looping while we are still active, and there is time left, and neither set of motors have reached the target
-            while ((time.time() < timeoutSeconds) && (lessThanLeftTarget && lessThanRightTarget)) {
+            while ((rb_time.time() < timeoutSeconds) && (lessThanLeftTarget && lessThanRightTarget)) {
 
                 double averagePositions = (double) (Math.abs(lf.position()) + Math.abs(lb.position()) + Math.abs(rf.position()) + Math.abs(rb.position())) / 4;
                 double newLeftSpeed;
@@ -196,7 +200,7 @@ public class OnlineMove implements MoveTools {
                 logger.add("average pos:  ", String.valueOf(averagePositions), true);
 
                 //To Avoid spinning the wheels, this will "Slowly" ramp the motors up over the amount of time you set for this SubRun
-                double seconds = time.seconds();
+                double seconds = rb_time.seconds();
 
                 // ramps up in the beginning based on the number of seconds specified
                 if (seconds < rampup) {
@@ -222,8 +226,9 @@ public class OnlineMove implements MoveTools {
                 }
 
                 // calculates the ratio for the wheels to spin to achieve the angle of motion
-                double speedX = Math.cos(angle - Math.toRadians(45));
-                double speedY = Math.sin(angle - Math.toRadians(45));
+                double speedX = Math.cos(Math.toRadians(angle) - Math.toRadians(45));
+
+                double speedY = Math.sin(Math.toRadians(angle) - Math.toRadians(45));
 
                 // Applies the calculated value to move and the angle calculation
                 powerLF += speedX * newLeftSpeed;

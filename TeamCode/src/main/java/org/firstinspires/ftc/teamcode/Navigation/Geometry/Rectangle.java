@@ -22,7 +22,7 @@ public class Rectangle {
     public LineSegment[] getEdges() {
         LineSegment[] sides = new LineSegment[4];
         Coord[] corners = getCorners();
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 3; i++) {
             sides[i] = new LineSegment(corners[i], corners[i+1]);
         }
         sides[3] = new LineSegment(corners[0], corners[3]);

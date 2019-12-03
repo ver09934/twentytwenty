@@ -3,21 +3,23 @@ package org.firstinspires.ftc.teamcode.Tools.Logger;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 
 import java.util.concurrent.TimeUnit;
 
 public class OnlineLogger implements LoggerTools {
     Telemetry telemetry;
-    ElapsedTime elapsedTime = new ElapsedTime();
-    RobotTime time = new RobotTime();
+    ElapsedTime elapsedTime;
+    RobotTime rb_time = new RobotTime();
 
 
     public RobotTime getRobotTimeClass() {
-        return time;
+        return rb_time;
     }
 
-    public OnlineLogger(Telemetry telemetry) {
+    public OnlineLogger(Telemetry telemetry, ElapsedTime time) {
+        this.elapsedTime = time;
         this.telemetry = telemetry;
     }
 
@@ -44,6 +46,9 @@ public class OnlineLogger implements LoggerTools {
     }
 
     class RobotTime implements LoggerTools.RobotTime {
+
+
+
         public long now(TimeUnit unit) {
             return elapsedTime.now(unit);
         }

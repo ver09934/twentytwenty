@@ -26,20 +26,23 @@ public class TestCoordPlane extends LinearOpMode {
     @Override
     public void runOpMode() {
         // --- Init ---
+        ElapsedTime et_time = new ElapsedTime();
         Coord[] field_points = new Coord[]{new Coord(-50, 50), new Coord(50, 50), new Coord(-50, 50), new Coord(-50, -50)};
-        Field field = new Field(field_points, 300);
-        //3.6576
-        LoggerTools logger = new OnlineLogger(telemetry);
+        Field field = new Field(field_points, 3.6576);
+        MoveTools move = new OnlineMove(hardwareMap, telemetry, et_time);
+        LoggerTools logger = move.getLogger();
         LoggerTools.RobotTime time = logger.getRobotTimeClass();
-        MoveTools move = new OnlineMove(hardwareMap, telemetry);
         MoveTools.Steering steering = move.getSteeringClass();
 
         logger.add("field values", field.toString());
         logger.add("actual distances: ", String.valueOf(field.getEdges()[0].getLength()));
         logger.add("actual distances: ", String.valueOf(field.getEdges()[1].getLength()));
+        double conv = field.convertToMeters(50);
+        logger.add("actual distances: ", String.valueOf(conv));
+
 
         time.reset();
-        Robot robot = new Robot(logger, move);
+        Robot robot = new Robot(logger, move, field);
 
         sleep(500);
 
@@ -54,14 +57,24 @@ public class TestCoordPlane extends LinearOpMode {
 
         // --- Start ---
         time.sleep(500);
-        //logger.add("Status", "Test move...", true);
-        //steering.moveSeconds(1, 0, 1);
 
+        logger.add("Status", "Starting drive", true);
+        double len = field.convertToCoord(1);
 
- /*       logger.add("Status", "Starting drive", true);
-        robot.moveTo(new Coord(0, 50), 0.5);
-*/
+        logger.add("Status", "move forward 1m", true);
+        robot.moveTo(new Coord(0, len), 0.5);
 
+        logger.add("Status", "move backward 1m", true);
+        robot.moveTo(new Coord(0, 0), 0.5);
+
+        logger.add("Status", "move 1m at 45deg", true);
+        robot.moveTo(new Coord(len, len), 0.5);
+
+        logger.add("Status", "move left 1m", true);
+        robot.moveTo(new Coord(0, len), 0.5);
+
+        logger.add("Status", "move right 1m", true);
+        robot.moveTo(new Coord(len, len), 0.5);
 
 
         // Potentially reset the encoders here

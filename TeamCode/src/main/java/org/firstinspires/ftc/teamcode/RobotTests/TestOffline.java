@@ -24,7 +24,7 @@ class TestOffline {
         time.reset();
         logger.add(String.valueOf(time.startTime()), "");
         logger.add(String.valueOf(time.time()), "");
-        logger.add("Elapsed seconds, milliseconds, nanoseconds:","");
+        logger.add("Elapsed seconds, milliseconds, nanoseconds:", "");
 
         for (int i = 0; i < 10; i++) {
             try {
