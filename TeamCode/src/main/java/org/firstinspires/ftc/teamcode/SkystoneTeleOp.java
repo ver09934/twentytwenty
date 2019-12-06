@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
-import static org.firstinspires.ftc.teamcode.DriverFunction.MIN_SPEED_RATIO;
+// import static org.firstinspires.ftc.teamcode.DriverFunction.MIN_SPEED_RATIO;
 import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
 
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
@@ -32,6 +32,7 @@ public class SkystoneTeleOp extends OpMode {
 
     // Driving variables
     private final static double TURNING_SPEED_BOOST = 0.3;
+    private final static double MIN_SPEED_RATIO = 0.1;
 
     // DC Motors
     DcMotor gulperMotor1;
@@ -347,6 +348,9 @@ public class SkystoneTeleOp extends OpMode {
                 currentWinchIndex  = 0;
                 winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
                 winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+
+                blockServo.setPosition(blockServoClosedPosition);
+                blockServoOpen = false;
             }
         }
         else {
