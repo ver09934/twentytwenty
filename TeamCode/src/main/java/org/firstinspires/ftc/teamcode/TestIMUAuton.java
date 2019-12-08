@@ -61,11 +61,15 @@ public class TestIMUAuton extends LinearOpMode {
 
         while (opModeIsActive()) {
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
-            // imu. (see options)
+
+            double legitAngle = angles.firstAngle;
+            double LEGITANGLE = legitAngle < 0 ? legitAngle + 360 : legitAngle;
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Runtime", runtime.toString());
             telemetry.addLine(angles.toString());
+            telemetry.addData("Legit angle", legitAngle);
+            telemetry.addData("LEGIT ANGLE", LEGITANGLE);
             telemetry.update();
         }
     }
