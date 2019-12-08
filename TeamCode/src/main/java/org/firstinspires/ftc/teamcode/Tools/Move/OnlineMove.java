@@ -214,21 +214,20 @@ public class OnlineMove implements MoveTools {
                     newRightSpeed = Rspeed;
 
                 //start slowing down as you get close to the target
-                } else if (averagePositions > (200) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
+                } /*else if (averagePositions > (200) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
                     newLeftSpeed = Lspeed * (averagePositions / 1000);
                     newRightSpeed = Rspeed * (averagePositions / 1000);
 
                     //minimum speed
-                } else {
+                }*/ else {
                     newLeftSpeed = Lspeed * .2;
                     newRightSpeed = Rspeed * .2;
 
                 }
 
                 // calculates the ratio for the wheels to spin to achieve the angle of motion
-                double speedX = Math.cos(Math.toRadians(angle) - Math.toRadians(45));
-
-                double speedY = Math.sin(Math.toRadians(angle) - Math.toRadians(45));
+                double speedX = Math.cos(angle - Math.toRadians(45));
+                double speedY = Math.sin(angle - Math.toRadians(45));
 
                 // Applies the calculated value to move and the angle calculation
                 powerLF += speedX * newLeftSpeed;
@@ -237,16 +236,17 @@ public class OnlineMove implements MoveTools {
                 powerRF -= speedX * newRightSpeed;
                 finishSteering();
 
-                logger.add("Power LF", String.valueOf(powerLF));
-                logger.add("Power LB", String.valueOf(powerLB));
-                logger.add("Power RB", String.valueOf(powerRB));
-                logger.add("Power RF", String.valueOf(powerRF));
+
+                logger.add("Left speed jeff", String.valueOf(speedX));
+                logger.add("Right speed jeff", String.valueOf(speedY));
+                logger.add("loop calc speed", String.valueOf(newLeftSpeed));
+                logger.add("loop calc speed", String.valueOf(newRightSpeed));
 
 
                 // Recalculates the target value booleans
                 lessThanLeftTarget = Math.abs(lf.position() + lb.position()) / 2 < newLeftTarget;
                 lessThanRightTarget = Math.abs(rf.position() + rb.position()) / 2 < newRightTarget;
-                logger.update(true);
+                logger.update(false);
             }
 
             // Stop all motion;

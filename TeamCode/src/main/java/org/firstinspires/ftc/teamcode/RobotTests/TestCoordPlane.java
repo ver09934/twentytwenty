@@ -34,22 +34,17 @@ public class TestCoordPlane extends LinearOpMode {
         LoggerTools.RobotTime time = logger.getRobotTimeClass();
         MoveTools.Steering steering = move.getSteeringClass();
 
-        logger.add("field values", field.toString());
-        logger.add("actual distances: ", String.valueOf(field.getEdges()[0].getLength()));
-        logger.add("actual distances: ", String.valueOf(field.getEdges()[1].getLength()));
-        double conv = field.convertToMeters(50);
-        logger.add("actual distances: ", String.valueOf(conv));
-
-
         time.reset();
         Robot robot = new Robot(logger, move, field);
+
+        while(opModeIsActive()) {
+            idle();
+        }
 
         sleep(500);
 
         // Initial telemetry
-        logger.add("Test telem: ", "blah");
         logger.add("Status", "Initialized", true);
-
         sleep(500);
 
         // Reset encoders
@@ -57,24 +52,27 @@ public class TestCoordPlane extends LinearOpMode {
 
         // --- Start ---
         time.sleep(500);
-
         logger.add("Status", "Starting drive", true);
         double len = field.convertToCoord(1);
+/*
+
+
 
         logger.add("Status", "move forward 1m", true);
         robot.moveTo(new Coord(0, len), 0.5);
 
         logger.add("Status", "move backward 1m", true);
         robot.moveTo(new Coord(0, 0), 0.5);
+*/
 
         logger.add("Status", "move 1m at 45deg", true);
         robot.moveTo(new Coord(len, len), 0.5);
-
+/*
         logger.add("Status", "move left 1m", true);
         robot.moveTo(new Coord(0, len), 0.5);
 
         logger.add("Status", "move right 1m", true);
-        robot.moveTo(new Coord(len, len), 0.5);
+        robot.moveTo(new Coord(len, len), 0.5);*/
 
 
         // Potentially reset the encoders here
