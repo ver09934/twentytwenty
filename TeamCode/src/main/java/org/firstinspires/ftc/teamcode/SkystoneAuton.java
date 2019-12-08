@@ -541,6 +541,20 @@ public class SkystoneAuton extends LinearOpMode {
 
     // TODO: This method
     public void gotoDegreesRamping(double power, double degrees) {
-        // ramp based on degree difference
+
+        /*
+        TODO:
+        make something nice where we use the sign of the time derivative of the angle
+        to let us use angle wrapping to have an absolute angle, because this would make me very happy
+
+        If there is not time for this (which of course there won't be), we can just reuse the logic from
+        the hastily created method known as "turnDegrees"
+
+        Must be a bit careful, such as if we are at 359, time derivative is negative, and then we jump to zero
+        Therefore must do some tracking over time --> will be good fun
+         */
+
+        double currentAngle = getIMUAngleConverted();
+
     }
 }
