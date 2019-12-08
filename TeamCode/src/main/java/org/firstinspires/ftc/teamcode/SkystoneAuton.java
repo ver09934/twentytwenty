@@ -45,7 +45,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        testMoveTwo();
+        // testMoveTwo();
+        testMoveThree();
 
         while (opModeIsActive()) {
             idle();
@@ -53,6 +54,24 @@ public class SkystoneAuton extends LinearOpMode {
     }
 
     // ----- META-METHODS -----
+
+    public void testMoveThree() {
+
+        for (int i = 0; i < 360; i += 90) {
+            moveCardinalRamping(1, inchesToCm(30), i);
+            sleep(1000);
+        }
+
+        for (int i = 0; i < 360; i += 90) {
+            moveCardinalRamping(0.5, inchesToCm(12), i);
+            sleep(1000);
+        }
+
+        for (int i = 0; i < 360; i += 90) {
+            moveCardinalRamping(0.3, inchesToCm(4), i);
+            sleep(1000);
+        }
+    }
 
     public void testMoveTwo() {
 
@@ -410,40 +429,43 @@ public class SkystoneAuton extends LinearOpMode {
 
         int averageMotorTicks = 0;
 
-        double rampupSeconds = 1.5;
+        double rampupTicks = 600;
 
-        ElapsedTime rampupTimer = new ElapsedTime();
+        if (targetTicks / 2 < rampupTicks) {
+            rampupTicks = targetTicks / 2;
+        }
+
+        // ElapsedTime rampupTimer = new ElapsedTime();
 
         double motorPower = 0;
 
-        /*
-        lfMotor.setPower(power * motorDirections[0] / maxPower);
-        rfMotor.setPower(power * motorDirections[1] / maxPower);
-        lbMotor.setPower(power * motorDirections[2] / maxPower);
-        rbMotor.setPower(power * motorDirections[3] / maxPower);
-         */
-
         while (averageMotorTicks < targetTicks && !this.isStopRequested()) {
 
-            double currentTime = rampupTimer.time(TimeUnit.SECONDS);
-
-            if (currentTime < rampupSeconds) {
-                motorPower = power * (currentTime / rampupSeconds);
-            }
-            else {
-                maxPower = power;
-            }
-
-            lfMotor.setPower(motorPower * motorDirections[0] / maxPower);
-            rfMotor.setPower(motorPower * motorDirections[1] / maxPower);
-            lbMotor.setPower(motorPower * motorDirections[2] / maxPower);
-            rbMotor.setPower(motorPower * motorDirections[3] / maxPower);
+            // double currentTime = rampupTimer.time(TimeUnit.SECONDS);
 
             int lft = Math.abs(lfMotor.getCurrentPosition());
             int rft = Math.abs(rfMotor.getCurrentPosition());
             int lbt = Math.abs(lbMotor.getCurrentPosition());
             int rbt = Math.abs(rbMotor.getCurrentPosition());
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
+
+            double powerOffsetStart = 0.1;
+            double powerOffsetEnd = 0.1;
+
+            if (averageMotorTicks < rampupTicks) {
+                motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (averageMotorTicks / rampupTicks));
+            }
+            else if (averageMotorTicks > targetTicks - rampupTicks) {
+                motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks);
+            }
+            else {
+                motorPower = power;
+            }
+
+            lfMotor.setPower(motorPower * motorDirections[0] / maxPower);
+            rfMotor.setPower(motorPower * motorDirections[1] / maxPower);
+            lbMotor.setPower(motorPower * motorDirections[2] / maxPower);
+            rbMotor.setPower(motorPower * motorDirections[3] / maxPower);
 
             telemetry.addLine("Target Ticks: " + targetTicks);
             telemetry.addLine("LF Actual: " + lft);
@@ -483,21 +505,21 @@ public class SkystoneAuton extends LinearOpMode {
 
         if (angleDelta > 0 && targetAngle < startAngle && !isStopRequested()) {
             while (currentAngle >= startAngle || currentAngle < targetAngle) {
-                currentAngle = getIMUAngleConverted()
+                currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
         else if (angleDelta < 0 && targetAngle > startAngle && !isStopRequested()) {
             while (currentAngle <= startAngle || currentAngle > targetAngle) {
-                currentAngle = getIMUAngleConverted()
+                currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
         else if (angleDelta > 0) {
             while (currentAngle < targetAngle && !isStopRequested()) {
-                currentAngle = getIMUAngleConverted()
+                currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
