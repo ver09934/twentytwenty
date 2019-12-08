@@ -10,13 +10,11 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
@@ -240,6 +238,13 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
+    public double getIMUAngleConverted() {
+        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double angle = orientation.firstAngle;
+        angle =  angle < 0 ? angle + 360 : angle;
+        return angle;
+    }
+
     // ----- MOTOR STUFF -----
 
     private DcMotor lfMotor;
@@ -363,12 +368,99 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
+    // TODO: This method
+    // TODO: Make an "async" version for lidar stuff
+    public void moveCardinalRamping(double power, double distance, int direction) {
+
+        resetAllEncoders();
+
+        int[] motorDirections = {1, 1, 1, 1};
+
+        if (direction == 0) {
+            motorDirections[0] = -1;
+            motorDirections[1] = -1;
+        }
+        else if (direction == 90) {
+            motorDirections[0] = -1;
+            motorDirections[2] = -1;
+        }
+        else if (direction == 180) {
+            motorDirections[2] = -1;
+            motorDirections[3] = -1;
+        }
+        else if (direction == 270) {
+            motorDirections[1] = -1;
+            motorDirections[3] = -1;
+        }
+        else {
+            // This is bad, I know
+            throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
+        }
+
+        if (direction == 0 || direction == 180) {
+            // Empirically determined values for strafing sideways
+            distance *= ((304.8) / (304.8 - 19));
+        }
+
+        // TODO: See if needed
+        double maxPower = Math.sqrt(2);
+
+        // Distance things
+        double targetTicks = distanceToEncoderTicks(distance);
+
+        int averageMotorTicks = 0;
+
+        double rampupSeconds = 1.5;
+
+        ElapsedTime rampupTimer = new ElapsedTime();
+
+        double motorPower = 0;
+
+        /*
+        lfMotor.setPower(power * motorDirections[0] / maxPower);
+        rfMotor.setPower(power * motorDirections[1] / maxPower);
+        lbMotor.setPower(power * motorDirections[2] / maxPower);
+        rbMotor.setPower(power * motorDirections[3] / maxPower);
+         */
+
+        while (averageMotorTicks < targetTicks && !this.isStopRequested()) {
+
+            double currentTime = rampupTimer.time(TimeUnit.SECONDS);
+
+            if (currentTime < rampupSeconds) {
+                motorPower = power * (currentTime / rampupSeconds);
+            }
+            else {
+                maxPower = power;
+            }
+
+            lfMotor.setPower(motorPower * motorDirections[0] / maxPower);
+            rfMotor.setPower(motorPower * motorDirections[1] / maxPower);
+            lbMotor.setPower(motorPower * motorDirections[2] / maxPower);
+            rbMotor.setPower(motorPower * motorDirections[3] / maxPower);
+
+            int lft = Math.abs(lfMotor.getCurrentPosition());
+            int rft = Math.abs(rfMotor.getCurrentPosition());
+            int lbt = Math.abs(lbMotor.getCurrentPosition());
+            int rbt = Math.abs(rbMotor.getCurrentPosition());
+            averageMotorTicks = (lft + rft + lbt + rbt) / 4;
+
+            telemetry.addLine("Target Ticks: " + targetTicks);
+            telemetry.addLine("LF Actual: " + lft);
+            telemetry.addLine("RF Actual: " + rft);
+            telemetry.addLine("LB Actual: " + lbt);
+            telemetry.addLine("RB Actual: " + rbt);
+            telemetry.update();
+        }
+
+        setAllMotorPowers(0);
+    }
+
     public void turnDegrees(double turnPower, double angleDelta) {
 
         assert Math.abs(angleDelta) <= 180;
 
-        double startAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-        startAngle = startAngle < 0 ? startAngle + 360 : startAngle;
+        double startAngle = getIMUAngleConverted();
 
         double targetAngle = startAngle + angleDelta;
 
@@ -391,37 +483,42 @@ public class SkystoneAuton extends LinearOpMode {
 
         if (angleDelta > 0 && targetAngle < startAngle && !isStopRequested()) {
             while (currentAngle >= startAngle || currentAngle < targetAngle) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+                currentAngle = getIMUAngleConverted()
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
         else if (angleDelta < 0 && targetAngle > startAngle && !isStopRequested()) {
             while (currentAngle <= startAngle || currentAngle > targetAngle) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+                currentAngle = getIMUAngleConverted()
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
         else if (angleDelta > 0) {
             while (currentAngle < targetAngle && !isStopRequested()) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+                currentAngle = getIMUAngleConverted()
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
         else {
             while (currentAngle > targetAngle && !isStopRequested()) {
-                currentAngle = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES).firstAngle;
-                currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+                currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
 
         setAllMotorPowers(0);
+    }
+
+    // TODO: This method
+    public void makeStraight() {
+    }
+
+    // TODO: This method
+    public void gotoDegreesRamping(double power, double degrees) {
+        // ramp based on degree difference
     }
 }
