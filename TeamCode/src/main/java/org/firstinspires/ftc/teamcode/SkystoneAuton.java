@@ -12,7 +12,9 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
@@ -535,8 +537,26 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
-    // TODO
-    public void makeStraight() {
+    public void makeStraight(double power) {
+
+        double currentAngle = getIMUAngleConverted();
+
+        double[] potentialValues = {0, 90, 180, 270};
+
+        double[] diffs = new double[potentialValues.length];
+
+        for (int i = 0; i < potentialValues.length; i++) {
+            diffs[i] = Math.abs(getAngleDifference(currentAngle, potentialValues[i]));
+        }
+
+        ArrayList<Double> diffsArrayList = new ArrayList<>();
+        for(double diff : diffs) {
+            diffsArrayList.add(diff);
+        }
+
+        int minIndex = diffsArrayList.indexOf(Collections.min(diffsArrayList));
+
+        gotoDegreesRamping(power, potentialValues[minIndex]);
     }
 
     public void gotoDegreesRamping(double power, double targetAngle) {
