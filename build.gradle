@@ -9,8 +9,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.2'
-        classpath 'androidx.test.ext:junit:1.1.1'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
