@@ -301,6 +301,26 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Gulper Reverse", gulperReverse);
         telemetry.addData("Gulpers running", runGulper);
 
+        // --- Y Button: Build Plate Clamper Servos ---
+        if (this.gamepad2.y) {
+            if (!gamepad2YToggleLock) {
+                gamepad2YToggleLock = true;
+                plateServosUp = !plateServosUp;
+            }
+        }
+        else {
+            gamepad2YToggleLock = false;
+        }
+        if (plateServosUp) {
+            plateServoLeft.setPosition(plateServoLeftUp);
+            plateServoRight.setPosition(plateServoRightUp);
+        }
+        else {
+            plateServoLeft.setPosition(plateServoLeftDown);
+            plateServoRight.setPosition(plateServoRightDown);
+        }
+        telemetry.addData("Build plate servos up", plateServosUp);
+        /*
         // --- Y Button: Toggle Winch Power (for safety) ---
         if (this.gamepad2.y) {
             if (!gamepad2YToggleLock) {
@@ -320,6 +340,7 @@ public class SkystoneTeleOp extends OpMode {
             winchMotor2.setPower(0);
         }
         telemetry.addData("Winches Powered", winchesPowered);
+        */
 
         // --- Left/Right Bumpers: Winch motors ---
         if (this.gamepad2.left_bumper) {
@@ -387,6 +408,7 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Block Servo Opened", blockServoOpen);
         telemetry.addData("Block Servo Position", blockServo.getPosition());
 
+        /*
         // --- Right Trigger: Build Plate Clamper Servos ---
         if (this.gamepad2.right_trigger > 0.5) {
             if (!gamepad2RightTriggerToggleLock) {
@@ -406,6 +428,7 @@ public class SkystoneTeleOp extends OpMode {
             plateServoRight.setPosition(plateServoRightDown);
         }
         telemetry.addData("Build plate servos up", plateServosUp);
+        */
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
