@@ -17,9 +17,6 @@ public class Robot {
     MoveTools driverFunction;
     MoveTools.Steering steering;
 
-
-
-
     public Robot(LoggerTools logger, MoveTools moveTools, Field field) {
         this.logger = logger;
         this.time = logger.getRobotTimeClass();
@@ -49,7 +46,7 @@ public class Robot {
 
         steering.moveDistance(actual_dist, angle + direction_deg, speed);
 
-        driverFunction.resetAllEncoders();
+        steering.resetAllEncoders();
         position = end_point;
         addDegrees(angle);
 

@@ -15,7 +15,7 @@ public class OnlineMove implements MoveTools {
     private DrivingMotor rf; // stands for right front
     private DrivingMotor rb; // stands for right back
 
-    private Steering steering = new Steering();
+    public Steering steering = new Steering();
     public Steering getSteeringClass() {
         return steering;
     }
@@ -27,12 +27,15 @@ public class OnlineMove implements MoveTools {
     public LoggerTools getLogger() {
         return logger;
     }
+    public HardwareMap hardwareMap;
+
 
     private static final double MAX_SPEED_RATIO = 1;
     private static final double NORMAL_SPEED_RATIO = 0.5;
     private static final double MIN_SPEED_RATIO = 0.3;
     private static final double DEFAULT_SMOOTHNESS = 2;
     private static final DcMotor.RunMode DEFAULT_RUNMODE = DcMotor.RunMode.RUN_USING_ENCODER;
+
 
     public OnlineMove(HardwareMap hardwareMap, Telemetry telemetry, ElapsedTime time) {
         this(hardwareMap, telemetry, DEFAULT_SMOOTHNESS);
@@ -45,12 +48,12 @@ public class OnlineMove implements MoveTools {
         this.lb = new DrivingMotor(hardwareMap.dcMotor.get("lbMotor"), smoothness, DEFAULT_RUNMODE);
         this.rf = new DrivingMotor(hardwareMap.dcMotor.get("rfMotor"), smoothness, DEFAULT_RUNMODE);
         this.rb = new DrivingMotor(hardwareMap.dcMotor.get("rbMotor"), smoothness, DEFAULT_RUNMODE);
-
+        this.hardwareMap = hardwareMap;
     }
 
+    public String[] getAllMotorNames() { return new String[] {"LF", "RF", "LB", "RB"}; }
     public DrivingMotor[] getAllMotors() {
-        return new DrivingMotor[] {lf, rf, rb, lb};
-
+        return new DrivingMotor[] {lf, rf, lb, rb};
     }
     public DrivingMotor getMotor(String motor_name) {
         switch (motor_name) {
@@ -70,12 +73,7 @@ public class OnlineMove implements MoveTools {
         return getAllMotors()[motor_index];
     }
 
-    public void resetAllEncoders() {
-        lf.resetEncoder();
-        lb.resetEncoder();
-        rf.resetEncoder();
-        rb.resetEncoder();
-    }
+
 
     /**
      * This class wraps retractRelicSlide regular motor and adds utilities to it.
@@ -94,16 +92,27 @@ public class OnlineMove implements MoveTools {
             acceleration = new WeightedValue(smoothness);
         }
 
-        public void applyPower(double power) {
+        //PROBLEMATIC????
+        public void setPower(double power) {
             this.motor.setPower(acceleration.applyValue(power));
         }
         public void resetEncoder() {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(runMode);
         }
+
         public int position() {
             return motor.getCurrentPosition();
         }
+
+        public void setMode(DcMotor.RunMode runMode) {
+            motor.setMode(runMode);
+        }
+
+        public void setZeroPowerBehavior(DcMotor.ZeroPowerBehavior zeroPowerBehaviors) {
+            this.motor.setZeroPowerBehavior(zeroPowerBehaviors);
+        }
+
     }
 
     // An inner class that manages the repeated recalculation of motor powers.
@@ -116,12 +125,6 @@ public class OnlineMove implements MoveTools {
 
         public Steering() {
         }
-        public void setSpeedRatio(double speedRatio) {
-            this.speedRatio = speedRatio;
-        }
-        public double getSpeedRatio() {
-            return speedRatio;
-        }
 
         public void addToAllPowers(double power) {
             powerLF += power;
@@ -129,17 +132,37 @@ public class OnlineMove implements MoveTools {
             powerRF += power;
             powerRB += power;
         }
+        public void stopAllMotors() {
+            lf.setPower(0);
+            lb.setPower(0);
+            rf.setPower(0);
+            rb.setPower(0);
+        }
+
+        public void resetAllEncoders() {
+            for (DrivingMotor motor : getAllMotors()) {
+                motor.resetEncoder();
+            }
+        }
+        public void setAllRunModes(DcMotor.RunMode runMode) {
+            for (DrivingMotor motor : getAllMotors()) {
+                motor.setMode(runMode);
+            }
+        }
+        public void setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+            for (DrivingMotor motor : getAllMotors()) {
+                motor.setZeroPowerBehavior(zeroPowerBehavior);
+            }
+        }
         public void setAllPowers(double power) {
             powerLF = power;
             powerLB = power;
             powerRF = power;
             powerRB = power;
-        }
-        public void stopAllMotors() {
-            lf.applyPower(0);
-            lb.applyPower(0);
-            rf.applyPower(0);
-            rb.applyPower(0);
+
+            for (DrivingMotor motor : getAllMotors()) {
+                motor.setPower(power);
+            }
         }
 
         /**
@@ -265,10 +288,10 @@ public class OnlineMove implements MoveTools {
             // Actually set the powers for the motors. Dividing by maxRawPower makes the "biggest" power plus or minus 1,
             // and multiplying by speedRatio makes the maximum power equal to speedRatio.
             if (maxRawPower != 0) {
-                lf.applyPower(powerLF / maxRawPower * speedRatio);
-                lb.applyPower(powerLB / maxRawPower * speedRatio);
-                rf.applyPower(powerRF / maxRawPower * speedRatio);
-                rb.applyPower(powerRB / maxRawPower * speedRatio);
+                lf.setPower(powerLF / maxRawPower * speedRatio);
+                lb.setPower(powerLB / maxRawPower * speedRatio);
+                rf.setPower(powerRF / maxRawPower * speedRatio);
+                rb.setPower(powerRB / maxRawPower * speedRatio);
             } else {
                 stopAllMotors();
             }

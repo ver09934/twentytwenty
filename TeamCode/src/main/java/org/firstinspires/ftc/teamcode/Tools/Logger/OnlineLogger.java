@@ -6,6 +6,8 @@ import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 public class OnlineLogger implements LoggerTools {
@@ -32,6 +34,16 @@ public class OnlineLogger implements LoggerTools {
         if (update) {
             update(false);
         }
+    }
+    public void add(String caption, double num) {
+        add(caption, String.valueOf(num));
+    }
+    public void add(String caption, double num, boolean update) {
+        add(caption, String.valueOf(num), update);
+    }
+
+    public void add(String caption, ArrayList values) {
+        add(caption, Arrays.toString(values.toArray()));
     }
 
     public void update(boolean clear) {

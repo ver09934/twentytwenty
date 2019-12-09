@@ -4,6 +4,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class OfflineLoggerTools implements LoggerTools {
@@ -25,6 +26,21 @@ public class OfflineLoggerTools implements LoggerTools {
         if (update) {
             update(true);
         }
+    }
+
+    @Override
+    public void add(String caption, double num) {
+
+    }
+
+    @Override
+    public void add(String caption, double text, boolean update) {
+
+    }
+
+    @Override
+    public void add(String values, ArrayList values1) {
+
     }
 
     public void update(boolean clear) {

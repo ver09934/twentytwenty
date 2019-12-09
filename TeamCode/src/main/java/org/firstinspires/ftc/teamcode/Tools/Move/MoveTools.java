@@ -10,11 +10,9 @@ public interface MoveTools {
     DrivingMotor[] getAllMotors();
     DrivingMotor getMotor(String motor_name);
     DrivingMotor getMotor(int motor_index);
-    public void resetAllEncoders();
-
 
     interface DrivingMotor {
-        void applyPower(double power);
+        void setPower(double power);
 
         void resetEncoder();
 
@@ -42,11 +40,6 @@ public interface MoveTools {
     }
 
     interface Steering {
-
-        void setSpeedRatio(double speedRatio);
-
-        double getSpeedRatio();
-
         void addToAllPowers(double power);
 
         void setAllPowers(double power);
@@ -60,6 +53,8 @@ public interface MoveTools {
         void moveDistance(double distance, double angle, double power, double rampup, double timeoutSeconds);
 
         void finishSteering();
+
+        void resetAllEncoders();
     }
 
 }

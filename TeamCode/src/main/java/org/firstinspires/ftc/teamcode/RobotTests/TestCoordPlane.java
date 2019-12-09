@@ -53,7 +53,7 @@ public class TestCoordPlane extends LinearOpMode {
         sleep(500);
 
         // Reset encoders
-        move.resetAllEncoders();
+        steering.resetAllEncoders();
 
         // --- Start ---
         time.sleep(500);

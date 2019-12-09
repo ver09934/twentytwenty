@@ -10,8 +10,13 @@ public interface LoggerTools {
     void add(String caption, String text);
     void add(String caption, String text, boolean update);
 
+    void add(String caption, double num);
+    void add(String caption, double text, boolean update);
+    void add(String values, ArrayList values1);
+
 
     void update(boolean clear);
+
 
 
     interface RobotTime {
