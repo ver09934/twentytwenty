@@ -593,7 +593,9 @@ public class SkystoneAuton extends LinearOpMode {
             rampupAngle = Math.floor(initialAbsAngleDelta / (double) 2);
         }
 
-        while (Math.abs(signedAngleDifference) > 0 && !isStopRequested()) {
+        double angleTolerance = 0.5;
+
+        while (Math.abs(signedAngleDifference) > angleTolerance && !isStopRequested()) {
 
             currentAngle = getIMUAngleConverted();
 
