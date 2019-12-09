@@ -48,7 +48,8 @@ public class SkystoneAuton extends LinearOpMode {
         // ----- RUN SECTION -----
 
         // testMoveTwo();
-        testMoveThree();
+        // testMoveThree();
+        testMoveFour();
 
         while (opModeIsActive()) {
             idle();
@@ -56,6 +57,22 @@ public class SkystoneAuton extends LinearOpMode {
     }
 
     // ----- META-METHODS -----
+
+    public void testMoveFour() {
+
+        for (int j = 0; j < 3; j++) {
+            for (int i = 0; i < 360; i += 90) {
+                gotoDegreesRamping(0.5, i);
+                sleep(1000);
+            }
+        }
+
+        while (true) {
+            makeStraight(0.5);
+            sleep(5000);
+        }
+
+    }
 
     public void testMoveThree() {
 
