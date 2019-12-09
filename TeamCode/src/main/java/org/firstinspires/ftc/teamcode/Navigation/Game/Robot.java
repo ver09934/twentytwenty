@@ -10,7 +10,7 @@ import org.firstinspires.ftc.teamcode.Tools.Move.MoveTools;
 public class Robot {
     private Field currentField;
     private Coord position = new Coord(0, 0);
-    private double direction_deg = 0;
+    private double direction_deg = 90;
 
     LoggerTools logger;
     public LoggerTools.RobotTime time;

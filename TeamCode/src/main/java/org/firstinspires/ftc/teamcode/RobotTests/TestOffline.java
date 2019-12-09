@@ -45,7 +45,10 @@ class TestOffline {
         logger.update(false);
         logger.add("stack3", "c");
 
+<<<<<<< Updated upstream
         logger.update(true);
+=======
+>>>>>>> Stashed changes
     }
 
     void messageNoStackTest() {
