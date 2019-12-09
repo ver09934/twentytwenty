@@ -207,7 +207,7 @@ public class OnlineMove implements MoveTools {
                 motor_target[i] = getAllMotors()[i].position();
             }
             int rf_target = rf.position() + (int) (distance * COUNTS_PER_METER);
-            int rb_target = rb.position() + (int) ( distance)
+            int rb_target = rb.position() + (int) ( distance);
             int newLeftTarget = (lf.position() + lb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             int newRightTarget = (rf.position() + rb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             logger.add("Left target:", String.valueOf(newLeftTarget), true);

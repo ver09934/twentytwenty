@@ -1,34 +1,12 @@
 package org.firstinspires.ftc.teamcode;
-
-import android.graphics.Color;
-
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.ColorSensor;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.navigation.*;
-
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.teamcode.Driving.DriverFunction;
 import org.firstinspires.ftc.teamcode.Navigation.Game.Field;
-import org.firstinspires.ftc.teamcode.Navigation.Game.Robot;
 import org.firstinspires.ftc.teamcode.Navigation.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.Tools.Logger.LoggerTools;
-import org.firstinspires.ftc.teamcode.Tools.Logger.OnlineLogger;
 import org.firstinspires.ftc.teamcode.Tools.Move.MoveTools;
-import org.firstinspires.ftc.teamcode.Tools.Move.OnlineMove;
 import org.firstinspires.ftc.teamcode.Tools.Move.OnlineMove2020;
-
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
