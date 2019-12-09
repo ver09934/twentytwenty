@@ -503,15 +503,15 @@ public class SkystoneAuton extends LinearOpMode {
 
         double currentAngle = startAngle;
 
-        if (angleDelta > 0 && targetAngle < startAngle && !isStopRequested()) {
-            while (currentAngle >= startAngle || currentAngle < targetAngle) {
+        if (angleDelta > 0 && targetAngle < startAngle) {
+            while (currentAngle >= startAngle || currentAngle < targetAngle && !isStopRequested()) {
                 currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
             }
         }
-        else if (angleDelta < 0 && targetAngle > startAngle && !isStopRequested()) {
-            while (currentAngle <= startAngle || currentAngle > targetAngle) {
+        else if (angleDelta < 0 && targetAngle > startAngle) {
+            while (currentAngle <= startAngle || currentAngle > targetAngle && !isStopRequested()) {
                 currentAngle = getIMUAngleConverted();
                 telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
                 telemetry.update();
@@ -535,26 +535,79 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
-    // TODO: This method
+    // TODO
     public void makeStraight() {
     }
 
-    // TODO: This method
-    public void gotoDegreesRamping(double power, double degrees) {
+    public void gotoDegreesRamping(double power, double targetAngle) {
 
-        /*
-        TODO:
-        make something nice where we use the sign of the time derivative of the angle
-        to let us use angle wrapping to have an absolute angle, because this would make me very happy
+        double startAngle = getIMUAngleConverted();
+        double currentAngle = startAngle;
 
-        If there is not time for this (which of course there won't be), we can just reuse the logic from
-        the hastily created method known as "turnDegrees"
+        double initialAbsAngleDelta = Math.abs(getAngleDifference(startAngle, targetAngle));
 
-        Must be a bit careful, such as if we are at 359, time derivative is negative, and then we jump to zero
-        Therefore must do some tracking over time --> will be good fun
-         */
+        double signedAngleDifference = getAngleDifference(currentAngle, targetAngle);
+        double absAngleDifference = Math.abs(signedAngleDifference);
+        double absAngleProgress = Math.abs(getAngleDifference(startAngle, currentAngle));
 
-        double currentAngle = getIMUAngleConverted();
+        double rampupAngle = 45;
 
+        if (initialAbsAngleDelta / 2 < rampupAngle) {
+            rampupAngle = Math.floor(initialAbsAngleDelta / (double) 2);
+        }
+
+        while (Math.abs(signedAngleDifference) > 0 && !isStopRequested()) {
+
+            currentAngle = getIMUAngleConverted();
+
+            signedAngleDifference = getAngleDifference(currentAngle, targetAngle);
+            absAngleDifference = Math.abs(signedAngleDifference);
+            absAngleProgress = Math.abs(getAngleDifference(startAngle, currentAngle));
+
+            double powerOffsetStart = 0.1;
+            double powerOffsetEnd = 0.1;
+
+            double motorPower;
+
+            if (absAngleProgress < rampupAngle) {
+                motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (absAngleDifference / rampupAngle));
+            }
+            else if (absAngleDifference < rampupAngle) {
+                motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (absAngleDifference / rampupAngle));
+            }
+            else {
+                motorPower = power;
+            }
+
+            motorPower = Math.copySign(motorPower, signedAngleDifference);
+
+            setAllMotorPowers(motorPower);
+        }
+
+        setAllMotorPowers(0);
     }
+
+    public static double getAngleDifference(double currentAngle, double targetAngle) {
+
+        currentAngle = currentAngle % 360;
+        targetAngle = targetAngle % 360;
+
+        currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+        targetAngle = targetAngle < 0 ? targetAngle + 360 : targetAngle;
+
+        double angleDiff = targetAngle - currentAngle;
+
+        if (Math.abs(angleDiff) <= 180) {
+            return angleDiff;
+        }
+        else {
+            if (angleDiff > 0) {
+                return angleDiff - 360;
+            }
+            else {
+                return 360 + angleDiff;
+            }
+        }
+    }
+
 }
