@@ -1,23 +1,12 @@
-package org.firstinspires.ftc.robotcontroller.external.samples;
+package org.firstinspires.ftc.teamcode;
 
-import com.google.gson.internal.$Gson$Preconditions;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
-import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
-import org.openftc.easyopencv.OpenCvInternalCamera;
-import org.openftc.easyopencv.OpenCvPipeline;
 import org.opencv.core.*;
-import org.opencv.dnn.Dnn;
-import org.opencv.dnn.Net;
 import org.opencv.imgproc.Imgproc;
-import org.opencv.imgproc.Moments;
+import org.openftc.easyopencv.OpenCvPipeline;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.TreeMap;
 
 public class Detector extends OpenCvPipeline {
 
@@ -25,8 +14,15 @@ public class Detector extends OpenCvPipeline {
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
-    private Mat result = new Mat();
-    private List<Mat> recognitions = new ArrayList<>();
+    private Mat hsv = new Mat();
+    private Mat thresholdedStone = new Mat();
+    private Mat thresholdedSkystone = new Mat();
+
+    private List<MatOfPoint> stoneContours = new ArrayList<>();
+    private List<MatOfPoint> skyContours = new ArrayList<>();
+
+    private static final double[] y_bounds = {.35, .65};
+    private static int history = 1;
 
     private int position;
     private Telemetry telemetry;
@@ -39,22 +35,78 @@ public class Detector extends OpenCvPipeline {
         this.showUI = showUI;
     }
 
-    public int getPosition() { return position; }
+    public synchronized List<MatOfPoint> getStoneContours() {
+        List<MatOfPoint> stoneContoursCopy = new ArrayList<>();
+        for (MatOfPoint contourMat : stoneContours) {
+            MatOfPoint tempMat = new MatOfPoint();
+            contourMat.copyTo(tempMat);
+            stoneContoursCopy.add(tempMat);
+        }
+        return stoneContoursCopy;
+    }
+
+    public synchronized List<MatOfPoint> getSkyContours() {
+        List<MatOfPoint> skyContoursCopy = new ArrayList<>();
+        for (MatOfPoint contourMat : skyContours) {
+            MatOfPoint tempMat = new MatOfPoint();
+            contourMat.copyTo(tempMat);
+            skyContoursCopy.add(tempMat);
+        }
+        return skyContoursCopy;
+    }
+
+    public int getPosition() {
+        return position;
+    }
 
     @Override
-    public Mat processFrame(Mat input) {
+    public Mat processFrame(Mat rgba) {
 
         telemetry.addLine("---Detection Algorithm Begins---");
         System.out.println("---Detection Algorithm Begins---");
 
-        Size imageSize = input.size();
-        double w = imageSize.width;
-        double h = imageSize.height;
+        // Clear contour lists
+        stoneContours.clear();
+        skyContours.clear();
 
-        Net model = Dnn.readNetFromTensorflow;
+        // Change colorspace from RGBA to HSV
+        Imgproc.cvtColor(rgba, hsv, Imgproc.COLOR_RGB2HSV, 3);
 
-        model.setInput(input);
-        result = model.forward();
+        // Blur thresholded image
+        Imgproc.blur(hsv, hsv, new Size(10, 10));
+
+        // TODO get ranges of the SkyRect contours
+        Core.inRange(hsv, new Scalar(SKYRANGE), new Scalar(SKYRANGE_2), thresholdedSkystone);
+        Imgproc.erode(thresholdedSkystone, thresholdedSkystone, new Mat(), new Point(-1, -1), 5, Core.BORDER_CONSTANT);
+        Imgproc.dilate(thresholdedSkystone, thresholdedSkystone, new Mat(), new Point(-1, -1), 5, Core.BORDER_CONSTANT);
+
+        Imgproc.findContours(thresholdedSkystone, skyContours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.fillPoly(thresholdedSkystone, skyContours, new Scalar(255, 255, 255));
+
+        // Find the centers of the bounding rectangles
+        for (int i = 0; i < skyContours.size(); i++) {
+            RotatedRect skyRect = Imgproc.minAreaRect(skyContours.get(i));
+            Point skyCenter = skyRect.center;
+        }
+
+        // TODO get ranges of the Rect contours
+        Core.inRange(hsv, new Scalar(STONERANGE), new Scalar(STONERANGE_2), thresholdedStone);
+        Imgproc.erode(thresholdedStone, thresholdedStone, new Mat(), new Point(-1, -1), 5, Core.BORDER_CONSTANT);
+        Imgproc.dilate(thresholdedStone, thresholdedStone, new Mat(), new Point(-1, -1), 5, Core.BORDER_CONSTANT);
+
+        Imgproc.findContours(thresholdedStone, stoneContours, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.fillPoly(thresholdedStone, stoneContours, new Scalar(255, 255, 255));
+
+        // Find the centers of the bounding rectangles
+        for (int j = 0; j < stoneContours.size(); j++) {
+            RotatedRect stoneRect = Imgproc.minAreaRect(stoneContours.get(j));
+            Point stoneCenter = stoneRect.center;
+        }
+
+        if (showUI) {
+            Imgproc.circle(rgba, stoneCenter, 3, new Scalar(0, 255, 0));
+        }
+
 
         return null;
     }
