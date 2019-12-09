@@ -21,6 +21,11 @@ import java.util.concurrent.TimeUnit;
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
+    // TODO: May want to make the ramping floor an absolute of 0.1, instead of 0.1 * input_power
+    // Could do a quick Math.max(0.1, ramp), but that's a bit messy...
+    // Could do something like 0.1 + power * ramp, but then full power needs to be
+    // set to 0.1 + power, which is bad...
+
     private ElapsedTime runtime;
 
     @Override
@@ -609,7 +614,7 @@ public class SkystoneAuton extends LinearOpMode {
             double motorPower;
 
             if (absAngleProgress < rampupAngle) {
-                motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (absAngleDifference / rampupAngle));
+                motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (absAngleProgress / rampupAngle));
             }
             else if (absAngleDifference < rampupAngle) {
                 motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (absAngleDifference / rampupAngle));
