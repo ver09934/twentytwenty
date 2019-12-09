@@ -179,14 +179,19 @@ public class OnlineMove implements MoveTools {
             double Rspeed = power;
             double Lspeed = power;
 
-            //initialise some variables for the subroutine
-            // Determine new target position, and pass to motor controller we only do this in case the encoders are not totally zero'd
+            int motor_target[] = new int[4];
+            for (int i = 0; i < 4; i++) {
+                motor_target[i] = getAllMotors()[i].position();
+            }
+            int rf_target = rf.position() + (int) (distance * COUNTS_PER_METER);
+            int rb_target = rb.position() + (int) ( distance)
             int newLeftTarget = (lf.position() + lb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             int newRightTarget = (rf.position() + rb.position()) / 2 + (int) (distance * COUNTS_PER_METER);
             logger.add("Left target:", String.valueOf(newLeftTarget), true);
             logger.add("Right Target:", String.valueOf(newRightTarget), true);
 
             // reset the timeout time and start motion.
+
             boolean lessThanLeftTarget = Math.abs(lf.position() + lb.position()) / 2 < newLeftTarget;
             boolean lessThanRightTarget = Math.abs(rf.position() + rb.position()) / 2 < newRightTarget;
             time.reset();
@@ -209,9 +214,11 @@ public class OnlineMove implements MoveTools {
                     newRightSpeed = Rspeed * ramp;
 
                 //Keep running until you are about two rotations out
-                } else if (averagePositions > (COUNTS_PER_MOTOR_REV * 2)) {
-                    newLeftSpeed = Lspeed;
-                    newRightSpeed = Rspeed;
+                } else if (averagePositions > (((double)(newLeftTarget + newRightTarget) / 2) - (COUNTS_PER_MOTOR_REV * 2))) {
+
+                    newLeftSpeed = Lspeed * .2;
+                    newRightSpeed = Rspeed * .2;
+
 
                 //start slowing down as you get close to the target
                 } /*else if (averagePositions > (200) && (Lspeed * .2) > .1 && (Rspeed * .2) > .1) {
@@ -220,8 +227,8 @@ public class OnlineMove implements MoveTools {
 
                     //minimum speed
                 }*/ else {
-                    newLeftSpeed = Lspeed * .2;
-                    newRightSpeed = Rspeed * .2;
+                    newLeftSpeed = Lspeed;
+                    newRightSpeed = Rspeed;
 
                 }
 
