@@ -221,7 +221,12 @@ public class SkystoneTeleOp extends OpMode {
         if (this.gamepad1.right_trigger > 0.5) {
             steering.setSpeedRatio(MAX_SPEED_RATIO); // Left trigger: minimum speed ratio
         }
+        /*
         else if (this.gamepad1.left_trigger > 0.5) {
+            steering.setSpeedRatio(MIN_SPEED_RATIO); // Right trigger: maximum speed ratio
+        }
+        */
+        else if (this.gamepad1.right_bumper) {
             steering.setSpeedRatio(MIN_SPEED_RATIO); // Right trigger: maximum speed ratio
         }
         else {
