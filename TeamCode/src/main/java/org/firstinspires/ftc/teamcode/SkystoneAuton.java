@@ -52,9 +52,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // testMoveTwo();
-        // testMoveThree();
-        testMoveFour();
+        bothBlocksAuton();
 
         while (opModeIsActive()) {
             idle();
@@ -63,9 +61,82 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- META-METHODS -----
 
-    public void testMoveFour() {
+    double bigpow = 0.8;
+    double pow = 0.5;
+    double tinypow = 0.3;
 
-        for (int j = 0; j < 3; j++) {
+    public void plateAuton() {}
+
+    public void bothBlocksAuton() {
+
+        moveCardinalRamping(bigpow, inchesToCm(27), 270);
+
+        ArrayList values = new ArrayList<Double>();
+
+        // Scan blocks
+        for (int i = 0; i < 3; i++) {
+
+            values.add(getLeftHSV()[2]);
+
+            if (i < 2) {
+                moveCardinalRamping(pow, inchesToCm(8), 180);
+            }
+        }
+
+        int minIndex = values.indexOf(Collections.min(values));
+
+        telemetry.addData("Values", values);
+        telemetry.addData("Min Index", minIndex);
+        telemetry.update();
+
+        // Move back to the first black block
+        double extraDist = 0;
+        moveCardinalRamping(pow, inchesToCm(extraDist + (values.size() - minIndex - 1) * 8), 0);
+
+        double blockGetPart1Dist = 1;
+        double blockGetPart2Dist = 2;
+        double backupDistance = 8;
+
+        double middleDistance = 20;
+        double otherSideDistance = 15;
+        double totalOtherSideDistance = middleDistance + otherSideDistance;
+
+        double blockDistance = 8;
+
+        // Get block and back up
+        moveCardinalRamping(tinypow, inchesToCm(blockGetPart1Dist), 270);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        moveCardinalRamping(tinypow, inchesToCm(blockGetPart2Dist), 270);
+        moveCardinalRamping(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+
+        // Go to other side of field and release block
+        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockDistance), 0);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+
+        makeStraight();
+
+        // Go back to other block
+        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance), 180);
+        moveCardinalRamping(bigpow, inchesToCm(backupDistance), 270);
+
+        // Get block and back up
+        moveCardinalRamping(tinypow, inchesToCm(blockGetPart1Dist), 270);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        moveCardinalRamping(tinypow, inchesToCm(blockGetPart2Dist), 270);
+        moveCardinalRamping(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+
+        // Go to other side of field and release block
+        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance), 0);
+        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+
+        // Park
+        moveCardinalRamping(bigpow, inchesToCm(otherSideDistance), 180);
+    }
+
+    // ----- TEST META-METHODS -----
+
+    public void testMoveOne() {
+        for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 360; i += 90) {
                 gotoDegreesRamping(0.5, i);
                 sleep(1000);
@@ -73,14 +144,13 @@ public class SkystoneAuton extends LinearOpMode {
         }
 
         while (opModeIsActive()) {
-            makeStraight(0.5);
+            // makeStraight(0.5);
+            makeStraight();
             sleep(5000);
         }
-
     }
 
-    public void testMoveThree() {
-
+    public void testMoveTwo() {
         for (int i = 0; i < 360; i += 90) {
             moveCardinalRamping(1, inchesToCm(30), i);
             sleep(1000);
@@ -97,116 +167,13 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
-    public void testMoveTwo() {
-
-        double hugepow = 0.5;
-        double bigpow = 0.5;
-        double pow = 0.25;
-        double tinypow = 0.1;
-
-        moveCardinal(0.5, inchesToCm(27), 270, true);
-
-        sleep(1000);
-
-        ArrayList values = new ArrayList<Double>();
-
-        for (int i = 0; i < 3; i++) {
-
-            values.add(getLeftHSV()[2]);
-
-            if (i < 2) {
-                moveCardinal(pow, inchesToCm(8), 180, true);
-            }
-
-            sleep(1000);
-        }
-
-        int minIndex = values.indexOf(Collections.min(values));
-
-        telemetry.addData("Values", values);
-        telemetry.addData("Min Index", minIndex);
-        telemetry.update();
-
-        // moveCardinal(pow, inchesToCm(2), 0, true);
-
-        double randDist = 3;
-        if (minIndex == 2) {
-            moveCardinal(pow, inchesToCm(randDist), 0, true);
-        }
-        for (int i = 0; i < values.size() - minIndex - 1; i++) {
-
-            if (i == 0) {
-                moveCardinal(pow, inchesToCm(8 + randDist), 0, true);
-            }
-            else {
-                moveCardinal(pow, inchesToCm(8), 0, true);
-            }
-
-            sleep(1000);
-        }
-
-        moveCardinal(tinypow, inchesToCm(1), 270, false);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
-        moveCardinal(tinypow, inchesToCm(1), 270, true);
-        sleep(1000);
-
-        moveCardinal(bigpow, inchesToCm(18), 90, true);
-        sleep(1000);
-        moveCardinal(hugepow, inchesToCm(50), 0, true);
-        sleep(1000);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
-        sleep(1000);
-        moveCardinal(hugepow, inchesToCm(50 + 24), 180, true);
-        sleep(1000);
-        moveCardinal(bigpow, inchesToCm(18 - 2), 270, true);
-
-        moveCardinal(tinypow, inchesToCm(1), 270, false);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
-        moveCardinal(tinypow, inchesToCm(1), 270, true);
-        sleep(1000);
-
-        moveCardinal(bigpow, inchesToCm(18), 90, true);
-        sleep(1000);
-        moveCardinal(hugepow, inchesToCm(50 + 24), 0, true);
-        sleep(1000);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
-        sleep(1000);
-
-        telemetry.addData("Values", values);
-        telemetry.addData("Min Index", minIndex);
-        telemetry.update();
-    }
-
-    /*
-    public void testMove() {
-        moveCardinal(0.5, inchesToCm(27), 270);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(41), 180);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(2), 270);
-
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
-
-        sleep(3000);
-
-        moveCardinal(0.5, inchesToCm(12), 90);
-        sleep(1000);
-        moveCardinal(0.5, inchesToCm(12), 0);
-        sleep(1000);
-        turnDegrees(0.5, 180);
-        sleep(500);
-        turnDegrees(0.5, -180);
-    }
-     */
-
     // ----- SERVO STUFF -----
 
     public Servo autonGrabberLeft;
+    public Servo blockServo;
 
     public double AUTON_GRABBER_LEFT_PASSIVE = 0.74;
     public double AUTON_GRABBER_LEFT_ACTIVE = 0.04;
-
-    public Servo blockServo;
 
     private double blockServoClosedPosition = 0;
     private double blockServoOpenPosition = 0.5;
@@ -217,7 +184,6 @@ public class SkystoneAuton extends LinearOpMode {
 
         blockServo = hardwareMap.servo.get("testServo");
         // blockServo.setPosition(blockServoOpenPosition);
-
     }
 
     // ----- COLOR SENSOR STUFF -----
@@ -420,8 +386,6 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
-    // TODO: This method
-    // TODO: Make an "async" version for lidar stuff
     public void moveCardinalRamping(double power, double distance, int direction) {
 
         resetAllEncoders();
@@ -456,13 +420,15 @@ public class SkystoneAuton extends LinearOpMode {
 
         // TODO: See if needed
         double maxPower = Math.sqrt(2);
+        // double maxPower = 1;
 
         // Distance things
         double targetTicks = distanceToEncoderTicks(distance);
 
         int averageMotorTicks = 0;
 
-        double rampupTicks = 600;
+        // TODO: Empirical, see if this is good
+        double rampupTicks = 800 * power;
 
         if (targetTicks / 2 < rampupTicks) {
             rampupTicks = targetTicks / 2;
@@ -485,11 +451,15 @@ public class SkystoneAuton extends LinearOpMode {
             double powerOffsetStart = 0.1;
             double powerOffsetEnd = 0.1;
 
+            power = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
+
             if (averageMotorTicks < rampupTicks) {
-                motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (averageMotorTicks / rampupTicks));
+                // motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (averageMotorTicks / rampupTicks));
+                motorPower = powerOffsetStart + (power - powerOffsetStart) * (averageMotorTicks / rampupTicks);
             }
             else if (averageMotorTicks > targetTicks - rampupTicks) {
-                motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks);
+                // motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks);
+                motorPower = powerOffsetEnd + (power - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks;
             }
             else {
                 motorPower = power;
@@ -568,7 +538,8 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
-    public void makeStraight(double power) {
+    // public void makeStraight(double power) {
+    public void makeStraight() {
 
         double currentAngle = getIMUAngleConverted();
 
@@ -585,7 +556,11 @@ public class SkystoneAuton extends LinearOpMode {
             diffsArrayList.add(diff);
         }
 
-        int minIndex = diffsArrayList.indexOf(Collections.min(diffsArrayList));
+        double min = Collections.min(diffsArrayList);
+        int minIndex = diffsArrayList.indexOf(min);
+
+        double empiricalValue = 60;
+        double power = Math.max(0.1, min / 60);
 
         gotoDegreesRamping(power, potentialValues[minIndex]);
     }
@@ -607,13 +582,12 @@ public class SkystoneAuton extends LinearOpMode {
             rampupAngle = Math.floor(initialAbsAngleDelta / (double) 2);
         }
 
-        double abortTolerance = 3;
+        double abortTolerance = 2;
+        double angleTolerance = 0;
 
         if (Math.abs(signedAngleDifference) < abortTolerance) {
             return;
         }
-
-        double angleTolerance = 0.5;
 
         while (Math.abs(signedAngleDifference) > angleTolerance && !isStopRequested()) {
 
