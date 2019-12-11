@@ -72,7 +72,7 @@ public class SkystoneAuton extends LinearOpMode {
             }
         }
 
-        while (true) {
+        while (opModeIsActive()) {
             makeStraight(0.5);
             sleep(5000);
         }
@@ -206,9 +206,18 @@ public class SkystoneAuton extends LinearOpMode {
     public double AUTON_GRABBER_LEFT_PASSIVE = 0.74;
     public double AUTON_GRABBER_LEFT_ACTIVE = 0.04;
 
+    public Servo blockServo;
+
+    private double blockServoClosedPosition = 0;
+    private double blockServoOpenPosition = 0.5;
+
     public void initServos() {
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+
+        blockServo = hardwareMap.servo.get("testServo");
+        // blockServo.setPosition(blockServoOpenPosition);
+
     }
 
     // ----- COLOR SENSOR STUFF -----
@@ -596,6 +605,12 @@ public class SkystoneAuton extends LinearOpMode {
 
         if (initialAbsAngleDelta / 2 < rampupAngle) {
             rampupAngle = Math.floor(initialAbsAngleDelta / (double) 2);
+        }
+
+        double abortTolerance = 3;
+
+        if (Math.abs(signedAngleDifference) < abortTolerance) {
+            return;
         }
 
         double angleTolerance = 0.5;
