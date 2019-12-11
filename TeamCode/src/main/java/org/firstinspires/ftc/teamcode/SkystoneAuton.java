@@ -61,7 +61,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- META-METHODS -----
 
-    double bigpow = 0.8;
+    double bigpow = 1.2;
     double pow = 0.5;
     double tinypow = 0.3;
 
@@ -90,12 +90,12 @@ public class SkystoneAuton extends LinearOpMode {
         telemetry.update();
 
         // Move back to the first black block
-        double extraDist = 0;
-        moveCardinalRamping(pow, inchesToCm(extraDist + (values.size() - minIndex - 1) * 8), 0);
+        double extraDistOne = 0;
+        moveCardinalRamping(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
         double blockGetPart1Dist = 1;
         double blockGetPart2Dist = 2;
-        double backupDistance = 8;
+        double backupDistance = 10;
 
         double middleDistance = 20;
         double otherSideDistance = 15;
@@ -115,8 +115,10 @@ public class SkystoneAuton extends LinearOpMode {
 
         makeStraight();
 
+        double extraDistTwo = 1.5;
+
         // Go back to other block
-        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance), 180);
+        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance + extraDistTwo), 180);
         moveCardinalRamping(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
@@ -126,7 +128,7 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinalRamping(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance), 0);
+        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance + extraDistTwo), 0);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
 
         // Park
