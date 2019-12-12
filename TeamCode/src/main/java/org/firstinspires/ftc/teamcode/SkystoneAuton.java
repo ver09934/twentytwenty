@@ -63,10 +63,11 @@ public class SkystoneAuton extends LinearOpMode {
     public void bothBlocksAuton() {
 
         double bigpow = 0.85;
+        double medpow = 0.7;
         double pow = 0.35;
         double tinypow = 0.2;
 
-        moveCardinal(bigpow, inchesToCm(27), 270);
+        moveCardinal(medpow, inchesToCm(27), 270);
 
         ArrayList values = new ArrayList<Double>();
 
@@ -91,14 +92,14 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
         double blockGetPart1Dist = 1;
-        double blockGetPart2Dist = 2;
+        double blockGetPart2Dist = 3;
         double backupDistance = 10;
 
         double middleDistance = 20;
         double otherSideDistance = 15;
         double totalOtherSideDistance = middleDistance + otherSideDistance;
 
-        double blockDistance = 8;
+        double blockSize = 8;
 
         // Get block and back up
         moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
@@ -107,15 +108,16 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockDistance), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
 
-        makeStraight();
+        makeStraight(); // TODO
 
-        double extraDistTwo = 1.5;
+        double extraDistTwo = 1;
 
         // Go back to other block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance + extraDistTwo), 180);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
+        makeStraight(); // TODO
         moveCardinal(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
@@ -124,8 +126,10 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
+        makeStraight(); // TODO
+
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance + extraDistTwo), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
 
         // Park
@@ -442,7 +446,7 @@ public class SkystoneAuton extends LinearOpMode {
         int minIndex = diffsArrayList.indexOf(min);
 
         // Empirically set a reasonable motor power for turning
-        double power = Math.max(0.1, min / 60);
+        double power = Math.max(0.1, min / 50);
 
         gotoDegreesRamping(power, potentialValues[minIndex]);
     }
@@ -465,7 +469,7 @@ public class SkystoneAuton extends LinearOpMode {
         }
 
         double abortTolerance = 2;
-        double angleTolerance = 0;
+        double angleTolerance = 0.5;
 
         if (Math.abs(signedAngleDifference) < abortTolerance) {
             return;
