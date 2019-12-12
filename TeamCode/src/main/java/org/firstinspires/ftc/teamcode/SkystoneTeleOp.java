@@ -14,15 +14,6 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
 
-    /* The encoder functions available to us:
-    winchMotor1.setPower(0);
-    double tmp = winchMotor1.getPower();
-    winchMotor1.setTargetPosition(0);
-    int tmp = winchMotor1.getTargetPosition();
-    boolean tmp = winchMotor1.isBusy();
-    int tmp = winchMotor1.getCurrentPosition();
-    */
-
     // TODO: Rename variables and hardware devices from 1/2 to left/right
 
     // Important things
@@ -320,27 +311,6 @@ public class SkystoneTeleOp extends OpMode {
             plateServoRight.setPosition(plateServoRightDown);
         }
         telemetry.addData("Build plate servos up", plateServosUp);
-        /*
-        // --- Y Button: Toggle Winch Power (for safety) ---
-        if (this.gamepad2.y) {
-            if (!gamepad2YToggleLock) {
-                gamepad2YToggleLock = true;
-                winchesPowered = !winchesPowered;
-            }
-        }
-        else {
-            gamepad2YToggleLock = false;
-        }
-        if (winchesPowered) {
-            winchMotor1.setPower(winchMotor1Power);
-            winchMotor2.setPower(winchMotor2Power);
-        }
-        else {
-            winchMotor1.setPower(0);
-            winchMotor2.setPower(0);
-        }
-        telemetry.addData("Winches Powered", winchesPowered);
-        */
 
         // --- Left/Right Bumpers: Winch motors ---
         if (this.gamepad2.left_bumper) {
@@ -407,28 +377,6 @@ public class SkystoneTeleOp extends OpMode {
         }
         telemetry.addData("Block Servo Opened", blockServoOpen);
         telemetry.addData("Block Servo Position", blockServo.getPosition());
-
-        /*
-        // --- Right Trigger: Build Plate Clamper Servos ---
-        if (this.gamepad2.right_trigger > 0.5) {
-            if (!gamepad2RightTriggerToggleLock) {
-                gamepad2RightTriggerToggleLock = true;
-                plateServosUp = !plateServosUp;
-            }
-        }
-        else {
-            gamepad2RightTriggerToggleLock = false;
-        }
-        if (plateServosUp) {
-            plateServoLeft.setPosition(plateServoLeftUp);
-            plateServoRight.setPosition(plateServoRightUp);
-        }
-        else {
-            plateServoLeft.setPosition(plateServoLeftDown);
-            plateServoRight.setPosition(plateServoRightDown);
-        }
-        telemetry.addData("Build plate servos up", plateServosUp);
-        */
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
