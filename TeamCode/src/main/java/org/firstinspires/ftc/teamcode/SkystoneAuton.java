@@ -12,19 +12,16 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.concurrent.TimeUnit;
 
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
-    // TODO: May want to make the ramping floor an absolute of 0.1, instead of 0.1 * input_power
-    // Could do a quick Math.max(0.1, ramp), but that's a bit messy...
-    // Could do something like 0.1 + power * ramp, but then full power needs to be
-    // set to 0.1 + power, which is bad...
+    // TODO: Figure out how to reverse everything
+    // TODO: Read android app settings for field position (check Seth's 2019 commits)
+    // TODO: public servo autonGrabberRight
+    // TODO: Set block servo to open or wherever...
 
     private ElapsedTime runtime;
 
@@ -61,15 +58,15 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- META-METHODS -----
 
-    double bigpow = 1.2;
-    double pow = 0.5;
-    double tinypow = 0.3;
-
     public void plateAuton() {}
 
     public void bothBlocksAuton() {
 
-        moveCardinalRamping(bigpow, inchesToCm(27), 270);
+        double bigpow = 0.85;
+        double pow = 0.35;
+        double tinypow = 0.2;
+
+        moveCardinal(bigpow, inchesToCm(27), 270);
 
         ArrayList values = new ArrayList<Double>();
 
@@ -79,7 +76,7 @@ public class SkystoneAuton extends LinearOpMode {
             values.add(getLeftHSV()[2]);
 
             if (i < 2) {
-                moveCardinalRamping(pow, inchesToCm(8), 180);
+                moveCardinal(pow, inchesToCm(8), 180);
             }
         }
 
@@ -91,7 +88,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Move back to the first black block
         double extraDistOne = 0;
-        moveCardinalRamping(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
+        moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
         double blockGetPart1Dist = 1;
         double blockGetPart2Dist = 2;
@@ -104,13 +101,13 @@ public class SkystoneAuton extends LinearOpMode {
         double blockDistance = 8;
 
         // Get block and back up
-        moveCardinalRamping(tinypow, inchesToCm(blockGetPart1Dist), 270);
+        moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
-        moveCardinalRamping(tinypow, inchesToCm(blockGetPart2Dist), 270);
-        moveCardinalRamping(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+        moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
+        moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockDistance), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockDistance), 0);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
 
         makeStraight();
@@ -118,21 +115,21 @@ public class SkystoneAuton extends LinearOpMode {
         double extraDistTwo = 1.5;
 
         // Go back to other block
-        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance + extraDistTwo), 180);
-        moveCardinalRamping(bigpow, inchesToCm(backupDistance), 270);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockDistance + extraDistTwo), 180);
+        moveCardinal(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
-        moveCardinalRamping(tinypow, inchesToCm(blockGetPart1Dist), 270);
+        moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
-        moveCardinalRamping(tinypow, inchesToCm(blockGetPart2Dist), 270);
-        moveCardinalRamping(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+        moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
+        moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinalRamping(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance + extraDistTwo), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + 3 * blockDistance + extraDistTwo), 0);
         autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
 
         // Park
-        moveCardinalRamping(bigpow, inchesToCm(otherSideDistance), 180);
+        moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
     }
 
     // ----- TEST META-METHODS -----
@@ -154,17 +151,17 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void testMoveTwo() {
         for (int i = 0; i < 360; i += 90) {
-            moveCardinalRamping(1, inchesToCm(30), i);
+            moveCardinal(1, inchesToCm(30), i);
             sleep(1000);
         }
 
         for (int i = 0; i < 360; i += 90) {
-            moveCardinalRamping(0.5, inchesToCm(12), i);
+            moveCardinal(0.5, inchesToCm(12), i);
             sleep(1000);
         }
 
         for (int i = 0; i < 360; i += 90) {
-            moveCardinalRamping(0.3, inchesToCm(4), i);
+            moveCardinal(0.3, inchesToCm(4), i);
             sleep(1000);
         }
     }
@@ -233,8 +230,6 @@ public class SkystoneAuton extends LinearOpMode {
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
     }
-
-    // frontDistanceSensor.getDistance(distanceUnit);
 
     // ----- IMU STUFF -----
 
@@ -307,7 +302,7 @@ public class SkystoneAuton extends LinearOpMode {
         rbMotor.setPower(power);
     }
 
-    // ----- DRIVING STUFF -----
+    // ----- MOTOR STUFF -----
 
     public static final double GEAR_RATIO = 1; // output/input teeth
     public static final int TICKS_PER_MOTOR_ROTATION = 1120;
@@ -324,71 +319,17 @@ public class SkystoneAuton extends LinearOpMode {
         return inches * 2.54;
     }
 
-    public void moveCardinal(double power, double distance, int direction, boolean stopMotors) {
+    // ----- LINEAR MOVEMENT -----
 
-        resetAllEncoders();
+    public void moveCardinal(double power, double distance, int direction) {
 
-        int[] motorDirections = {1, 1, 1, 1};
+        // Empirically determine a reasonable number of rampup ticks for the given power
+        double rampupTicks = 600 * power;
 
-        if (direction == 0) {
-            motorDirections[0] = -1;
-            motorDirections[1] = -1;
-        }
-        else if (direction == 90) {
-            motorDirections[0] = -1;
-            motorDirections[2] = -1;
-        }
-        else if (direction == 180) {
-            motorDirections[2] = -1;
-            motorDirections[3] = -1;
-        }
-        else if (direction == 270) {
-            motorDirections[1] = -1;
-            motorDirections[3] = -1;
-        }
-        else {
-            // This is bad, I know
-            throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
-        }
-
-        if (direction == 0 || direction == 180) {
-            // Empirically determined values for strafing sideways
-            distance *= ((304.8) / (304.8 - 19));
-        }
-
-        // TODO: See if needed
-        double maxPower = Math.sqrt(2);
-
-        lfMotor.setPower(power * motorDirections[0] / maxPower);
-        rfMotor.setPower(power * motorDirections[1] / maxPower);
-        lbMotor.setPower(power * motorDirections[2] / maxPower);
-        rbMotor.setPower(power * motorDirections[3] / maxPower);
-
-        double targetTicks = distanceToEncoderTicks(distance);
-
-        int averageMotorTicks = 0;
-
-        while (averageMotorTicks < targetTicks && !this.isStopRequested()) {
-            int lft = Math.abs(lfMotor.getCurrentPosition());
-            int rft = Math.abs(rfMotor.getCurrentPosition());
-            int lbt = Math.abs(lbMotor.getCurrentPosition());
-            int rbt = Math.abs(rbMotor.getCurrentPosition());
-            averageMotorTicks = (lft + rft + lbt + rbt) / 4;
-
-            telemetry.addLine("Target Ticks: " + targetTicks);
-            telemetry.addLine("LF Actual: " + lft);
-            telemetry.addLine("RF Actual: " + rft);
-            telemetry.addLine("LB Actual: " + lbt);
-            telemetry.addLine("RB Actual: " + rbt);
-            telemetry.update();
-        }
-
-        if (stopMotors) {
-            setAllMotorPowers(0);
-        }
+        moveCardinal(power, distance, direction, true, rampupTicks);
     }
 
-    public void moveCardinalRamping(double power, double distance, int direction) {
+    public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
 
         resetAllEncoders();
 
@@ -415,34 +356,27 @@ public class SkystoneAuton extends LinearOpMode {
             throw new RuntimeException("Direction not multiple of 90 between 0 and 270, inclusive");
         }
 
+        // Empirically determined values for strafing sideways
         if (direction == 0 || direction == 180) {
-            // Empirically determined values for strafing sideways
             distance *= ((304.8) / (304.8 - 19));
         }
 
-        // TODO: See if needed
-        double maxPower = Math.sqrt(2);
-        // double maxPower = 1;
+        // Used to be Math.sqrt(2) to make max speed consistent with movement at 45 degrees,
+        // but we aborted that plan, giving us a higher possible cardinal max speed
+        double maxPower = 1;
 
         // Distance things
         double targetTicks = distanceToEncoderTicks(distance);
 
         int averageMotorTicks = 0;
 
-        // TODO: Empirical, see if this is good
-        double rampupTicks = 800 * power;
-
         if (targetTicks / 2 < rampupTicks) {
             rampupTicks = targetTicks / 2;
         }
 
-        // ElapsedTime rampupTimer = new ElapsedTime();
-
         double motorPower = 0;
 
         while (averageMotorTicks < targetTicks && !this.isStopRequested()) {
-
-            // double currentTime = rampupTimer.time(TimeUnit.SECONDS);
 
             int lft = Math.abs(lfMotor.getCurrentPosition());
             int rft = Math.abs(rfMotor.getCurrentPosition());
@@ -450,18 +384,20 @@ public class SkystoneAuton extends LinearOpMode {
             int rbt = Math.abs(rbMotor.getCurrentPosition());
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
-            double powerOffsetStart = 0.1;
-            double powerOffsetEnd = 0.1;
+            double powerOffsetStart = 0.08;
+            double powerOffsetEnd = 0.08;
 
-            power = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
-
-            if (averageMotorTicks < rampupTicks) {
-                // motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (averageMotorTicks / rampupTicks));
-                motorPower = powerOffsetStart + (power - powerOffsetStart) * (averageMotorTicks / rampupTicks);
+            if (ramping) {
+                power = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
             }
-            else if (averageMotorTicks > targetTicks - rampupTicks) {
-                // motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks);
+
+            if (ramping && averageMotorTicks < rampupTicks) {
+                motorPower = powerOffsetStart + (power - powerOffsetStart) * (averageMotorTicks / rampupTicks);
+                // motorPower = power * (powerOffsetStart + (1 - powerOffsetStart) * (averageMotorTicks / rampupTicks));
+            }
+            else if (ramping && averageMotorTicks > targetTicks - rampupTicks) {
                 motorPower = powerOffsetEnd + (power - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks;
+                // motorPower = power * (powerOffsetEnd + (1 - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks);
             }
             else {
                 motorPower = power;
@@ -483,64 +419,8 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
-    public void turnDegrees(double turnPower, double angleDelta) {
+    // ----- ROTATIONAL MOVEMENT -----
 
-        assert Math.abs(angleDelta) <= 180;
-
-        double startAngle = getIMUAngleConverted();
-
-        double targetAngle = startAngle + angleDelta;
-
-        if (targetAngle > 360) {
-            targetAngle = targetAngle % 360;
-        }
-        else if (targetAngle < 0) {
-            targetAngle = targetAngle % 360;
-            targetAngle += 360;
-        }
-
-        turnPower = Math.copySign(turnPower, angleDelta);
-
-        lfMotor.setPower(turnPower);
-        rfMotor.setPower(turnPower);
-        lbMotor.setPower(turnPower);
-        rbMotor.setPower(turnPower);
-
-        double currentAngle = startAngle;
-
-        if (angleDelta > 0 && targetAngle < startAngle) {
-            while (currentAngle >= startAngle || currentAngle < targetAngle && !isStopRequested()) {
-                currentAngle = getIMUAngleConverted();
-                telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
-                telemetry.update();
-            }
-        }
-        else if (angleDelta < 0 && targetAngle > startAngle) {
-            while (currentAngle <= startAngle || currentAngle > targetAngle && !isStopRequested()) {
-                currentAngle = getIMUAngleConverted();
-                telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
-                telemetry.update();
-            }
-        }
-        else if (angleDelta > 0) {
-            while (currentAngle < targetAngle && !isStopRequested()) {
-                currentAngle = getIMUAngleConverted();
-                telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
-                telemetry.update();
-            }
-        }
-        else {
-            while (currentAngle > targetAngle && !isStopRequested()) {
-                currentAngle = getIMUAngleConverted();
-                telemetry.addLine("Delta: " + angleDelta + " Target: " + targetAngle + " Current: " + currentAngle);
-                telemetry.update();
-            }
-        }
-
-        setAllMotorPowers(0);
-    }
-
-    // public void makeStraight(double power) {
     public void makeStraight() {
 
         double currentAngle = getIMUAngleConverted();
@@ -561,7 +441,7 @@ public class SkystoneAuton extends LinearOpMode {
         double min = Collections.min(diffsArrayList);
         int minIndex = diffsArrayList.indexOf(min);
 
-        double empiricalValue = 60;
+        // Empirically set a reasonable motor power for turning
         double power = Math.max(0.1, min / 60);
 
         gotoDegreesRamping(power, potentialValues[minIndex]);
