@@ -23,6 +23,8 @@ public class SkystoneAuton extends LinearOpMode {
     // TODO: public servo autonGrabberRight
     // TODO: Set block servo to open or wherever...
 
+    // TODO: Add optional direction forcing to angle turn method
+
     private ElapsedTime runtime;
 
     @Override
@@ -49,7 +51,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        bothBlocksAuton();
+        // bothBlocksAuton();
+        plateAuton();
 
         while (opModeIsActive()) {
             idle();
@@ -58,7 +61,40 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- META-METHODS -----
 
-    public void plateAuton() {}
+    public void plateAuton() {
+
+        double bigpow = 0.85;
+        double medpow = 0.5;
+        double pow = 0.35;
+
+        plateServosUp();
+
+        moveCardinal(bigpow, inchesToCm(29), 90);
+        moveCardinal(pow, inchesToCm(2), 90);
+
+        plateServosDown();
+
+        gotoDegreesRamping(pow, 270);
+        gotoDegreesRamping(pow, 180);
+
+        // moveCardinal(bigpow, inchesToCm(12), 90);
+
+        plateServosUp();
+
+        moveCardinal(pow, inchesToCm(1), 270);
+
+        makeStraight();
+
+        moveCardinal(bigpow, inchesToCm(30), 180);
+
+        makeStraight();
+
+        moveCardinal(bigpow, inchesToCm(30), 90);
+
+        makeStraight();
+
+        moveCardinal(bigpow, inchesToCm(18), 180);
+    }
 
     public void bothBlocksAuton() {
 
@@ -103,13 +139,13 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Get block and back up
         moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        autonGrabberLeft.setPosition(autonGrabberLeftActive);
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
 
         makeStraight(); // TODO
 
@@ -122,7 +158,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Get block and back up
         moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_ACTIVE);
+        autonGrabberLeft.setPosition(autonGrabberLeftActive);
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
@@ -130,7 +166,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Go to other side of field and release block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
 
         // Park
         moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
@@ -175,18 +211,40 @@ public class SkystoneAuton extends LinearOpMode {
     public Servo autonGrabberLeft;
     public Servo blockServo;
 
-    public double AUTON_GRABBER_LEFT_PASSIVE = 0.74;
-    public double AUTON_GRABBER_LEFT_ACTIVE = 0.04;
+    private Servo plateServoLeft;
+    private Servo plateServoRight;
+
+    public double autonGrabberLeftPassive = 0.74;
+    public double autonGrabberLeftActive = 0.04;
 
     private double blockServoClosedPosition = 0;
     private double blockServoOpenPosition = 0.5;
 
+    private double plateServoLeftDown = 0.28;
+    private double plateServoLeftUp = 0.5;
+    private double plateServoRightDown = 0.82;
+    private double plateServoRightUp = 0.6;
+
     public void initServos() {
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
-        autonGrabberLeft.setPosition(AUTON_GRABBER_LEFT_PASSIVE);
+        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+
+        plateServoLeft = hardwareMap.servo.get("plateServo1");
+        plateServoRight = hardwareMap.servo.get("plateServo2");
+        // plateServosUp();
 
         blockServo = hardwareMap.servo.get("testServo");
         // blockServo.setPosition(blockServoOpenPosition);
+    }
+
+    private void plateServosUp() {
+        plateServoLeft.setPosition(plateServoLeftUp);
+        plateServoRight.setPosition(plateServoRightUp);
+    }
+
+    private void plateServosDown() {
+        plateServoLeft.setPosition(plateServoLeftDown);
+        plateServoRight.setPosition(plateServoRightDown);
     }
 
     // ----- COLOR SENSOR STUFF -----
