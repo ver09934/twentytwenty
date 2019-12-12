@@ -51,8 +51,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // bothBlocksAuton();
-        plateAuton();
+        bothBlocksAuton();
+        // plateAuton();
 
         while (opModeIsActive()) {
             idle();
@@ -209,6 +209,7 @@ public class SkystoneAuton extends LinearOpMode {
     // ----- SERVO STUFF -----
 
     public Servo autonGrabberLeft;
+    public Servo autonGrabberRight;
     public Servo blockServo;
 
     private Servo plateServoLeft;
@@ -216,6 +217,9 @@ public class SkystoneAuton extends LinearOpMode {
 
     public double autonGrabberLeftPassive = 0.74;
     public double autonGrabberLeftActive = 0.04;
+
+    public double autonGrabberRightPassive = 0.8;
+    public double autonGrabberRightActive = 0.3;
 
     private double blockServoClosedPosition = 0;
     private double blockServoOpenPosition = 0.5;
@@ -227,6 +231,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void initServos() {
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
+        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
         autonGrabberLeft.setPosition(autonGrabberLeftPassive);
 
         plateServoLeft = hardwareMap.servo.get("plateServo1");
@@ -392,6 +397,8 @@ public class SkystoneAuton extends LinearOpMode {
     }
 
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
+
+        // direction = (int) reflectAngle(direction);
 
         resetAllEncoders();
 
@@ -564,6 +571,8 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
+    // ----- ANGLE UTILS -----
+
     public static double getAngleDifference(double currentAngle, double targetAngle) {
 
         currentAngle = currentAngle % 360;
@@ -587,4 +596,17 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
+    public static double reflectAngle(double angle) {
+        angle = angle % 360;
+        angle = angle < 0 ? angle + 360 : angle;
+        if (0 <= angle && angle < 180) {
+            return 180 - angle;
+        }
+        else if (180 <= angle && angle <= 360) {
+            return 540 - angle;
+        }
+        else {
+            return angle;
+        }
+    }
 }
