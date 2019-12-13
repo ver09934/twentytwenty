@@ -115,7 +115,7 @@ public class SkystoneAuton extends LinearOpMode {
         // Scan blocks
         for (int i = 0; i < 3; i++) {
 
-            values.add(getLeftHSV()[2]);
+            values.add(getHSV()[2]);
 
             if (i < 2) {
                 moveCardinal(pow, inchesToCm(8), 180);
@@ -144,34 +144,34 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Get block and back up
         moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        autonGrabberLeft.setPosition(autonGrabberLeftActive);
+        deploySkystoneGrabber();
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
-        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        retractSkystoneGrabber();
 
-        makeStraight(); // TODO
+        makeStraight(); // Align
 
         double extraDistTwo = 1;
 
         // Go back to other block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
-        makeStraight(); // TODO
+        makeStraight(); // Align
         moveCardinal(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
         moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        autonGrabberLeft.setPosition(autonGrabberLeftActive);
+        deploySkystoneGrabber();
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
-        makeStraight(); // TODO
+        makeStraight(); // Align
 
         // Go to other side of field and release block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
-        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        retractSkystoneGrabber();
 
         // Park
         moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
@@ -291,14 +291,13 @@ public class SkystoneAuton extends LinearOpMode {
     public void initServos() {
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
         autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
-        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        retractBothSkystoneGrabbers();
 
         plateServoLeft = hardwareMap.servo.get("plateServo1");
         plateServoRight = hardwareMap.servo.get("plateServo2");
-        // plateServosUp();
+        plateServosDown();
 
         blockServo = hardwareMap.servo.get("testServo");
-        // blockServo.setPosition(blockServoOpenPosition);
     }
 
     private void plateServosUp() {
@@ -311,24 +310,67 @@ public class SkystoneAuton extends LinearOpMode {
         plateServoRight.setPosition(plateServoRightDown);
     }
 
+    public void retractBothSkystoneGrabbers() {
+        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        autonGrabberRight.setPosition(autonGrabberRightPassive);
+    }
+
+    public void deploySkystoneGrabber() {
+        if (allianceColor == AllianceColor.BLUE) {
+            autonGrabberLeft.setPosition(autonGrabberLeftActive);
+        }
+        else if (allianceColor == AllianceColor.RED) {
+            autonGrabberRight.setPosition(autonGrabberRightActive);
+        }
+    }
+
+    public void retractSkystoneGrabber() {
+        if (allianceColor == AllianceColor.BLUE) {
+            autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        }
+        else if (allianceColor == AllianceColor.RED) {
+            autonGrabberRight.setPosition(autonGrabberRightPassive);
+        }
+    }
+
     // ----- COLOR SENSOR STUFF -----
 
     public ColorSensor leftColorColorSensor;
     public DistanceSensor leftColorDistanceSensor;
 
+    public ColorSensor rightColorColorSensor;
+    public DistanceSensor rightColorDistanceSensor;
+
     public void initColorSensors() {
         leftColorColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
         leftColorDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftColorSensor");
+
+        // TODO: Add sensor to config
+        rightColorColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
+        rightColorDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightColorSensor");
     }
 
-    public float[] getLeftHSV() {
+    public float[] getHSV() {
 
-        double dist = leftColorDistanceSensor.getDistance(DistanceUnit.CM);
+        // This couldn't possibly be bad design
+        DistanceSensor distanceSensor = null;
+        ColorSensor colorSensor = null;
 
-        double a = leftColorColorSensor.alpha();
-        double r = leftColorColorSensor.red();
-        double g = leftColorColorSensor.green();
-        double b = leftColorColorSensor.blue();
+        if (allianceColor == AllianceColor.BLUE) {
+            distanceSensor = leftColorDistanceSensor;
+            colorSensor = leftColorColorSensor;
+        }
+        if (allianceColor == AllianceColor.RED) {
+            distanceSensor = rightColorDistanceSensor;
+            colorSensor = rightColorColorSensor;
+        }
+
+        double dist = distanceSensor.getDistance(DistanceUnit.CM);
+
+        double a = colorSensor.alpha();
+        double r = colorSensor.red();
+        double g = colorSensor.green();
+        double b = colorSensor.blue();
 
         float hsvValues[] = {0F, 0F, 0F};
         final double SCALE_FACTOR = 255;
