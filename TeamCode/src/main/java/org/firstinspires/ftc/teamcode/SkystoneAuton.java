@@ -55,8 +55,14 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // bothBlocksAuton();
-        // plateAuton();
+        /*
+        if (autonType == AutonType.TWOSKYSTONES) {
+            bothBlocksAuton();
+        }
+        else if (autonType == AutonType.FOUNDATION) {
+            plateAuton();
+        }
+        */
         sharedPrefsTest();
 
         while (opModeIsActive()) {
