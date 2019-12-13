@@ -309,6 +309,15 @@ public class SkystoneAuton extends LinearOpMode {
         plateServosDown();
 
         blockServo = hardwareMap.servo.get("testServo");
+        blockServoJamOpen();
+    }
+
+    private void blockServoJamOpen() {
+        blockServo.setPosition(blockServoOpenPosition);
+    }
+
+    private void blockServoClosed() {
+        blockServo.setPosition(blockServoClosedPosition);
     }
 
     private void plateServosUp() {
