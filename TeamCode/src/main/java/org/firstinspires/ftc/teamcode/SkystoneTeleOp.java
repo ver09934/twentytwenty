@@ -81,6 +81,11 @@ public class SkystoneTeleOp extends OpMode {
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int currentWinchIndex = 0;
 
+    private void updateWinchPositions() {
+        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
+        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+    }
+
     // Gulper motor speeds
     private double gulperForwardPower = 1;
     private double gulperReversePower = -gulperForwardPower;
@@ -110,8 +115,7 @@ public class SkystoneTeleOp extends OpMode {
         gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         winchMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        winchMotor1.setTargetPosition(0);
-        winchMotor2.setTargetPosition(0);
+        updateWinchPositions();
         winchMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         winchMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -154,8 +158,7 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor1.setPower(winchMotor1Power);
         winchMotor2.setPower(winchMotor2Power);
         winchesPowered = true;
-        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
-        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+        updateWinchPositions();
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -318,8 +321,7 @@ public class SkystoneTeleOp extends OpMode {
                 gamepad2BumperToggleLock = true;
                 if (currentWinchIndex > 0) {
                     currentWinchIndex -= 1;
-                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
-                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+                    updateWinchPositions();
                 }
             }
         }
@@ -328,8 +330,7 @@ public class SkystoneTeleOp extends OpMode {
                 gamepad2BumperToggleLock = true;
                 if (currentWinchIndex < winchMotorPositions.length - 1) {
                     currentWinchIndex += 1;
-                    winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
-                    winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+                    updateWinchPositions();
                 }
             }
         }
@@ -342,8 +343,7 @@ public class SkystoneTeleOp extends OpMode {
             if (!gamepad2LeftTriggerToggleLock) {
                 gamepad2LeftTriggerToggleLock = true;
                 currentWinchIndex  = 0;
-                winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
-                winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+                updateWinchPositions();
 
                 blockServo.setPosition(blockServoClosedPosition);
                 blockServoOpen = false;
