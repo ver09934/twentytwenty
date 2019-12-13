@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
+
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
@@ -41,6 +44,7 @@ public class SkystoneAuton extends LinearOpMode {
         initServos();
         initColorSensors();
         initIMU();
+        initSharedPreferences();
 
         while (!this.isStarted()) {
             telemetry.addData("Status", "Waiting for start");
@@ -51,8 +55,9 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        bothBlocksAuton();
+        // bothBlocksAuton();
         // plateAuton();
+        sharedPrefsTest();
 
         while (opModeIsActive()) {
             idle();
@@ -174,6 +179,24 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- TEST META-METHODS -----
 
+    public void sharedPrefsTest() {
+        if (allianceColor == AllianceColor.BLUE) {
+            moveCardinal(0.5, 12, 90);
+        }
+        else if (allianceColor == AllianceColor.RED) {
+            moveCardinal(0.5, 12, 270);
+        }
+
+        sleep(500);
+
+        if (autonType == AutonType.TWOSKYSTONES) {
+            moveCardinal(0.5, 12, 0);
+        }
+        else if (autonType == AutonType.FOUNDATION) {
+            moveCardinal(0.5, 12, 180);
+        }
+    }
+
     public void testMoveOne() {
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 360; i += 90) {
@@ -204,6 +227,42 @@ public class SkystoneAuton extends LinearOpMode {
             moveCardinal(0.3, inchesToCm(4), i);
             sleep(1000);
         }
+    }
+
+    // ----- ANDROID SHARED PREFERENCES -----
+
+    private static SharedPreferences sharedPrefs;
+
+    private static AllianceColor allianceColor;
+    private static AutonType autonType;
+
+    public void initSharedPreferences() {
+        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.hardwareMap.appContext);
+
+        String color = sharedPrefs.getString("alliance_color", "ERROR");
+        String type = sharedPrefs.getString("auton_type", "ERROR");
+
+        if (color.equals("BLUE")) {
+            allianceColor = AllianceColor.BLUE;
+        }
+        else if (color.equals("RED")) {
+            allianceColor = AllianceColor.RED;
+        }
+
+        if (type.equals("TWOSKYSTONES")) {
+            autonType = AutonType.TWOSKYSTONES;
+        }
+        else if (type.equals("FOUNDATION")) {
+            autonType = AutonType.FOUNDATION;
+        }
+    }
+
+    private enum AllianceColor {
+        BLUE, RED
+    }
+
+    private enum AutonType {
+        TWOSKYSTONES, FOUNDATION
     }
 
     // ----- SERVO STUFF -----

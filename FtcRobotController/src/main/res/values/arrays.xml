@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- AUTON ALLIANCE COLOR -->
+
+    <string-array name="allianceColor">
+        <item>Blue Alliance</item>
+        <item>Red Alliance</item>
+    </string-array>
+
+    <string-array name="allianceColorAlias">
+        <item>"BLUE"</item>
+        <item>"RED"</item>
+    </string-array>
+
+    <!-- AUTON TYPE -->
+
+    <string-array name="autonType">
+        <item>2 Skystones</item>
+        <item>Foundation / Build Plate</item>
+    </string-array>
+
+    <string-array name="autonTypeAlias">
+        <item>"TWOSKYSTONES"</item>
+        <item>"FOUNDATION"</item>
+    </string-array>
+
+</resources>
