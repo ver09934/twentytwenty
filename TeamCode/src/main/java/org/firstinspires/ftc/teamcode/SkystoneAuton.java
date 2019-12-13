@@ -85,7 +85,12 @@ public class SkystoneAuton extends LinearOpMode {
 
         plateServosDown();
 
-        gotoDegreesRamping(pow, 270);
+        if (allianceColor == allianceColor.BLUE) {
+            gotoDegreesRamping(pow, 270);
+        }
+        else if (allianceColor == allianceColor.RED) {
+            gotoDegreesRamping(pow, 90);
+        }
         gotoDegreesRamping(pow, 180);
 
         // moveCardinal(bigpow, inchesToCm(12), 90);
@@ -505,7 +510,10 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
 
-        // direction = (int) reflectAngle(direction);
+        // TODO
+        if (allianceColor == AllianceColor.RED) {
+            direction = (int) reflectAngle(direction);
+        }
 
         resetAllEncoders();
 
