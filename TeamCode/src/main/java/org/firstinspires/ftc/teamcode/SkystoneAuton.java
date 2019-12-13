@@ -600,10 +600,10 @@ public class SkystoneAuton extends LinearOpMode {
         angle = angle % 360;
         angle = angle < 0 ? angle + 360 : angle;
         if (0 <= angle && angle < 180) {
-            return 180 - angle;
+            return (180 - angle) % 360;
         }
         else if (180 <= angle && angle <= 360) {
-            return 540 - angle;
+            return (540 - angle) % 360;
         }
         else {
             return angle;
