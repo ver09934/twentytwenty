@@ -638,10 +638,14 @@ public class SkystoneAuton extends LinearOpMode {
         // Empirically set a reasonable motor power for turning
         double power = Math.max(0.1, min / 50);
 
-        gotoDegreesRamping(power, potentialValues[minIndex]);
+        gotoDegreesRamping(power, potentialValues[minIndex], true);
     }
 
     public void gotoDegreesRamping(double power, double targetAngle) {
+        gotoDegreesRamping(power, targetAngle, false);
+    }
+
+    public void gotoDegreesRamping(double power, double targetAngle, boolean useTimeout) {
 
         double startAngle = getIMUAngleConverted();
         double currentAngle = startAngle;
@@ -665,7 +669,17 @@ public class SkystoneAuton extends LinearOpMode {
             return;
         }
 
+        double timeoutTime = 2.5;
+
+        ElapsedTime timeoutTimer = new ElapsedTime();
+        timeoutTimer.reset(); // Probably not necessary
+
         while (Math.abs(signedAngleDifference) > angleTolerance && !isStopRequested()) {
+
+            // Could've just &&-ed this into the loop condition, but whatever, really
+            if (useTimeout && timeoutTimer.seconds() > timeoutTime) {
+                break;
+            }
 
             currentAngle = getIMUAngleConverted();
 
