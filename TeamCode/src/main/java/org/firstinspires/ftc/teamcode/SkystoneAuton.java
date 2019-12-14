@@ -79,6 +79,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         plateServosUp();
 
+        moveCardinal(bigpow, inchesToCm(12), 180);
+
         moveCardinal(bigpow, inchesToCm(29), 90);
         moveCardinal(pow, inchesToCm(2), 90);
 
