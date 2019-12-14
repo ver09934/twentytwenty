@@ -379,7 +379,7 @@ public class SkystoneAuton extends LinearOpMode {
             distanceSensor = leftColorDistanceSensor;
             colorSensor = leftColorColorSensor;
         }
-        if (allianceColor == AllianceColor.RED) {
+        else if (allianceColor == AllianceColor.RED) {
             distanceSensor = rightColorDistanceSensor;
             colorSensor = rightColorColorSensor;
         }
