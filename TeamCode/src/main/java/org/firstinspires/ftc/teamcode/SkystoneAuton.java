@@ -286,8 +286,9 @@ public class SkystoneAuton extends LinearOpMode {
     private Servo plateServoLeft;
     private Servo plateServoRight;
 
-    public double autonGrabberLeftPassive = 0.74;
-    public double autonGrabberLeftActive = 0.04;
+    // TODO: THE IMPORTANT VALUES
+    public double autonGrabberLeftPassive = 0;
+    public double autonGrabberLeftActive = 0.5;
 
     public double autonGrabberRightPassive = 0.8;
     public double autonGrabberRightActive = 0.3;
