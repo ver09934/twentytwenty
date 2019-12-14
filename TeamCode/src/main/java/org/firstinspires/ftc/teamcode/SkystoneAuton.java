@@ -115,7 +115,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void bothBlocksAuton() {
 
-        double bigpow = 0.85;
+        double bigpow = 0.925;
         double medpow = 0.7;
         double pow = 0.35;
         double tinypow = 0.2;
@@ -149,7 +149,7 @@ public class SkystoneAuton extends LinearOpMode {
         double backupDistance = 10;
 
         double middleDistance = 20;
-        double otherSideDistance = 15;
+        double otherSideDistance = 20;
         double totalOtherSideDistance = middleDistance + otherSideDistance;
 
         double blockSize = 8;
