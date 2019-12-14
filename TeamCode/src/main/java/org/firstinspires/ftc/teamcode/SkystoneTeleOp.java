@@ -63,7 +63,7 @@ public class SkystoneTeleOp extends OpMode {
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
 
-    private int foundationHeight = 700;
+    private int foundationHeight = 850;
     private int winchMotorStep = 750;
     private int[] winchMotorPositions = {
             0,
