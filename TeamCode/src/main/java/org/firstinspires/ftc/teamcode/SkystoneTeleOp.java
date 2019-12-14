@@ -97,6 +97,23 @@ public class SkystoneTeleOp extends OpMode {
     private double plateServoRightDown = 0.82;
     private double plateServoRightUp = 0.6;
 
+    // TODO: Clean up and organize
+    // ------------------------------------------
+    private Servo autonGrabberLeft;
+    private Servo autonGrabberRight;
+
+    public double autonGrabberLeftPassive = 0.74;
+    public double autonGrabberLeftActive = 0.04;
+
+    public double autonGrabberRightPassive = 0.8;
+    public double autonGrabberRightActive = 0.3;
+
+    public void retractBothSkystoneGrabbers() {
+        autonGrabberLeft.setPosition(autonGrabberLeftPassive);
+        autonGrabberRight.setPosition(autonGrabberRightPassive);
+    }
+    // ------------------------------------------
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
@@ -145,6 +162,11 @@ public class SkystoneTeleOp extends OpMode {
         plateServosUp = false;
         plateServoLeft.setPosition(plateServoLeftDown);
         plateServoRight.setPosition(plateServoRightDown);
+
+        // TODO: Clean up and organize
+        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
+        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
+        retractBothSkystoneGrabbers();
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
