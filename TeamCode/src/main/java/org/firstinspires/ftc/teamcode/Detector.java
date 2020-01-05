@@ -61,6 +61,12 @@ public class Detector extends OpenCvPipeline {
 
     @Override
     public Mat processFrame(Mat rgba) {
+        return null;
+    }
+    /*
+    @Override
+    public Mat processFrame(Mat rgba) {
+        Point stoneCenter;
 
         telemetry.addLine("---Detection Algorithm Begins---");
         System.out.println("---Detection Algorithm Begins---");
@@ -100,7 +106,7 @@ public class Detector extends OpenCvPipeline {
         // Find the centers of the bounding rectangles
         for (int j = 0; j < stoneContours.size(); j++) {
             RotatedRect stoneRect = Imgproc.minAreaRect(stoneContours.get(j));
-            Point stoneCenter = stoneRect.center;
+            stoneCenter = stoneRect.center;
         }
 
         if (showUI) {
@@ -110,4 +116,5 @@ public class Detector extends OpenCvPipeline {
 
         return null;
     }
+     */
 }
