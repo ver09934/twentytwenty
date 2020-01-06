@@ -31,9 +31,12 @@ public class Servos {
 
     HardwareMap hardwareMap;
     LinearOpMode op;
-    Servos(LinearOpMode op) {
+    SkystoneAuton.AllianceColor color;
+
+    Servos(LinearOpMode op, SkystoneAuton.AllianceColor color) {
         hardwareMap = op.hardwareMap;
         this.op = op;
+        this.color = color;
     }
 
     public void initServos() {
@@ -57,12 +60,12 @@ public class Servos {
         blockServo.setPosition(blockServoClosedPosition);
     }
 
-    private void plateServosUp() {
+    public void plateServosUp() {
         plateServoLeft.setPosition(plateServoLeftUp);
         plateServoRight.setPosition(plateServoRightUp);
     }
 
-    private void plateServosDown() {
+    public void plateServosDown() {
         plateServoLeft.setPosition(plateServoLeftDown);
         plateServoRight.setPosition(plateServoRightDown);
     }
@@ -73,17 +76,17 @@ public class Servos {
     }
 
     public void deploySkystoneGrabber() {
-        if (allianceColor == AllianceColor.BLUE) {
+        if (color == color.BLUE) {
             autonGrabberLeft.setPosition(autonGrabberLeftActive);
-        } else if (allianceColor == AllianceColor.RED) {
+        } else if (color == color.RED) {
             autonGrabberRight.setPosition(autonGrabberRightActive);
         }
     }
 
     public void retractSkystoneGrabber() {
-        if (allianceColor == AllianceColor.BLUE) {
+        if (color == color.BLUE) {
             autonGrabberLeft.setPosition(autonGrabberLeftPassive);
-        } else if (allianceColor == AllianceColor.RED) {
+        } else if (color == color.RED) {
             autonGrabberRight.setPosition(autonGrabberRightPassive);
         }
     }

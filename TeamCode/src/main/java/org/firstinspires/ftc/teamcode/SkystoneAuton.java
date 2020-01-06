@@ -28,6 +28,11 @@ public class SkystoneAuton extends LinearOpMode {
     // TODO: Add optional direction forcing to angle turn method
 
     private ElapsedTime runtime;
+    Motors motors = new Motors(this);
+    Servos servos = new Servos(this, allianceColor);
+    Sensors sensors = new Sensors(this, allianceColor);
+    Movement movement = new Movement(this, motors, allianceColor, sensors);
+
 
     @Override
     public void runOpMode() {
@@ -39,16 +44,16 @@ public class SkystoneAuton extends LinearOpMode {
 
         runtime = new ElapsedTime();
 
-        initMotors();
-        initServos();
-        initColorSensors();
-        initIMU();
+        motors.initMotors();
+        servos.initServos();
+        sensors.initColorSensors();
+        sensors.initIMU();
         initSharedPreferences();
 
         while (!this.isStarted()) {
             telemetry.addData("Status", "Waiting for start");
             telemetry.addData("Runtime", runtime.toString());
-            telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
+            telemetry.addData("IMU calibration status", sensors.imu.getCalibrationStatus().toString());
             telemetry.update();
         }
 
@@ -56,8 +61,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         if (autonType == AutonType.TWOSKYSTONES) {
             bothBlocksAuton();
-        }
-        else if (autonType == AutonType.FOUNDATION) {
+        } else if (autonType == AutonType.FOUNDATION) {
             plateAuton();
         }
 
@@ -76,40 +80,39 @@ public class SkystoneAuton extends LinearOpMode {
         double medpow = 0.5;
         double pow = 0.35;
 
-        plateServosUp();
+        servos.plateServosUp();
 
-        moveCardinal(bigpow, inchesToCm(12), 180);
+        movement.moveCardinal(bigpow, motors.inchesToCm(12), 180);
 
-        moveCardinal(bigpow, inchesToCm(29), 90);
-        moveCardinal(pow, inchesToCm(2), 90);
+        movement.moveCardinal(bigpow, motors.inchesToCm(29), 90);
+        movement.moveCardinal(pow, motors.inchesToCm(2), 90);
 
-        plateServosDown();
+        servos.plateServosDown();
 
         if (allianceColor == allianceColor.BLUE) {
-            gotoDegreesRamping(pow, 270);
+            movement.gotoDegreesRamping(pow, 270);
+        } else if (allianceColor == allianceColor.RED) {
+            movement.gotoDegreesRamping(pow, 90);
         }
-        else if (allianceColor == allianceColor.RED) {
-            gotoDegreesRamping(pow, 90);
-        }
-        gotoDegreesRamping(pow, 180);
+        movement.gotoDegreesRamping(pow, 180);
 
         // moveCardinal(bigpow, inchesToCm(12), 90);
 
-        plateServosUp();
+        servos.plateServosUp();
 
-        moveCardinal(pow, inchesToCm(1), 270);
+        movement.moveCardinal(pow, motors.inchesToCm(1), 270);
 
-        makeStraight();
+        movement.makeStraight();
 
-        moveCardinal(bigpow, inchesToCm(30), 180);
+        movement.moveCardinal(bigpow, motors.inchesToCm(30), 180);
 
-        makeStraight();
+        movement.makeStraight();
 
-        moveCardinal(bigpow, inchesToCm(30), 90);
+        movement.moveCardinal(bigpow, motors.inchesToCm(30), 90);
 
-        makeStraight();
+        movement.makeStraight();
 
-        moveCardinal(bigpow, inchesToCm(18), 180);
+        movement.moveCardinal(bigpow, motors.inchesToCm(18), 180);
     }
 
     public void bothBlocksAuton() {
@@ -119,17 +122,17 @@ public class SkystoneAuton extends LinearOpMode {
         double pow = 0.35;
         double tinypow = 0.2;
 
-        moveCardinal(medpow, inchesToCm(27), 270);
+        movement.moveCardinal(medpow, motors.inchesToCm(27), 270);
 
         ArrayList values = new ArrayList<Double>();
 
         // Scan blocks
         for (int i = 0; i < 3; i++) {
 
-            values.add(getHSV()[2]);
+            values.add(sensors.getHSV()[2]);
 
             if (i < 2) {
-                moveCardinal(pow, inchesToCm(8), 180);
+                movement.moveCardinal(pow, motors.inchesToCm(8), 180);
             }
         }
 
@@ -141,7 +144,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         // Move back to the first black block
         double extraDistOne = 0;
-        moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
+        movement.moveCardinal(pow, motors.inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
         double blockGetPart1Dist = 1;
         double blockGetPart2Dist = 3;
@@ -154,88 +157,86 @@ public class SkystoneAuton extends LinearOpMode {
         double blockSize = 8;
 
         // Get block and back up
-        moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        deploySkystoneGrabber();
-        moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
-        moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+        movement.moveCardinal(tinypow, motors.inchesToCm(blockGetPart1Dist), 270);
+        servos.deploySkystoneGrabber();
+        movement.moveCardinal(tinypow, motors.inchesToCm(blockGetPart2Dist), 270);
+        movement.moveCardinal(bigpow, motors.inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
-        retractSkystoneGrabber();
+        movement.moveCardinal(bigpow, motors.inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
+        servos.retractSkystoneGrabber();
 
-        makeStraight(); // Align
+        movement.makeStraight(); // Align
 
         double extraDistTwo = 1;
 
         // Go back to other block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
-        makeStraight(); // Align
-        moveCardinal(bigpow, inchesToCm(backupDistance), 270);
+        movement.moveCardinal(bigpow, motors.inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
+        movement.makeStraight(); // Align
+        movement.moveCardinal(bigpow, motors.inchesToCm(backupDistance), 270);
 
         // Get block and back up
-        moveCardinal(tinypow, inchesToCm(blockGetPart1Dist), 270);
-        deploySkystoneGrabber();
-        moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
-        moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
+        movement.moveCardinal(tinypow, motors.inchesToCm(blockGetPart1Dist), 270);
+        servos.deploySkystoneGrabber();
+        movement.moveCardinal(tinypow, motors.inchesToCm(blockGetPart2Dist), 270);
+        movement.moveCardinal(bigpow, motors.inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
-        makeStraight(); // Align
+        movement.makeStraight(); // Align
 
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
-        retractSkystoneGrabber();
+        movement.moveCardinal(bigpow, motors.inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
+        servos.retractSkystoneGrabber();
 
         // Park
-        moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
+        movement.moveCardinal(bigpow, motors.inchesToCm(otherSideDistance), 180);
     }
 
     // ----- TEST META-METHODS -----
 
     public void sharedPrefsTest() {
         if (allianceColor == AllianceColor.BLUE) {
-            moveCardinal(0.5, 12, 90);
-        }
-        else if (allianceColor == AllianceColor.RED) {
-            moveCardinal(0.5, 12, 270);
+            movement.moveCardinal(0.5, 12, 90);
+        } else if (allianceColor == AllianceColor.RED) {
+            movement.moveCardinal(0.5, 12, 270);
         }
 
         sleep(500);
 
         if (autonType == AutonType.TWOSKYSTONES) {
-            moveCardinal(0.5, 12, 0);
-        }
-        else if (autonType == AutonType.FOUNDATION) {
-            moveCardinal(0.5, 12, 180);
+            movement.moveCardinal(0.5, 12, 0);
+        } else if (autonType == AutonType.FOUNDATION) {
+            movement.moveCardinal(0.5, 12, 180);
         }
     }
 
     public void testMoveOne() {
         for (int j = 0; j < 1; j++) {
             for (int i = 0; i < 360; i += 90) {
-                gotoDegreesRamping(0.5, i);
+                movement.gotoDegreesRamping(0.5, i);
                 sleep(1000);
             }
         }
 
         while (opModeIsActive()) {
             // makeStraight(0.5);
-            makeStraight();
+            movement.makeStraight();
             sleep(5000);
         }
     }
 
     public void testMoveTwo() {
         for (int i = 0; i < 360; i += 90) {
-            moveCardinal(1, inchesToCm(30), i);
+            movement.moveCardinal(1, motors.inchesToCm(30), i);
             sleep(1000);
         }
 
         for (int i = 0; i < 360; i += 90) {
-            moveCardinal(0.5, inchesToCm(12), i);
+            movement.moveCardinal(0.5, motors.inchesToCm(12), i);
             sleep(1000);
         }
 
         for (int i = 0; i < 360; i += 90) {
-            moveCardinal(0.3, inchesToCm(4), i);
+            movement.moveCardinal(0.3, motors.inchesToCm(4), i);
             sleep(1000);
         }
     }
@@ -255,29 +256,24 @@ public class SkystoneAuton extends LinearOpMode {
 
         if (color.equals("BLUE")) {
             allianceColor = AllianceColor.BLUE;
-        }
-        else if (color.equals("RED")) {
+        } else if (color.equals("RED")) {
             allianceColor = AllianceColor.RED;
         }
 
         if (type.equals("TWOSKYSTONES")) {
             autonType = AutonType.TWOSKYSTONES;
-        }
-        else if (type.equals("FOUNDATION")) {
+        } else if (type.equals("FOUNDATION")) {
             autonType = AutonType.FOUNDATION;
         }
     }
 
-    private enum AllianceColor {
+    public enum AllianceColor {
         BLUE, RED
     }
 
-    private enum AutonType {
+    public enum AutonType {
         TWOSKYSTONES, FOUNDATION
     }
-
-
-
 
 
 }

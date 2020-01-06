@@ -12,12 +12,17 @@ import java.util.Collections;
 // ----- LINEAR MOVEMENT -----
 public class Movement {
     LinearOpMode op;
-    static Motors motors;
+    Motors motors;
+    Sensors sensors;
     Telemetry telemetry;
-    Movement(LinearOpMode op, Motors motors) {
+    SkystoneAuton.AllianceColor color;
+
+    Movement(LinearOpMode op, Motors motors, SkystoneAuton.AllianceColor color, Sensors sensors) {
         this.op = op;
         this.motors = motors;
+        this.sensors = sensors;
         this.telemetry = op.telemetry;
+        this.color = color;
     }
 
     public void moveCardinal(double power, double distance, int direction) {
@@ -31,7 +36,7 @@ public class Movement {
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
 
         // TODO
-        if (allianceColor == AllianceColor.RED) {
+        if (color == color.RED) {
             direction = (int) reflectAngle(direction);
         }
 
@@ -119,9 +124,9 @@ public class Movement {
 
 // ----- ROTATIONAL MOVEMENT -----
 
-    public static void makeStraight() {
+    public void makeStraight() {
 
-        double currentAngle = getIMUAngleConverted();
+        double currentAngle = sensors.getIMUAngleConverted();
 
         double[] potentialValues = {0, 90, 180, 270};
 
@@ -145,13 +150,13 @@ public class Movement {
         gotoDegreesRamping(power, potentialValues[minIndex], true);
     }
 
-    public static void gotoDegreesRamping(double power, double targetAngle) {
+    public void gotoDegreesRamping(double power, double targetAngle) {
         gotoDegreesRamping(power, targetAngle, false);
     }
 
-    public static void gotoDegreesRamping(double power, double targetAngle, boolean useTimeout) {
+    public void gotoDegreesRamping(double power, double targetAngle, boolean useTimeout) {
 
-        double startAngle = getIMUAngleConverted();
+        double startAngle = sensors.getIMUAngleConverted();
         double currentAngle = startAngle;
 
         double initialAbsAngleDelta = Math.abs(getAngleDifference(startAngle, targetAngle));
@@ -178,14 +183,14 @@ public class Movement {
         ElapsedTime timeoutTimer = new ElapsedTime();
         timeoutTimer.reset(); // Probably not necessary
 
-        while (Math.abs(signedAngleDifference) > angleTolerance && !isStopRequested()) {
+        while (Math.abs(signedAngleDifference) > angleTolerance && !op.isStopRequested()) {
 
             // Could've just &&-ed this into the loop condition, but whatever, really
             if (useTimeout && timeoutTimer.seconds() > timeoutTime) {
                 break;
             }
 
-            currentAngle = getIMUAngleConverted();
+            currentAngle = sensors.getIMUAngleConverted();
 
             signedAngleDifference = getAngleDifference(currentAngle, targetAngle);
             absAngleDifference = Math.abs(signedAngleDifference);
@@ -206,10 +211,10 @@ public class Movement {
 
             motorPower = Math.copySign(motorPower, signedAngleDifference);
 
-            setAllMotorPowers(motorPower);
+            motors.setAllMotorPowers(motorPower);
         }
 
-        setAllMotorPowers(0);
+        motors.setAllMotorPowers(0);
     }
 
 // ----- ANGLE UTILS -----

@@ -23,10 +23,13 @@ public class Sensors {
     HardwareMap hardwareMap;
     LinearOpMode op;
     Telemetry telemetry;
-    Sensors(LinearOpMode op) {
+    SkystoneAuton.AllianceColor color;
+
+    Sensors(LinearOpMode op, SkystoneAuton.AllianceColor color) {
         hardwareMap = op.hardwareMap;
         this.op = op;
         this.telemetry = op.telemetry;
+        this.color = color;
     }
 
     public void initColorSensors() {
@@ -44,10 +47,10 @@ public class Sensors {
         DistanceSensor distanceSensor = null;
         ColorSensor colorSensor = null;
 
-        if (allianceColor == AllianceColor.BLUE) {
+        if (color == color.BLUE) {
             distanceSensor = leftColorDistanceSensor;
             colorSensor = leftColorColorSensor;
-        } else if (allianceColor == AllianceColor.RED) {
+        } else if (color == color.RED) {
             distanceSensor = rightColorDistanceSensor;
             colorSensor = rightColorColorSensor;
         }

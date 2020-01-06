@@ -14,23 +14,28 @@ public class Motors {
 
     HardwareMap hardwareMap;
     LinearOpMode op;
+
     Motors(LinearOpMode op) {
         hardwareMap = op.hardwareMap;
         this.op = op;
     }
 
-    public DcMotor getlfMotor(){
+    public DcMotor getlfMotor() {
         return lfMotor;
     }
-    public DcMotor getrfMotor(){
+
+    public DcMotor getrfMotor() {
         return rfMotor;
     }
-    public DcMotor getlbMotor(){
+
+    public DcMotor getlbMotor() {
         return lbMotor;
     }
-    public DcMotor getrbMotor(){
+
+    public DcMotor getrbMotor() {
         return rbMotor;
     }
+
     public void initMotors() {
         lfMotor = hardwareMap.dcMotor.get("lfMotor");
         rfMotor = hardwareMap.dcMotor.get("rfMotor");
