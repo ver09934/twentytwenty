@@ -41,7 +41,7 @@ public class TestServoTeleOp extends OpMode {
     public void init() {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-        testServo = hardwareMap.servo.get("autonGrabberLeft");
+        testServo = hardwareMap.servo.get("blockServoLeft");
 
         servoHigh = false;
         testServo.setPosition(lowPosition);

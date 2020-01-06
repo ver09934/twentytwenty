@@ -32,7 +32,8 @@ public class SkystoneTeleOp extends OpMode {
     DcMotor winchMotor2;
 
     // Servos
-    private Servo blockServo;
+    private Servo blockServoLeft;
+    private Servo blockServoRight;
     private Servo plateServoLeft;
     private Servo plateServoRight;
 
@@ -55,8 +56,11 @@ public class SkystoneTeleOp extends OpMode {
     private boolean blockServoOpen = false;
 
     // Block servo positions
-    private double blockServoClosedPosition = 0;
-    private double blockServoOpenPosition = 0.5;
+    private double blockServoLeftClosedPosition = 0.08;
+    private double blockServoLeftOpenPosition = 0.45;
+
+    private double blockServoRightClosedPosition = 0.92;
+    private double blockServoRightOpenPosition = 0.54;
 
     // Winch things
     private double winchPower = 0.6;
@@ -152,10 +156,12 @@ public class SkystoneTeleOp extends OpMode {
         winchMotor2.setPower(0);
         winchesPowered = false;
 
-        blockServo = hardwareMap.servo.get("testServo");
+        blockServoLeft = hardwareMap.servo.get("blockServoLeft");
+        blockServoRight = hardwareMap.servo.get("blockServoRight");
 
         blockServoOpen = false;
-        blockServo.setPosition(blockServoClosedPosition);
+        blockServoLeft.setPosition(blockServoRightClosedPosition);
+        blockServoRight.setPosition(blockServoLeftClosedPosition);
 
         plateServoLeft = hardwareMap.servo.get("plateServo1");
         plateServoRight = hardwareMap.servo.get("plateServo2");
@@ -368,7 +374,8 @@ public class SkystoneTeleOp extends OpMode {
                 currentWinchIndex  = 0;
                 updateWinchPositions();
 
-                blockServo.setPosition(blockServoClosedPosition);
+                blockServoLeft.setPosition(blockServoLeftClosedPosition);
+                blockServoRight.setPosition(blockServoRightClosedPosition);
                 blockServoOpen = false;
             }
         }
@@ -393,13 +400,15 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2XToggleLock = false;
         }
         if (blockServoOpen) {
-            blockServo.setPosition(blockServoOpenPosition);
+            blockServoLeft.setPosition(blockServoLeftOpenPosition);
+            blockServoRight.setPosition(blockServoRightOpenPosition);
         }
         else {
-            blockServo.setPosition(blockServoClosedPosition);
+            blockServoLeft.setPosition(blockServoLeftClosedPosition);
+            blockServoRight.setPosition(blockServoRightClosedPosition);
         }
         telemetry.addData("Block Servo Opened", blockServoOpen);
-        telemetry.addData("Block Servo Position", blockServo.getPosition());
+        // telemetry.addData("Block Servo Position", blockServo.getPosition());
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
