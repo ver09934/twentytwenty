@@ -58,9 +58,11 @@ public class SkystoneTeleOp extends OpMode {
     // Block servo positions
     private double blockServoLeftClosedPosition = 0.08;
     private double blockServoLeftOpenPosition = 0.45;
+    // private double blockServoLeftOpenPosition = 0.82;
 
     private double blockServoRightClosedPosition = 0.92;
     private double blockServoRightOpenPosition = 0.54;
+    // private double blockServoRightOpenPosition = 0.16;
 
     // Winch things
     private double winchPower = 0.6;
