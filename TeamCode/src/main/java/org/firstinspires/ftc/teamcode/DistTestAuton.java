@@ -26,6 +26,8 @@ public class DistTestAuton extends LinearOpMode {
     @Override
     public void runOpMode() {
 
+        initIMU();
+
         waitForStart();
 
         telemetry.addData("Status", "Initialized");
@@ -64,17 +66,23 @@ public class DistTestAuton extends LinearOpMode {
 
         while (!isStopRequested()) {
 
+            /*
             double d1 = getLeftDistance();
             double d2 = getRightDistance();
 
             double d3 = 27;
 
             double angle = Math.toDegrees(Math.atan2(d2 - d1, d3));
+             */
+
+            double tmpAngle = getIMUAngleConverted();
+            double angle = getAngleDifference(tmpAngle, 0);
 
             double k = 0.012;
 
             double correction = angle * k;
 
+            /*
             boolean zeroCorrect = false;
             if (d1 > 800 || d2 > 800) {
                 zeroCorrect = true;
@@ -82,17 +90,18 @@ public class DistTestAuton extends LinearOpMode {
             if (zeroCorrect) {
                 correction = 0;
             }
+             */
 
             lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
             rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
             lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
             rbMotor.setPower(motorPower * motorDirections[3] / maxPower + correction);
 
-            telemetry.addData("Left Distance", d1);
-            telemetry.addData("Right Distance", d2);
+            // telemetry.addData("Left Distance", d1);
+            // telemetry.addData("Right Distance", d2);
             telemetry.addData("Angle", angle);
             telemetry.addData("Correction", correction);
-            telemetry.addData("Zero Correct", zeroCorrect);
+            // telemetry.addData("Zero Correct", zeroCorrect);
             telemetry.update();
         }
     }
@@ -146,4 +155,57 @@ public class DistTestAuton extends LinearOpMode {
         lbMotor.setZeroPowerBehavior(zeroPowerBehavior);
         rbMotor.setZeroPowerBehavior(zeroPowerBehavior);
     }
+
+    // ----- IMU STUFF -----
+
+    public BNO055IMU imu;
+
+    public void initIMU() {
+        BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
+        parameters.mode = BNO055IMU.SensorMode.IMU;
+        parameters.angleUnit = BNO055IMU.AngleUnit.DEGREES;
+        parameters.accelUnit = BNO055IMU.AccelUnit.METERS_PERSEC_PERSEC;
+        parameters.loggingEnabled = false;
+        imu = hardwareMap.get(BNO055IMU.class, "imu");
+        imu.initialize(parameters);
+
+        telemetry.addData("Status", "Calibrating IMU");
+        telemetry.update();
+
+        while (!isStopRequested() && !imu.isGyroCalibrated()) {
+            sleep(50);
+            idle();
+        }
+    }
+
+    public double getIMUAngleConverted() {
+        Orientation orientation = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
+        double angle = orientation.firstAngle;
+        angle =  angle < 0 ? angle + 360 : angle;
+        return angle;
+    }
+
+    public static double getAngleDifference(double currentAngle, double targetAngle) {
+
+        currentAngle = currentAngle % 360;
+        targetAngle = targetAngle % 360;
+
+        currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+        targetAngle = targetAngle < 0 ? targetAngle + 360 : targetAngle;
+
+        double angleDiff = targetAngle - currentAngle;
+
+        if (Math.abs(angleDiff) <= 180) {
+            return angleDiff;
+        }
+        else {
+            if (angleDiff > 0) {
+                return angleDiff - 360;
+            }
+            else {
+                return 360 + angleDiff;
+            }
+        }
+    }
+
 }
