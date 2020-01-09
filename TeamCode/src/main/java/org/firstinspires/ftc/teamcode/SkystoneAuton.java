@@ -306,8 +306,8 @@ public class SkystoneAuton extends LinearOpMode {
         autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
         retractBothSkystoneGrabbers();
 
-        plateServoLeft = hardwareMap.servo.get("plateServo1");
-        plateServoRight = hardwareMap.servo.get("plateServo2");
+        plateServoLeft = hardwareMap.servo.get("plateServoLeft");
+        plateServoRight = hardwareMap.servo.get("plateServoRight");
         plateServosDown();
 
         blockServo = hardwareMap.servo.get("testServo");
