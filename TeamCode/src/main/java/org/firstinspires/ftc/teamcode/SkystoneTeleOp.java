@@ -113,7 +113,7 @@ public class SkystoneTeleOp extends OpMode {
     }
 
     // Gulper motor speeds
-    private double gulperForwardPower = 1;
+    private double gulperForwardPower = 0.9;
     private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
 
