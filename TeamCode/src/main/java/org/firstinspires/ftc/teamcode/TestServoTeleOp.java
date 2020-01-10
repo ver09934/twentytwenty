@@ -23,6 +23,8 @@ public class TestServoTeleOp extends OpMode {
     private boolean dpadUpDownToggleLock = false;
     private boolean bToggleLock = false;
 
+    private boolean ayToggleLock = false;
+
     private double getIncrement() {
         if (this.gamepad1.left_trigger > 0.5 || this.gamepad2.right_trigger > 0.5) {
             return fineAdjustIncrement;
@@ -36,12 +38,77 @@ public class TestServoTeleOp extends OpMode {
         return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
     }
 
+    String[] servos = {
+        "blockServoLeft",
+        "blockServoRight",
+        "plateServoLeft",
+        "plateServoRight",
+        "autonGrabberLeft",
+        "autonGrabberRight"
+    };
+    String servoString;
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-        testServo = hardwareMap.servo.get("blockServoLeft");
+
+        int currentIndex = 0;
+        String selector = ">>>";
+        String selectorSpaces = "";
+        for (int i = 0; i < selector.length(); i++) {
+            selectorSpaces += " ";
+        }
+
+        while (true) {
+
+            if (this.gamepad1.y) {
+                if (!ayToggleLock) {
+                    ayToggleLock = true;
+                    if (currentIndex == 0) {
+                        currentIndex = servos.length - 1;
+                    }
+                    else if (currentIndex > 0) {
+                        currentIndex--;
+                    }
+                }
+            }
+            else if (this.gamepad1.a) {
+                if (!ayToggleLock) {
+                    ayToggleLock = true;
+                    if (currentIndex == servos.length - 1) {
+                        currentIndex = 0;
+                    }
+                    else if (currentIndex < servos.length - 1) {
+                        currentIndex++;
+                    }
+                }
+            }
+            else {
+                ayToggleLock = false;
+            }
+
+            if (this.gamepad1.x) {
+                break;
+            }
+
+            telemetry.addLine("Select a servo:");
+            for (int i = 0; i < servos.length; i++) {
+                String prefix;
+                if (i == currentIndex) {
+                    prefix = selector;
+                }
+                else {
+                    prefix = selectorSpaces;
+                }
+                telemetry.addLine(prefix + " " + servos[i]);
+            }
+            telemetry.update();
+        }
+
+        servoString = servos[currentIndex];
+        telemetry.addData("Servo selected", servoString);
+
+        testServo = hardwareMap.servo.get(servoString);
 
         servoHigh = false;
         testServo.setPosition(lowPosition);
@@ -128,6 +195,7 @@ public class TestServoTeleOp extends OpMode {
             bToggleLock = false;
         }
 
+        telemetry.addData("Servo", servoString);
         telemetry.addData("Fine Adjust Increment", fineAdjustIncrement);
         telemetry.addData("Coarse Adjust Increment", coarseAdjustIncrement);
         telemetry.addData("Low Position", lowPosition);
