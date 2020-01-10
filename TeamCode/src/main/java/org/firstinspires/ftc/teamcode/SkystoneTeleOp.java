@@ -68,26 +68,28 @@ public class SkystoneTeleOp extends OpMode {
     private double winchMotor2Power = winchPower;
     private int foundationHeight = 850;
     private int winchMotorStep = 750;
-    private int[] winchMotorPositions = {
-            0,
-            foundationHeight,
-            foundationHeight + winchMotorStep * 1,
-            foundationHeight + winchMotorStep * 2,
-            foundationHeight + winchMotorStep * 3,
-            foundationHeight + winchMotorStep * 4,
-            foundationHeight + winchMotorStep * 5,
-            foundationHeight + winchMotorStep * 6,
-            // foundationHeight + winchMotorStep * 7
-            (int) ((foundationHeight + winchMotorStep * 6.8) + 0.5)
+
+    private int[] winchMotorSteps = {
+            1,
+            2,
+            3
     };
     private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] winchMotorPositions = new int[winchMotorSteps.length + 1];
+
     private int currentWinchIndex = 0;
 
     // Winch methods
+    private void genWinchIndices() {
+        for (int i = 0; i < winchMotorSteps.length; i++) {
+
+        }
+    }
+
     private void updateWinchPositions() {
-        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
-        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+        winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex]);
+        winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex]);
     }
 
     private void unpowerWinches() {
