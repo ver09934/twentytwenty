@@ -78,10 +78,9 @@ public class SkystoneTeleOp extends OpMode {
             winchMotorStep,
             winchMotorStep,
             winchMotorStep,
-            winchMotorStep,
     };
-    private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-    private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] winchMotor1Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0};
+    private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int[] winchMotorPositions = new int[winchMotorSteps.length + 1];
     private int currentWinchIndex = 0;
 
@@ -90,7 +89,7 @@ public class SkystoneTeleOp extends OpMode {
         assert(winchMotorPositions.length == winchMotor1Offsets.length);
         assert(winchMotorPositions.length == winchMotor2Offsets.length);
         winchMotorPositions[0] = winchMotorsInitialPosition;
-        for (int i = 1; i < winchMotorSteps.length; i++) {
+        for (int i = 1; i < winchMotorPositions.length; i++) {
             winchMotorPositions[i] = winchMotorPositions[i - 1];
             winchMotorPositions[i] += winchMotorSteps[i - 1];
         }
