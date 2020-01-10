@@ -162,8 +162,8 @@ public class SkystoneTeleOp extends OpMode {
         blockServoRight = hardwareMap.servo.get("blockServoRight");
 
         blockServoOpen = false;
-        blockServoLeft.setPosition(blockServoRightClosedPosition);
-        blockServoRight.setPosition(blockServoLeftClosedPosition);
+        blockServoLeft.setPosition(blockServoLeftClosedPosition);
+        blockServoRight.setPosition(blockServoRightClosedPosition);
 
         plateServoLeft = hardwareMap.servo.get("plateServoLeft");
         plateServoRight = hardwareMap.servo.get("plateServoRight");
