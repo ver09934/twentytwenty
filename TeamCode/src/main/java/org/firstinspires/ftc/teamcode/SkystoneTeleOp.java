@@ -7,14 +7,12 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 // import static org.firstinspires.ftc.teamcode.DriverFunction.MIN_SPEED_RATIO;
 import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
+import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
-
-    // TODO: Rename variables and hardware devices from 1/2 to left/right
 
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
@@ -36,6 +34,8 @@ public class SkystoneTeleOp extends OpMode {
     private Servo blockServoRight;
     private Servo plateServoLeft;
     private Servo plateServoRight;
+    private Servo autonGrabberLeft;
+    private Servo autonGrabberRight;
 
     // Toggle locks
     private boolean gamepad1XToggleLock = false;
@@ -44,7 +44,6 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2XToggleLock = false;
     private boolean gamepad2YToggleLock = false;
     private boolean gamepad2BumperToggleLock = false;
-    private boolean gamepad2RightTriggerToggleLock = false;
     private boolean gamepad2LeftTriggerToggleLock = false;
 
     // Boolean state variables
@@ -58,17 +57,15 @@ public class SkystoneTeleOp extends OpMode {
     // Block servo positions
     private double blockServoLeftClosedPosition = 0.08;
     private double blockServoLeftOpenPosition = 0.45;
-    // private double blockServoLeftOpenPosition = 0.82;
-
+    // Auton start position: 0.82
     private double blockServoRightClosedPosition = 0.92;
     private double blockServoRightOpenPosition = 0.54;
-    // private double blockServoRightOpenPosition = 0.16;
+    // Auton start position: 0.16
 
-    // Winch things
+    // Winch values
     private double winchPower = 0.6;
     private double winchMotor1Power = winchPower;
     private double winchMotor2Power = winchPower;
-
     private int foundationHeight = 850;
     private int winchMotorStep = 750;
     private int[] winchMotorPositions = {
@@ -87,9 +84,22 @@ public class SkystoneTeleOp extends OpMode {
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int currentWinchIndex = 0;
 
+    // Winch methods
     private void updateWinchPositions() {
         winchMotor1.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor1Offsets[currentWinchIndex]);
         winchMotor2.setTargetPosition(winchMotorPositions[currentWinchIndex] + winchMotor2Offsets[currentWinchIndex]);
+    }
+
+    private void unpowerWinches() {
+        winchMotor1.setPower(0);
+        winchMotor2.setPower(0);
+        winchesPowered = false;
+    }
+
+    private void powerWinches() {
+        winchMotor1.setPower(winchMotor1Power);
+        winchMotor2.setPower(winchMotor2Power);
+        winchesPowered = true;
     }
 
     // Gulper motor speeds
@@ -103,43 +113,36 @@ public class SkystoneTeleOp extends OpMode {
     private double plateServoRightDown = 0.82;
     private double plateServoRightUp = 0.6;
 
-    // TODO: Clean up and organize
-    // ------------------------------------------
-    private Servo autonGrabberLeft;
-    private Servo autonGrabberRight;
-
-    // TODO: THE IMPORTANT VALUES
+    // Auton grabber positions
     public double autonGrabberLeftPassive = 0;
     public double autonGrabberLeftActive = 0.5;
-
     public double autonGrabberRightPassive = 0.8;
     public double autonGrabberRightActive = 0.3;
 
-    public void retractBothSkystoneGrabbers() {
+    // Auton grabber method
+    public void retractBothAutonGrabbers() {
         autonGrabberLeft.setPosition(autonGrabberLeftPassive);
         autonGrabberRight.setPosition(autonGrabberRightPassive);
     }
-    // ------------------------------------------
 
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
+
         driverFunction = new DriverFunction(hardwareMap, telemetry);
         steering = driverFunction.getSteering();
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
 
         gulperMotor1 = hardwareMap.dcMotor.get("intake1");
         gulperMotor2 = hardwareMap.dcMotor.get("intake2");
         winchMotor1 = hardwareMap.dcMotor.get("winch1");
         winchMotor2 = hardwareMap.dcMotor.get("winch2");
 
+        updateWinchPositions();
+
         gulperMotor1.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         gulperMotor2.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         winchMotor1.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         winchMotor2.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        updateWinchPositions();
         winchMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         winchMotor2.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
@@ -154,28 +157,27 @@ public class SkystoneTeleOp extends OpMode {
         gulperMotor1.setPower(0);
         gulperMotor2.setPower(0);
 
-        winchMotor1.setPower(0);
-        winchMotor2.setPower(0);
-        winchesPowered = false;
+        unpowerWinches();
 
         blockServoLeft = hardwareMap.servo.get("blockServoLeft");
         blockServoRight = hardwareMap.servo.get("blockServoRight");
+        plateServoLeft = hardwareMap.servo.get("plateServoLeft");
+        plateServoRight = hardwareMap.servo.get("plateServoRight");
+        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
+        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
 
         blockServoOpen = false;
         blockServoLeft.setPosition(blockServoLeftClosedPosition);
         blockServoRight.setPosition(blockServoRightClosedPosition);
 
-        plateServoLeft = hardwareMap.servo.get("plateServoLeft");
-        plateServoRight = hardwareMap.servo.get("plateServoRight");
-
         plateServosUp = false;
         plateServoLeft.setPosition(plateServoLeftDown);
         plateServoRight.setPosition(plateServoRightDown);
 
-        // TODO: Clean up and organize
-        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
-        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
-        retractBothSkystoneGrabbers();
+        retractBothAutonGrabbers();
+
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
     }
 
     // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
@@ -186,9 +188,7 @@ public class SkystoneTeleOp extends OpMode {
     @Override
     public void start() {
         runtime.reset();
-        winchMotor1.setPower(winchMotor1Power);
-        winchMotor2.setPower(winchMotor2Power);
-        winchesPowered = true;
+        powerWinches();
         updateWinchPositions();
     }
 
@@ -246,11 +246,6 @@ public class SkystoneTeleOp extends OpMode {
         if (this.gamepad1.right_trigger > 0.5) {
             steering.setSpeedRatio(MAX_SPEED_RATIO); // Left trigger: minimum speed ratio
         }
-        /*
-        else if (this.gamepad1.left_trigger > 0.5) {
-            steering.setSpeedRatio(MIN_SPEED_RATIO); // Right trigger: maximum speed ratio
-        }
-        */
         else if (this.gamepad1.right_bumper) {
             steering.setSpeedRatio(MIN_SPEED_RATIO); // Right trigger: maximum speed ratio
         }
@@ -375,7 +370,6 @@ public class SkystoneTeleOp extends OpMode {
                 gamepad2LeftTriggerToggleLock = true;
                 currentWinchIndex  = 0;
                 updateWinchPositions();
-
                 blockServoLeft.setPosition(blockServoLeftClosedPosition);
                 blockServoRight.setPosition(blockServoRightClosedPosition);
                 blockServoOpen = false;
@@ -385,6 +379,7 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2LeftTriggerToggleLock = false;
         }
 
+        // Winch position telemetry
         telemetry.addData("Winch Index", currentWinchIndex);
         telemetry.addData("Winch 1 Target", winchMotor1.getTargetPosition());
         telemetry.addData("Winch 2 Target", winchMotor2.getTargetPosition());
@@ -410,11 +405,11 @@ public class SkystoneTeleOp extends OpMode {
             blockServoRight.setPosition(blockServoRightClosedPosition);
         }
         telemetry.addData("Block Servo Opened", blockServoOpen);
-        // telemetry.addData("Block Servo Position", blockServo.getPosition());
 
         // Finish steering, putting power into hardware
         steering.finishSteering();
 
+        // Motor position telemetry for testing
         telemetry.addLine("-----------------------------");
         telemetry.addData("LF Position", driverFunction.lf.getPosition());
         telemetry.addData("LB Position", driverFunction.lb.getPosition());
