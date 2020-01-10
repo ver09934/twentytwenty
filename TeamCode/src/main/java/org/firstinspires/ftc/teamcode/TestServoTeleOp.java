@@ -64,7 +64,10 @@ public class TestServoTeleOp extends OpMode {
             if (this.gamepad1.y) {
                 if (!ayToggleLock) {
                     ayToggleLock = true;
-                    if (currentIndex > 0) {
+                    if (currentIndex == 0) {
+                        currentIndex = servos.length - 1;
+                    }
+                    else if (currentIndex > 0) {
                         currentIndex--;
                     }
                 }
@@ -72,7 +75,10 @@ public class TestServoTeleOp extends OpMode {
             else if (this.gamepad1.a) {
                 if (!ayToggleLock) {
                     ayToggleLock = true;
-                    if (currentIndex < servos.length - 1) {
+                    if (currentIndex == servos.length - 1) {
+                        currentIndex = 0;
+                    }
+                    else if (currentIndex < servos.length - 1) {
                         currentIndex++;
                     }
                 }
