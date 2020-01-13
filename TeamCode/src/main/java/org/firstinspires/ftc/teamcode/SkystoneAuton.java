@@ -52,19 +52,25 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
+        mainAuton();
+
+        while (opModeIsActive()) {
+            telemetry.addData("Runtime", runtime.toString());
+            telemetry.update();
+            idle();
+        }
+    }
+
+    // ----- META-METHODS -----
+
+    public void mainAuton() {
         if (autonType == AutonType.TWOSKYSTONES) {
             bothBlocksAuton();
         }
         else if (autonType == AutonType.FOUNDATION) {
             plateAuton();
         }
-
-        while (opModeIsActive()) {
-            idle();
-        }
     }
-
-    // ----- META-METHODS -----
 
     public void plateAuton() {
 
@@ -344,7 +350,6 @@ public class SkystoneAuton extends LinearOpMode {
         leftColorColorSensor = hardwareMap.get(ColorSensor.class, "leftColorSensor");
         leftColorDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftColorSensor");
 
-        // TODO: Add sensor to config
         rightColorColorSensor = hardwareMap.get(ColorSensor.class, "rightColorSensor");
         rightColorDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightColorSensor");
     }
@@ -386,16 +391,22 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- DISTANCE SENSOR STUFF -----
 
-    public DistanceSensor frontDistanceSensor;
     public DistanceSensor leftDistanceSensor;
     public DistanceSensor rightDistanceSensor;
 
     public DistanceUnit distanceUnit = DistanceUnit.CM;
 
     public void initDistanceSensors() {
-        frontDistanceSensor = hardwareMap.get(DistanceSensor.class, "frontDistanceSensor");
         leftDistanceSensor = hardwareMap.get(DistanceSensor.class, "leftDistanceSensor");
         rightDistanceSensor = hardwareMap.get(DistanceSensor.class, "rightDistanceSensor");
+    }
+
+    public double getLeftDistance() {
+        return leftDistanceSensor.getDistance(distanceUnit);
+    }
+
+    public double getRightDistance() {
+        return rightDistanceSensor.getDistance(distanceUnit);
     }
 
     // ----- IMU STUFF -----
@@ -723,6 +734,71 @@ public class SkystoneAuton extends LinearOpMode {
         }
         else {
             return angle;
+        }
+    }
+
+    // ----- LINEAR MOVEMENT WITH ANGLE CORRECTING -----
+
+    public void distanceTest(double motorPower, int direction) {
+
+        // NOTE: Make power small so correction can actually add something
+        // NOTE: Handle max >> appears to be ~819 for right
+
+        int[] motorDirections = {1, 1, 1, 1};
+
+        if (direction == 0) {
+            motorDirections[0] = -1;
+            motorDirections[1] = -1;
+        }
+        else if (direction == 180) {
+            motorDirections[2] = -1;
+            motorDirections[3] = -1;
+        }
+        else {
+            throw new RuntimeException("Direction must be -1 or 1");
+        }
+
+        double maxPower = 1;
+
+        while (!isStopRequested()) {
+
+            /*
+            double d1 = getLeftDistance();
+            double d2 = getRightDistance();
+
+            double d3 = 27;
+
+            double angle = Math.toDegrees(Math.atan2(d2 - d1, d3));
+             */
+
+            double tmpAngle = getIMUAngleConverted();
+            double angle = getAngleDifference(tmpAngle, 0);
+
+            double k = 0.012;
+
+            double correction = angle * k;
+
+            /*
+            boolean zeroCorrect = false;
+            if (d1 > 800 || d2 > 800) {
+                zeroCorrect = true;
+            }
+            if (zeroCorrect) {
+                correction = 0;
+            }
+             */
+
+            lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
+            rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
+            lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
+            rbMotor.setPower(motorPower * motorDirections[3] / maxPower + correction);
+
+            // telemetry.addData("Left Distance", d1);
+            // telemetry.addData("Right Distance", d2);
+            telemetry.addData("Angle", angle);
+            telemetry.addData("Correction", correction);
+            // telemetry.addData("Zero Correct", zeroCorrect);
+            telemetry.update();
         }
     }
 }
