@@ -16,7 +16,6 @@ public class SkystoneTeleOp extends OpMode {
 
     // TODO: Release capstone (gamepad 2 x)
     // TODO: Adjust slide offset (gamepad 2 left stick)
-    // TODO: Toggle forwards, toggle reverse (gamepad 2 right trigger, left trigger)
 
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
@@ -239,7 +238,7 @@ public class SkystoneTeleOp extends OpMode {
             plateServoLeft.setPosition(plateServoLeftDown);
             plateServoRight.setPosition(plateServoRightDown);
         }
-        telemetry.addData("Build plate servos up", plateServosUp);
+        telemetry.addData("Build plate servos down", !plateServosUp);
 
         // X Button: Toggle direction reverse
         if (this.gamepad1.x) {
@@ -385,9 +384,11 @@ public class SkystoneTeleOp extends OpMode {
             double power;
             if (gulpersInput > 0) {
                 power = gulperForwardPower * (Math.abs(gulpersInput) / maxGulperInput);
+                telemetry.addData("Gulpers", "Forwards");
             }
             else {
                 power = gulperReversePower * (Math.abs(gulpersInput) / maxGulperInput);
+                telemetry.addData("Gulpers", "Reverse");
             }
             gulperMotor1.setPower(power);
             gulperMotor2.setPower(power);
@@ -395,14 +396,17 @@ public class SkystoneTeleOp extends OpMode {
         else if (gulpersForwards) {
             gulperMotor1.setPower(gulperForwardPower);
             gulperMotor2.setPower(gulperForwardPower);
+            telemetry.addData("Gulpers", "Forwards");
         }
         else if (gulpersReverse) {
             gulperMotor1.setPower(gulperReversePower);
             gulperMotor2.setPower(gulperReversePower);
+            telemetry.addData("Gulpers", "Reverse");
         }
         else {
             gulperMotor1.setPower(gulperOffPower);
             gulperMotor2.setPower(gulperOffPower);
+            telemetry.addData("Gulpers", "Off");
         }
 
         // --- D-Pad Up/Down: Winch motors up/down ---
