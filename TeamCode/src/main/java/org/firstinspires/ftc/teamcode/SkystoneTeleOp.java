@@ -115,28 +115,9 @@ public class SkystoneTeleOp extends OpMode {
     private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
 
-    double enableGulpersThresh = 0.1;
-    double maxInput = 1;
+    // Gulper input things
     private boolean gulpersScaling = false;
     private double gulpersInput = 0;
-
-    public void runGulpers(double rawInput) {
-        if (rawInput > 0) {
-            double power = gulperForwardPower * (Math.abs(rawInput) / maxInput);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-        }
-        else {
-            double power = gulperReversePower * (Math.abs(rawInput) / maxInput);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-        }
-    }
-
-    public void gulpersOff() {
-        gulperMotor1.setPower(gulperOffPower);
-        gulperMotor2.setPower(gulperOffPower);
-    }
 
     // Block servo positions
     public static final double blockServoLeftClosedPosition = 0.08;
@@ -371,7 +352,8 @@ public class SkystoneTeleOp extends OpMode {
 
         // --- Right Trigger: Take in blocks ---
         // --- Left Trigger: Push out blocks ---
-
+        double enableGulpersThresh = 0.01;
+        double maxGulperInput = 1;
         if (this.gamepad2.right_trigger > enableGulpersThresh) {
             gulpersScaling = true;
             gulpersInput = this.gamepad2.right_trigger;
@@ -386,12 +368,43 @@ public class SkystoneTeleOp extends OpMode {
         }
         else if (this.gamepad2.right_stick_y > enableGulpersThresh) {
             gulpersScaling = true;
-            gulpersInput = this.gamepad2.right_stick_y;
+            gulpersInput = -this.gamepad2.right_stick_y;
         }
         else {
             gulpersScaling = false;
         }
-        
+
+        // Gulper logic
+        if (gulpersScaling) {
+            gulpersForwards = false;
+            gulpersReverse = false;
+        }
+
+        // Write powers to gulpers
+        if (gulpersScaling) {
+            double power;
+            if (gulpersInput > 0) {
+                power = gulperForwardPower * (Math.abs(gulpersInput) / maxGulperInput);
+            }
+            else {
+                power = gulperReversePower * (Math.abs(gulpersInput) / maxGulperInput);
+            }
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+        }
+        else if (gulpersForwards) {
+            gulperMotor1.setPower(gulperForwardPower);
+            gulperMotor2.setPower(gulperForwardPower);
+        }
+        else if (gulpersReverse) {
+            gulperMotor1.setPower(gulperReversePower);
+            gulperMotor2.setPower(gulperReversePower);
+        }
+        else {
+            gulperMotor1.setPower(gulperOffPower);
+            gulperMotor2.setPower(gulperOffPower);
+        }
+
         // --- D-Pad Up/Down: Winch motors up/down ---
         if (this.gamepad2.dpad_down) {
             if (!gamepad2DPadUpDownToggleLock) {
