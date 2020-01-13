@@ -52,7 +52,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        mainAuton();
+        // mainAuton();
+        angleHoldingTest();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -739,7 +740,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- LINEAR MOVEMENT WITH ANGLE CORRECTING -----
 
-    public void distanceTest(double motorPower, int direction) {
+    public void holdAngle(double motorPower, int direction) {
 
         // NOTE: Make power small so correction can actually add something
         // NOTE: Handle max >> appears to be ~819 for right
@@ -750,8 +751,16 @@ public class SkystoneAuton extends LinearOpMode {
             motorDirections[0] = -1;
             motorDirections[1] = -1;
         }
+        else if (direction == 90) {
+            motorDirections[0] = -1;
+            motorDirections[2] = -1;
+        }
         else if (direction == 180) {
             motorDirections[2] = -1;
+            motorDirections[3] = -1;
+        }
+        else if (direction == 270) {
+            motorDirections[1] = -1;
             motorDirections[3] = -1;
         }
         else {
@@ -800,5 +809,9 @@ public class SkystoneAuton extends LinearOpMode {
             // telemetry.addData("Zero Correct", zeroCorrect);
             telemetry.update();
         }
+    }
+
+    public void angleHoldingTest() {
+        holdAngle(0.5, 0);
     }
 }
