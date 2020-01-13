@@ -364,11 +364,11 @@ public class SkystoneTeleOp extends OpMode {
         }
         else if (this.gamepad2.right_stick_y < -enableGulpersThresh) {
             gulpersScaling = true;
-            gulpersInput = -this.gamepad2.right_stick_y;
+            gulpersInput = this.gamepad2.right_stick_y;
         }
         else if (this.gamepad2.right_stick_y > enableGulpersThresh) {
             gulpersScaling = true;
-            gulpersInput = -this.gamepad2.right_stick_y;
+            gulpersInput = this.gamepad2.right_stick_y;
         }
         else {
             gulpersScaling = false;
