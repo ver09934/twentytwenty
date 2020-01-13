@@ -37,8 +37,11 @@ public class SkystoneTeleOp extends OpMode {
     private Servo autonGrabberLeft;
     private Servo autonGrabberRight;
 
-    // Toggle locks
+    // Gamepad 1 Toggle locks
     private boolean gamepad1XToggleLock = false;
+    private boolean gamepad1YToggleLock = false;
+
+    // Gamepad 2 Toggle Locks
     private boolean gamepad2AToggleLock = false;
     private boolean gamepad2BToggleLock = false;
     private boolean gamepad2XToggleLock = false;
@@ -211,6 +214,26 @@ public class SkystoneTeleOp extends OpMode {
         // ---------- Gamepad 1: Driving Functions ----------
         // --------------------------------------------------
 
+        // Y Button: Toggle build plate clamper servos
+        if (this.gamepad1.y) {
+            if (!gamepad1YToggleLock) {
+                gamepad1YToggleLock = true;
+                plateServosUp = !plateServosUp;
+            }
+        }
+        else {
+            gamepad1YToggleLock = false;
+        }
+        if (plateServosUp) {
+            plateServoLeft.setPosition(plateServoLeftUp);
+            plateServoRight.setPosition(plateServoRightUp);
+        }
+        else {
+            plateServoLeft.setPosition(plateServoLeftDown);
+            plateServoRight.setPosition(plateServoRightDown);
+        }
+        telemetry.addData("Build plate servos up", plateServosUp);
+
         // X Button: Toggle direction reverse
         if (this.gamepad1.x) {
             if (!gamepad1XToggleLock) {
@@ -331,26 +354,6 @@ public class SkystoneTeleOp extends OpMode {
         }
         telemetry.addData("Gulper Reverse", gulperReverse);
         telemetry.addData("Gulpers running", runGulper);
-
-        // --- Y Button: Build Plate Clamper Servos ---
-        if (this.gamepad2.y) {
-            if (!gamepad2YToggleLock) {
-                gamepad2YToggleLock = true;
-                plateServosUp = !plateServosUp;
-            }
-        }
-        else {
-            gamepad2YToggleLock = false;
-        }
-        if (plateServosUp) {
-            plateServoLeft.setPosition(plateServoLeftUp);
-            plateServoRight.setPosition(plateServoRightUp);
-        }
-        else {
-            plateServoLeft.setPosition(plateServoLeftDown);
-            plateServoRight.setPosition(plateServoRightDown);
-        }
-        telemetry.addData("Build plate servos up", plateServosUp);
 
         // --- Left/Right Bumpers: Winch motors ---
         if (this.gamepad2.left_bumper) {
