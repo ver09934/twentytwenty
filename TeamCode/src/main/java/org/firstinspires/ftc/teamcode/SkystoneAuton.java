@@ -18,13 +18,10 @@ import org.firstinspires.ftc.robotcore.external.navigation.*;
 import java.util.ArrayList;
 import java.util.Collections;
 
+import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
+
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
-
-    // TODO: Figure out how to reverse everything
-    // TODO: Read android app settings for field position (check Seth's 2019 commits)
-    // TODO: public servo autonGrabberRight
-    // TODO: Set block servo to open or wherever...
 
     // TODO: Add optional direction forcing to angle turn method
 
@@ -61,8 +58,6 @@ public class SkystoneAuton extends LinearOpMode {
         else if (autonType == AutonType.FOUNDATION) {
             plateAuton();
         }
-
-        // sharedPrefsTest();
 
         while (opModeIsActive()) {
             idle();
@@ -279,47 +274,29 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- SERVO STUFF -----
 
-    public Servo autonGrabberLeft;
-    public Servo autonGrabberRight;
-    public Servo blockServo;
-
+    private Servo blockServoLeft;
+    private Servo blockServoRight;
     private Servo plateServoLeft;
     private Servo plateServoRight;
-
-    // TODO: THE IMPORTANT VALUES
-    public double autonGrabberLeftPassive = 0;
-    public double autonGrabberLeftActive = 0.5;
-
-    public double autonGrabberRightPassive = 0.8;
-    public double autonGrabberRightActive = 0.3;
-
-    private double blockServoClosedPosition = 0;
-    private double blockServoOpenPosition = 0.5;
-
-    private double plateServoLeftDown = 0.28;
-    private double plateServoLeftUp = 0.5;
-    private double plateServoRightDown = 0.82;
-    private double plateServoRightUp = 0.6;
+    private Servo autonGrabberLeft;
+    private Servo autonGrabberRight;
 
     public void initServos() {
-        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
-        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
-        retractBothSkystoneGrabbers();
-
+        blockServoLeft = hardwareMap.servo.get("blockServoLeft");
+        blockServoRight = hardwareMap.servo.get("blockServoRight");
         plateServoLeft = hardwareMap.servo.get("plateServoLeft");
         plateServoRight = hardwareMap.servo.get("plateServoRight");
-        plateServosDown();
+        autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
+        autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
 
-        blockServo = hardwareMap.servo.get("testServo");
+        retractBothSkystoneGrabbers();
+        plateServosDown();
         blockServoJamOpen();
     }
 
     private void blockServoJamOpen() {
-        blockServo.setPosition(blockServoOpenPosition);
-    }
-
-    private void blockServoClosed() {
-        blockServo.setPosition(blockServoClosedPosition);
+        blockServoLeft.setPosition(blockServoLeftAutonPosition);
+        blockServoRight.setPosition(blockServoRightAutonPosition);
     }
 
     private void plateServosUp() {
@@ -521,7 +498,6 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
 
-        // TODO
         if (allianceColor == AllianceColor.RED) {
             direction = (int) reflectAngle(direction);
         }

@@ -54,14 +54,6 @@ public class SkystoneTeleOp extends OpMode {
     private boolean plateServosUp = false;
     private boolean blockServoOpen = false;
 
-    // Block servo positions
-    private double blockServoLeftClosedPosition = 0.08;
-    private double blockServoLeftOpenPosition = 0.45;
-    // Auton start position: 0.82
-    private double blockServoRightClosedPosition = 0.92;
-    private double blockServoRightOpenPosition = 0.54;
-    // Auton start position: 0.16
-
     // Winch values
     private double winchPower = 0.6;
     private double winchMotor1Power = winchPower;
@@ -117,17 +109,25 @@ public class SkystoneTeleOp extends OpMode {
     private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
 
+    // Block servo positions
+    public static final double blockServoLeftClosedPosition = 0.08;
+    public static final double blockServoLeftOpenPosition = 0.45;
+    public static final double blockServoLeftAutonPosition = 0.82;
+    public static final double blockServoRightClosedPosition = 0.92;
+    public static final double blockServoRightOpenPosition = 0.54;
+    public static final double blockServoRightAutonPosition = 0.16;
+
     // Build plate servo positions
-    private double plateServoLeftDown = 0.07;
-    private double plateServoLeftUp = 0.67;
-    private double plateServoRightDown = 0;
-    private double plateServoRightUp = 0.53;
+    public static final double plateServoLeftDown = 0.07;
+    public static final double plateServoLeftUp = 0.67;
+    public static final double plateServoRightDown = 0;
+    public static final double plateServoRightUp = 0.53;
 
     // Auton grabber positions
-    public double autonGrabberLeftPassive = 0;
-    public double autonGrabberLeftActive = 0.5;
-    public double autonGrabberRightPassive = 0.8;
-    public double autonGrabberRightActive = 0.3;
+    public static final double autonGrabberLeftPassive = 0;
+    public static final double autonGrabberLeftActive = 0.5;
+    public static final double autonGrabberRightPassive = 0.8;
+    public static final double autonGrabberRightActive = 0.3;
 
     // Auton grabber method
     public void retractBothAutonGrabbers() {
