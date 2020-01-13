@@ -743,7 +743,6 @@ public class SkystoneAuton extends LinearOpMode {
     public void holdAngle(double motorPower, int direction) {
 
         // NOTE: Make power small so correction can actually add something
-        // NOTE: Handle max >> appears to be ~819 for right
 
         int[] motorDirections = {1, 1, 1, 1};
 
@@ -771,47 +770,48 @@ public class SkystoneAuton extends LinearOpMode {
 
         while (!isStopRequested()) {
 
-            /*
-            double d1 = getLeftDistance();
-            double d2 = getRightDistance();
-
-            double d3 = 27;
-
-            double angle = Math.toDegrees(Math.atan2(d2 - d1, d3));
-             */
-
             double tmpAngle = getIMUAngleConverted();
-            double angle = getAngleDifference(tmpAngle, 0);
+            double angle = getAngleDifference(tmpAngle, direction);
 
             double k = 0.012;
 
             double correction = angle * k;
-
-            /*
-            boolean zeroCorrect = false;
-            if (d1 > 800 || d2 > 800) {
-                zeroCorrect = true;
-            }
-            if (zeroCorrect) {
-                correction = 0;
-            }
-             */
 
             lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
             rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
             lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
             rbMotor.setPower(motorPower * motorDirections[3] / maxPower + correction);
 
-            // telemetry.addData("Left Distance", d1);
-            // telemetry.addData("Right Distance", d2);
             telemetry.addData("Angle", angle);
             telemetry.addData("Correction", correction);
-            // telemetry.addData("Zero Correct", zeroCorrect);
             telemetry.update();
         }
     }
 
     public void angleHoldingTest() {
         holdAngle(0.5, 0);
+    }
+
+    public class SimpleTimer {
+
+        private long startTime;
+
+        // Calling the default constructor starts the timer
+        public SimpleTimer() {
+            reset();
+        }
+
+        public void reset() {
+            startTime = System.nanoTime();
+        }
+
+        public double getElapsedNanoseconds() {
+            return System.nanoTime() - startTime;
+        }
+
+        public double getElapsedSeconds() {
+            return getElapsedNanoseconds() / Math.pow(10, 9);
+        }
+
     }
 }
