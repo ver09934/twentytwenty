@@ -54,6 +54,7 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2DPadRightLeftToggleLock = false;
     private boolean gamepad2RightBumperToggleLock = false;
     private boolean gamepad2LeftBumperToggleLock = false;
+    private boolean gamepad2LeftStickToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
@@ -69,6 +70,7 @@ public class SkystoneTeleOp extends OpMode {
     private double winchMotor2Power = winchPower;
     private int winchMotorsInitialPosition = 0;
     private int foundationHeight = 500;
+    private int originalFoundationHeight = foundationHeight;
     private int winchMotorStep = 725;
     private int[] winchMotorSteps = {
             foundationHeight,
@@ -84,6 +86,8 @@ public class SkystoneTeleOp extends OpMode {
     private int[] winchMotor2Offsets = {0, 0, 0, 0, 0, 0, 0, 0, 0};
     private int[] winchMotorPositions = new int[winchMotorSteps.length + 1];
     private int currentWinchIndex = 0;
+
+    private int winchAdjustIncrement = 50;
 
     // Winch methods
     private void genWinchIndices() {
@@ -453,8 +457,30 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2DPadRightLeftToggleLock = false;
         }
 
+        double leftGamepadThresh = 0.4;
+        if (this.gamepad2.left_stick_y > leftGamepadThresh) {
+            if (!gamepad2LeftStickToggleLock) {
+                gamepad2LeftStickToggleLock = true;
+                foundationHeight += winchAdjustIncrement;
+                genWinchIndices();
+                updateWinchPositions();
+            }
+        }
+        else if (this.gamepad2.left_stick_y < -leftGamepadThresh) {
+            if (!gamepad2LeftStickToggleLock) {
+                gamepad2LeftStickToggleLock = true;
+                foundationHeight -= winchAdjustIncrement;
+                genWinchIndices();
+                updateWinchPositions();
+            }
+        }
+        else {
+            gamepad2LeftStickToggleLock = false;
+        }
+
         // Winch position telemetry
         telemetry.addData("Winch Index", currentWinchIndex);
+        telemetry.addData("Winch Offset", foundationHeight - originalFoundationHeight);
         telemetry.addData("Winch 1 Target", winchMotor1.getTargetPosition());
         telemetry.addData("Winch 2 Target", winchMotor2.getTargetPosition());
         telemetry.addData("Winch 1 Current", winchMotor1.getCurrentPosition());
