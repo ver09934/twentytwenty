@@ -15,7 +15,11 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 public class SkystoneTeleOp extends OpMode {
 
     // TODO: Release capstone (gamepad 2 x)
+        // Just servo stuff
     // TODO: Adjust slide offset (gamepad 2 left stick)
+        // Simply adjust winchMotorsInitialPosition, and then
+        // call genWinchIndices() again
+        // Make 1 step ~5-10 encoder ticks?
 
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
