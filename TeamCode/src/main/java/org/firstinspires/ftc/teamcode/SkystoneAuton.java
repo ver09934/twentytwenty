@@ -768,15 +768,32 @@ public class SkystoneAuton extends LinearOpMode {
 
         double maxPower = 1;
 
+        // NOTE: This tuning probably depends on motorPower
+        SimpleTimer timer = new SimpleTimer();
+        double previousAngle = 0;
+        double iTerm = 0;
+        double kp = 0.01;
+        double ki = 0.025;
+        double kd = 0.0025;
+
         while (!isStopRequested()) {
 
             double tmpAngle = getIMUAngleConverted();
             double angle = getAngleDifference(tmpAngle, direction);
 
-            double k = 0.012;
+            double dt = timer.getElapsedSeconds();
+            timer.reset();
 
-            double correction = angle * k;
+            double pTerm = angle * kp;
+            iTerm += ki * 0.5 * dt * (previousAngle + angle);
+            double dTerm = kd * (angle - previousAngle) / dt;
 
+            double correction = pTerm + iTerm + dTerm;
+
+            previousAngle = angle;
+
+            // Pretty sure these are automatically clipped,
+            // so there's no need to do Math.min(..., 1)
             lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
             rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
             lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
