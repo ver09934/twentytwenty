@@ -740,7 +740,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- LINEAR MOVEMENT WITH ANGLE CORRECTING -----
 
-    public void holdAngle(double motorPower, int direction) {
+    public void holdAngle(double motorPower, int direction, double distance) {
 
         // NOTE: Make power small so correction can actually add something
 
@@ -766,6 +766,13 @@ public class SkystoneAuton extends LinearOpMode {
             throw new RuntimeException("Direction must be -1 or 1");
         }
 
+        if (direction == 0 || direction == 180) {
+            distance *= ((304.8) / (304.8 - 19));
+        }
+
+        double targetTicks = distanceToEncoderTicks(distance);
+        int averageMotorTicks = 0;
+
         double maxPower = 1;
 
         while (!isStopRequested()) {
@@ -789,7 +796,7 @@ public class SkystoneAuton extends LinearOpMode {
     }
 
     public void angleHoldingTest() {
-        holdAngle(0.5, 0);
+        holdAngle(0.5, 0, 30);
     }
 
     public class SimpleTimer {
