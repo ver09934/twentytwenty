@@ -49,14 +49,16 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2BToggleLock = false;
     private boolean gamepad2DPadUpDownToggleLock = false;
     private boolean gamepad2DPadRightLeftToggleLock = false;
+    private boolean gamepad2RightBumperToggleLock = false;
+    private boolean gamepad2LeftBumperToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
-    private boolean gulperReverse = false;
-    private boolean runGulper = false;
     private boolean winchesPowered = false;
     private boolean plateServosUp = false;
     private boolean blockServoOpen = false;
+    private boolean gulpersForwards = false;
+    private boolean gulpersReverse = false;
 
     // Winch values
     private double winchPower = 0.6;
@@ -108,10 +110,33 @@ public class SkystoneTeleOp extends OpMode {
         winchesPowered = true;
     }
 
-    // Gulper motor speeds
+    // Gulper motor vars and methods
     private double gulperForwardPower = 0.9;
     private double gulperReversePower = -gulperForwardPower;
     private double gulperOffPower = 0;
+
+    double enableGulpersThresh = 0.1;
+    double maxInput = 1;
+    private boolean gulpersScaling = false;
+    private double gulpersInput = 0;
+
+    public void runGulpers(double rawInput) {
+        if (rawInput > 0) {
+            double power = gulperForwardPower * (Math.abs(rawInput) / maxInput);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+        }
+        else {
+            double power = gulperReversePower * (Math.abs(rawInput) / maxInput);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+        }
+    }
+
+    public void gulpersOff() {
+        gulperMotor1.setPower(gulperOffPower);
+        gulperMotor2.setPower(gulperOffPower);
+    }
 
     // Block servo positions
     public static final double blockServoLeftClosedPosition = 0.08;
@@ -318,40 +343,55 @@ public class SkystoneTeleOp extends OpMode {
         // ---------- Gamepad 2: Gunner Functions -----------
         // --------------------------------------------------
 
-        // --- Right Trigger: Take in blocks ---
-        // --- Left Trigger: Push out blocks ---
-        double enableGulpersThresh = 0.1;
-        double maxTrigger = 1;
-        if (this.gamepad2.right_trigger > enableGulpersThresh) {
-            double power = gulperForwardPower * (this.gamepad2.right_trigger / maxTrigger);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-            telemetry.addData("Gulpers", "Forwards");
-        }
-        else if (this.gamepad2.left_trigger > enableGulpersThresh) {
-            double power = gulperReversePower * (this.gamepad2.left_trigger / maxTrigger);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-            telemetry.addData("Gulpers", "Reverse");
-        }
-        else if (this.gamepad2.right_stick_y < -enableGulpersThresh) {
-            double power = gulperForwardPower * (Math.abs(this.gamepad2.right_stick_y) / maxTrigger);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-            telemetry.addData("Gulpers", "Forwards");
-        }
-        else if (this.gamepad2.right_stick_y > enableGulpersThresh) {
-            double power = gulperReversePower * (this.gamepad2.left_trigger / maxTrigger);
-            gulperMotor1.setPower(power);
-            gulperMotor2.setPower(power);
-            telemetry.addData("Gulpers", "Reverse");
+        // Right/Left Bumpers: Toggle gulpers forwards/reverse
+        if (this.gamepad2.right_bumper) {
+            if (!gamepad2RightBumperToggleLock) {
+                gamepad2RightBumperToggleLock = true;
+                if (gulpersReverse) {
+                    gulpersReverse = false;
+                }
+                gulpersForwards = !gulpersForwards;
+            }
         }
         else {
-            gulperMotor1.setPower(gulperOffPower);
-            gulperMotor2.setPower(gulperOffPower);
-            telemetry.addData("Gulpers", "Off");
+            gamepad2RightBumperToggleLock = false;
+        }
+        if (this.gamepad2.left_bumper) {
+            if (!gamepad2LeftBumperToggleLock) {
+                gamepad2LeftBumperToggleLock = true;
+                if (gulpersForwards) {
+                    gulpersForwards = false;
+                }
+                gulpersReverse = !gulpersReverse;
+            }
+        }
+        else {
+            gamepad2LeftBumperToggleLock = false;
         }
 
+        // --- Right Trigger: Take in blocks ---
+        // --- Left Trigger: Push out blocks ---
+
+        if (this.gamepad2.right_trigger > enableGulpersThresh) {
+            gulpersScaling = true;
+            gulpersInput = this.gamepad2.right_trigger;
+        }
+        else if (this.gamepad2.left_trigger > enableGulpersThresh) {
+            gulpersScaling = true;
+            gulpersInput = -this.gamepad2.left_trigger;
+        }
+        else if (this.gamepad2.right_stick_y < -enableGulpersThresh) {
+            gulpersScaling = true;
+            gulpersInput = -this.gamepad2.right_stick_y;
+        }
+        else if (this.gamepad2.right_stick_y > enableGulpersThresh) {
+            gulpersScaling = true;
+            gulpersInput = this.gamepad2.right_stick_y;
+        }
+        else {
+            gulpersScaling = false;
+        }
+        
         // --- D-Pad Up/Down: Winch motors up/down ---
         if (this.gamepad2.dpad_down) {
             if (!gamepad2DPadUpDownToggleLock) {
