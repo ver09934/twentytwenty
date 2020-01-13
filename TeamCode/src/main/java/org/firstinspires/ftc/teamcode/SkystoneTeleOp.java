@@ -119,9 +119,11 @@ public class SkystoneTeleOp extends OpMode {
     private double gulpersInput = 0;
 
     // Block servo positions
+    // public static final double blockServoLeftReallyClosedPosition = 0;
     public static final double blockServoLeftClosedPosition = 0.08;
     public static final double blockServoLeftOpenPosition = 0.45;
     public static final double blockServoLeftAutonPosition = 0.82;
+    // public static final double blockServoRightReallyClosedPosition = 1;
     public static final double blockServoRightClosedPosition = 0.92;
     public static final double blockServoRightOpenPosition = 0.54;
     public static final double blockServoRightAutonPosition = 0.16;
