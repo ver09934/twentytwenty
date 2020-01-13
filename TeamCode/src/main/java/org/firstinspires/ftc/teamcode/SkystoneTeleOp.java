@@ -14,6 +14,10 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
 
+    // TODO: Release capstone (gamepad 2 x)
+    // TODO: Adjust slide offset (gamepad 2 left stick)
+    // TODO: Toggle forwards, toggle reverse (gamepad 2 right trigger, left trigger)
+
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
     private DriverFunction driverFunction;
@@ -42,12 +46,9 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad1YToggleLock = false;
 
     // Gamepad 2 Toggle Locks
-    private boolean gamepad2AToggleLock = false;
     private boolean gamepad2BToggleLock = false;
-    private boolean gamepad2XToggleLock = false;
-    private boolean gamepad2YToggleLock = false;
-    private boolean gamepad2BumperToggleLock = false;
-    private boolean gamepad2LeftTriggerToggleLock = false;
+    private boolean gamepad2DPadUpDownToggleLock = false;
+    private boolean gamepad2DPadRightLeftToggleLock = false;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
@@ -317,57 +318,53 @@ public class SkystoneTeleOp extends OpMode {
         // ---------- Gamepad 2: Gunner Functions -----------
         // --------------------------------------------------
 
-        // --- A Button: Toggle Gulper Direction ---
-        if (this.gamepad2.a) {
-            if (!gamepad2AToggleLock) {
-                gamepad2AToggleLock = true;
-                gulperReverse = !gulperReverse;
-            }
+        // --- Right Trigger: Take in blocks ---
+        // --- Left Trigger: Push out blocks ---
+        double enableGulpersThresh = 0.1;
+        double maxTrigger = 1;
+        if (this.gamepad2.right_trigger > enableGulpersThresh) {
+            double power = gulperForwardPower * (this.gamepad2.right_trigger / maxTrigger);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+            telemetry.addData("Gulpers", "Forwards");
         }
-        else {
-            gamepad2AToggleLock = false;
+        else if (this.gamepad2.left_trigger > enableGulpersThresh) {
+            double power = gulperReversePower * (this.gamepad2.left_trigger / maxTrigger);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+            telemetry.addData("Gulpers", "Reverse");
         }
-
-        // --- B Button: Gulper motors ---
-        if (this.gamepad2.b) {
-            if (!gamepad2BToggleLock) {
-                gamepad2BToggleLock = true;
-                runGulper = !runGulper;
-            }
+        else if (this.gamepad2.right_stick_y < -enableGulpersThresh) {
+            double power = gulperForwardPower * (Math.abs(this.gamepad2.right_stick_y) / maxTrigger);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+            telemetry.addData("Gulpers", "Forwards");
         }
-        else {
-            gamepad2BToggleLock = false;
-        }
-        if (runGulper) {
-            if (!gulperReverse) {
-                gulperMotor1.setPower(gulperForwardPower);
-                gulperMotor2.setPower(gulperForwardPower);
-            }
-            else {
-                gulperMotor1.setPower(gulperReversePower);
-                gulperMotor2.setPower(gulperReversePower);
-            }
+        else if (this.gamepad2.right_stick_y > enableGulpersThresh) {
+            double power = gulperReversePower * (this.gamepad2.left_trigger / maxTrigger);
+            gulperMotor1.setPower(power);
+            gulperMotor2.setPower(power);
+            telemetry.addData("Gulpers", "Reverse");
         }
         else {
             gulperMotor1.setPower(gulperOffPower);
             gulperMotor2.setPower(gulperOffPower);
+            telemetry.addData("Gulpers", "Off");
         }
-        telemetry.addData("Gulper Reverse", gulperReverse);
-        telemetry.addData("Gulpers running", runGulper);
 
-        // --- Left/Right Bumpers: Winch motors ---
-        if (this.gamepad2.left_bumper) {
-            if (!gamepad2BumperToggleLock) {
-                gamepad2BumperToggleLock = true;
+        // --- D-Pad Up/Down: Winch motors up/down ---
+        if (this.gamepad2.dpad_down) {
+            if (!gamepad2DPadUpDownToggleLock) {
+                gamepad2DPadUpDownToggleLock = true;
                 if (currentWinchIndex > 0) {
                     currentWinchIndex -= 1;
                     updateWinchPositions();
                 }
             }
         }
-        else if (this.gamepad2.right_bumper) {
-            if (!gamepad2BumperToggleLock) {
-                gamepad2BumperToggleLock = true;
+        else if (this.gamepad2.dpad_up) {
+            if (!gamepad2DPadUpDownToggleLock) {
+                gamepad2DPadUpDownToggleLock = true;
                 if (currentWinchIndex < winchMotorPositions.length - 1) {
                     currentWinchIndex += 1;
                     updateWinchPositions();
@@ -375,13 +372,13 @@ public class SkystoneTeleOp extends OpMode {
             }
         }
         else {
-            gamepad2BumperToggleLock = false;
+            gamepad2DPadUpDownToggleLock = false;
         }
 
-        // --- Left Trigger: Set winch all the way down ---
-        if (this.gamepad2.left_trigger > 0.5) {
-            if (!gamepad2LeftTriggerToggleLock) {
-                gamepad2LeftTriggerToggleLock = true;
+        // --- D-Pad Right/Left: Winch motors reset ---
+        if (this.gamepad2.dpad_left || this.gamepad2.dpad_right) {
+            if (!gamepad2DPadRightLeftToggleLock) {
+                gamepad2DPadRightLeftToggleLock = true;
                 currentWinchIndex  = 0;
                 updateWinchPositions();
                 blockServoLeft.setPosition(blockServoLeftClosedPosition);
@@ -390,7 +387,7 @@ public class SkystoneTeleOp extends OpMode {
             }
         }
         else {
-            gamepad2LeftTriggerToggleLock = false;
+            gamepad2DPadRightLeftToggleLock = false;
         }
 
         // Winch position telemetry
@@ -400,15 +397,15 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Winch 1 Current", winchMotor1.getCurrentPosition());
         telemetry.addData("Winch 2 Current", winchMotor2.getCurrentPosition());
 
-        // --- X Button: Block Gripper Servo ---
-        if (this.gamepad2.x) {
-            if (!gamepad2XToggleLock) {
-                gamepad2XToggleLock = true;
+        // --- B Button: Block Gripper Servo ---
+        if (this.gamepad2.b) {
+            if (!gamepad2BToggleLock) {
+                gamepad2BToggleLock = true;
                 blockServoOpen = !blockServoOpen;
             }
         }
         else {
-            gamepad2XToggleLock = false;
+            gamepad2BToggleLock = false;
         }
         if (blockServoOpen) {
             blockServoLeft.setPosition(blockServoLeftOpenPosition);
