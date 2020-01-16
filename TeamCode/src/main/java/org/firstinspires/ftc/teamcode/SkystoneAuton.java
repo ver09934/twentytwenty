@@ -76,25 +76,33 @@ public class SkystoneAuton extends LinearOpMode {
     public void plateAuton() {
 
         double bigpow = 0.85;
+        double medbigpow = 0.6;
         double medpow = 0.5;
         double pow = 0.35;
+        double littlepow = 0.1;
 
         plateServosUp();
 
-        moveCardinal(bigpow, inchesToCm(12), 180);
+        moveCardinal(bigpow, inchesToCm(8), 180);
 
-        moveCardinal(bigpow, inchesToCm(29), 90);
-        moveCardinal(pow, inchesToCm(2), 90);
+        moveCardinal(bigpow, inchesToCm(26), 90);
+        moveCardinal(littlepow, inchesToCm(5), 90);
 
         plateServosDown();
 
+        moveCardinal(littlepow, inchesToCm(1.5), 90);
+
+        sleep(500);
+
         if (allianceColor == allianceColor.BLUE) {
-            gotoDegreesRamping(pow, 270);
+            gotoDegreesRamping(medbigpow, 270);
         }
         else if (allianceColor == allianceColor.RED) {
-            gotoDegreesRamping(pow, 90);
+            gotoDegreesRamping(medbigpow, 90);
         }
-        gotoDegreesRamping(pow, 180);
+        gotoDegreesRamping(medbigpow, 180);
+
+        moveCardinal(medbigpow, inchesToCm(2), 90);
 
         // moveCardinal(bigpow, inchesToCm(12), 90);
 
@@ -108,7 +116,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         makeStraight();
 
-        moveCardinal(bigpow, inchesToCm(30), 90);
+        moveCardinal(bigpow, inchesToCm(28), 90);
 
         makeStraight();
 
@@ -755,9 +763,29 @@ public class SkystoneAuton extends LinearOpMode {
 
         // NOTE: Make power small so correction can actually add something
 
+        double currentAngle = getIMUAngleConverted();
+
+        double[] potentialValues = {0, 90, 180, 270};
+
+        double[] diffs = new double[potentialValues.length];
+
+        for (int i = 0; i < potentialValues.length; i++) {
+            diffs[i] = Math.abs(getAngleDifference(currentAngle, potentialValues[i]));
+        }
+
+        ArrayList<Double> diffsArrayList = new ArrayList<>();
+        for(double diff : diffs) {
+            diffsArrayList.add(diff);
+        }
+
+        double min = Collections.min(diffsArrayList);
+        int minIndex = diffsArrayList.indexOf(min);
+
         if (allianceColor == AllianceColor.RED) {
             direction = (int) reflectAngle(direction);
         }
+
+        double angleHold = potentialValues[minIndex];
 
         resetAllEncoders();
 
@@ -803,7 +831,7 @@ public class SkystoneAuton extends LinearOpMode {
 
             double tmpAngle = getIMUAngleConverted();
             // double angle = getAngleDifference(tmpAngle, direction);
-            double angle = getAngleDifference(tmpAngle, 0); // TODO: Pass this in
+            double angle = getAngleDifference(tmpAngle, angleHold); // TODO: Pass this in
 
             // double k = 0.012;
             // double k = 0.02;
