@@ -744,6 +744,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // NOTE: Make power small so correction can actually add something
 
+        resetAllEncoders();
+
         int[] motorDirections = {1, 1, 1, 1};
 
         if (direction == 0) {
@@ -775,7 +777,13 @@ public class SkystoneAuton extends LinearOpMode {
 
         double maxPower = 1;
 
-        while (!isStopRequested()) {
+        while (averageMotorTicks < targetTicks && !isStopRequested()) {
+
+            int lft = Math.abs(lfMotor.getCurrentPosition());
+            int rft = Math.abs(rfMotor.getCurrentPosition());
+            int lbt = Math.abs(lbMotor.getCurrentPosition());
+            int rbt = Math.abs(rbMotor.getCurrentPosition());
+            averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
             double tmpAngle = getIMUAngleConverted();
             double angle = getAngleDifference(tmpAngle, direction);
@@ -793,6 +801,8 @@ public class SkystoneAuton extends LinearOpMode {
             telemetry.addData("Correction", correction);
             telemetry.update();
         }
+
+        setAllMotorPowers(0);
     }
 
     public void angleHoldingTest() {
