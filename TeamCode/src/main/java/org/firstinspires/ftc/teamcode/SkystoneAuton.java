@@ -16,7 +16,6 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
@@ -53,12 +52,12 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // mainAuton();
-        angleHoldingTest();
+        mainAuton();
+        // angleHoldingTest();
 
         while (opModeIsActive()) {
-            telemetry.addData("Runtime", runtime.toString());
-            telemetry.update();
+            // telemetry.addData("Runtime", runtime.toString());
+            // telemetry.update();
             idle();
         }
     }
@@ -118,17 +117,21 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void bothBlocksAuton() {
 
-        double bigpow = 0.925;
+        // double bigpow = 0.925;
+        double bigpow = 0.85;
         double medpow = 0.7;
         double pow = 0.35;
         double tinypow = 0.2;
 
-        moveCardinal(medpow, inchesToCm(27), 270);
+        // moveCardinal(medpow, inchesToCm(27), 270);
+        moveCardinal(medpow, inchesToCm(25), 270);
 
         ArrayList values = new ArrayList<Double>();
 
         // Scan blocks
         for (int i = 0; i < 3; i++) {
+
+            sleep(500);
 
             values.add(getHSV()[2]);
 
@@ -149,10 +152,10 @@ public class SkystoneAuton extends LinearOpMode {
 
         double blockGetPart1Dist = 1;
         double blockGetPart2Dist = 3;
-        double backupDistance = 10;
+        double backupDistance = 5;
 
-        double middleDistance = 20;
-        double otherSideDistance = 20;
+        double middleDistance = 23;
+        double otherSideDistance = 25;
         double totalOtherSideDistance = middleDistance + otherSideDistance;
 
         double blockSize = 8;
@@ -169,7 +172,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         makeStraight(); // Align
 
-        double extraDistTwo = 1;
+        // double extraDistTwo = 1;
+        double extraDistTwo = 0;
 
         // Go back to other block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
@@ -751,6 +755,10 @@ public class SkystoneAuton extends LinearOpMode {
 
         // NOTE: Make power small so correction can actually add something
 
+        if (allianceColor == AllianceColor.RED) {
+            direction = (int) reflectAngle(direction);
+        }
+
         resetAllEncoders();
 
         int[] motorDirections = {1, 1, 1, 1};
@@ -847,10 +855,12 @@ public class SkystoneAuton extends LinearOpMode {
                 maxCorrection = correction;
             }
 
+            /*
             telemetry.addData("Angle", angle);
             telemetry.addData("Correction", correction);
             telemetry.addData("Max correction", maxCorrection);
             telemetry.update();
+             */
         }
 
         setAllMotorPowers(0);
