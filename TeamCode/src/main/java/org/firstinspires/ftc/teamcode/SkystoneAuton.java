@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
@@ -502,10 +503,12 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void moveCardinal(double power, double distance, int direction) {
 
-        // Empirically determine a reasonable number of rampup ticks for the given power
-        double rampupTicks = 600 * power;
+        holdAngle(power, direction, distance);
 
-        moveCardinal(power, distance, direction, true, rampupTicks);
+        // Empirically determine a reasonable number of rampup ticks for the given power
+        // double rampupTicks = 600 * power;
+
+        // moveCardinal(power, distance, direction, true, rampupTicks);
     }
 
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
@@ -604,6 +607,9 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- ROTATIONAL MOVEMENT -----
 
+    public void makeStraight() {}
+
+    /*
     public void makeStraight() {
 
         double currentAngle = getIMUAngleConverted();
@@ -629,6 +635,7 @@ public class SkystoneAuton extends LinearOpMode {
 
         gotoDegreesRamping(power, potentialValues[minIndex], true);
     }
+     */
 
     public void gotoDegreesRamping(double power, double targetAngle) {
         gotoDegreesRamping(power, targetAngle, false);
@@ -775,7 +782,8 @@ public class SkystoneAuton extends LinearOpMode {
         double targetTicks = distanceToEncoderTicks(distance);
         int averageMotorTicks = 0;
 
-        double maxPower = 1;
+        // double maxPower = 1;
+        double maxCorrection = 0;
 
         while (averageMotorTicks < targetTicks && !isStopRequested()) {
 
@@ -786,19 +794,62 @@ public class SkystoneAuton extends LinearOpMode {
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
             double tmpAngle = getIMUAngleConverted();
-            double angle = getAngleDifference(tmpAngle, direction);
+            // double angle = getAngleDifference(tmpAngle, direction);
+            double angle = getAngleDifference(tmpAngle, 0); // TODO: Pass this in
 
-            double k = 0.012;
+            // double k = 0.012;
+            // double k = 0.02;
+            double k = 0.04;
 
             double correction = angle * k;
 
+            /*
+            Potential fixes: increase k value when motor power is high
+            Drop down raw motor power when motor power is high and correction pushes speed > 1
+             */
+
+            double[] motorPowers = {
+                motorPower * motorDirections[0],
+                motorPower * motorDirections[1],
+                motorPower * motorDirections[2],
+                motorPower * motorDirections[3],
+            };
+
+            double minPower = getMin(motorPowers);
+            double maxPower = getMax(motorPowers);
+
+            double tempMax = Math.max(Math.abs(minPower), Math.abs(maxPower));
+            double tempCorrectedMax = Math.max(Math.abs(minPower + correction), Math.abs(maxPower + correction));
+
+            if (tempCorrectedMax > 1) {
+                for (int i = 0; i < motorPowers.length; i++) {
+                    motorPowers[i] *= (1 - Math.abs(correction)) / tempMax;
+                }
+            }
+
+            for (int i = 0; i < motorPowers.length; i++) {
+                motorPowers[i] += correction;
+            }
+
+            lfMotor.setPower(motorPowers[0]);
+            rfMotor.setPower(motorPowers[1]);
+            lbMotor.setPower(motorPowers[2]);
+            rbMotor.setPower(motorPowers[3]);
+
+            /*
             lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
             rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
             lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
             rbMotor.setPower(motorPower * motorDirections[3] / maxPower + correction);
+             */
+
+            if (correction > maxCorrection) {
+                maxCorrection = correction;
+            }
 
             telemetry.addData("Angle", angle);
             telemetry.addData("Correction", correction);
+            telemetry.addData("Max correction", maxCorrection);
             telemetry.update();
         }
 
@@ -806,7 +857,8 @@ public class SkystoneAuton extends LinearOpMode {
     }
 
     public void angleHoldingTest() {
-        holdAngle(0.5, 0, 30);
+        // holdAngle(0.85, 0, 30);
+        holdAngle(0.85, 0, 300);
     }
 
     public class SimpleTimer {
@@ -830,5 +882,25 @@ public class SkystoneAuton extends LinearOpMode {
             return getElapsedNanoseconds() / Math.pow(10, 9);
         }
 
+    }
+
+    public double getMin(double[] arr) {
+        double min = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] < min) {
+                min = arr[i];
+            }
+        }
+        return min;
+    }
+
+    public double getMax(double[] arr) {
+        double max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
     }
 }
