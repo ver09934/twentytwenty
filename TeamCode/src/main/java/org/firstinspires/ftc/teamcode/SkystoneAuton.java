@@ -50,8 +50,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // mainAuton();
-        angleHoldingTest();
+        mainAuton();
+        // angleHoldingTest();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -68,7 +68,7 @@ public class SkystoneAuton extends LinearOpMode {
         int count = 1;
         for (double i = 0.3; i <= 1; i += 0.1) {
             int angle = (90 * count) % 360;
-            holdAngle(i, 100, angle);
+            holdAngle(i, 80, angle);
             count++;
         }
     }
