@@ -50,8 +50,9 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        mainAuton();
+        // mainAuton();
         // angleHoldingTest();
+        angleForcingTest();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -70,6 +71,29 @@ public class SkystoneAuton extends LinearOpMode {
             int angle = (90 * count) % 360;
             holdAngle(i, 80, angle);
             count++;
+        }
+    }
+
+    public void angleForcingTest() {
+        for (int i = 0; i < 3; i++) {
+            gotoDegreesRampingv2(1, 90, true, "cw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 0, true, "ccw");
+            sleep(3000);
+            /*
+            gotoDegreesRampingv2(1, 90, false, "cw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 0, false, "ccw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 90, false, "cw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 180, false, "ccw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 270, false, "cw");
+            sleep(3000);
+            gotoDegreesRampingv2(1, 0, false, "ccw");
+            sleep(3000);
+             */
         }
     }
 
@@ -642,22 +666,13 @@ public class SkystoneAuton extends LinearOpMode {
         while (!isStopRequested()) {
 
             double tmpAngle = getIMUAngleConverted();
-            double angle = getAngleDifference(tmpAngle, targetAngle);
+            double angle;
 
             if (forceDirection) {
-
-                // Don't worry about it
-                if (Math.abs(angle) == 180) {
-                    angle = Math.copySign(179, angle);
-                }
-
-                if (!direction.equals(getShortestDirection(tmpAngle, targetAngle))) {
-                    if (angle > 0) {
-                        angle = -(360 - angle);
-                    } else {
-                        angle = 360 + angle;
-                    }
-                }
+                angle = getAngleDifferenceInDirection(direction, tmpAngle, targetAngle);
+            }
+            else {
+                angle = getAngleDifference(tmpAngle, targetAngle);
             }
 
             if (Math.abs(angle) < angleTolerance) {
@@ -733,12 +748,31 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
-    public String getShortestDirection(double currentAngle, double targetAngle) {
-        if (getAngleDifference(currentAngle, targetAngle) < 0) {
-            return "cw";
+    public double getAngleDifferenceInDirection(String direction, double currentAngle, double targetAngle) {
+
+        currentAngle = currentAngle % 360;
+        targetAngle = targetAngle % 360;
+
+        currentAngle = currentAngle < 0 ? currentAngle + 360 : currentAngle;
+        targetAngle = targetAngle < 0 ? targetAngle + 360 : targetAngle;
+
+        double angleDiff = targetAngle - currentAngle;
+
+        if (direction.equals("ccw")) {
+            if (angleDiff > 0) {
+                return angleDiff;
+            }
+            else {
+                return (360 - currentAngle) + targetAngle;
+            }
         }
         else {
-            return "ccw";
+            if (angleDiff < 0) {
+                return angleDiff;
+            }
+            else {
+                return (targetAngle - 360) - currentAngle;
+            }
         }
     }
 
