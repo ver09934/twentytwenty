@@ -13,9 +13,6 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
-
-    // TODO: Release capstone (gamepad 2 x)
-        // Just servo stuff
     
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
@@ -82,7 +79,7 @@ public class SkystoneTeleOp extends OpMode {
     private int[] winchMotorPositions = new int[winchMotorSteps.length + 1];
     private int currentWinchIndex = 0;
 
-    private int winchAdjustIncrement = 50;
+    private int winchAdjustIncrement = 100;
 
     // Winch methods
     private void genWinchIndices() {
@@ -452,6 +449,7 @@ public class SkystoneTeleOp extends OpMode {
             gamepad2DPadRightLeftToggleLock = false;
         }
 
+        // --- Left Stick Up/Down: Adjust Winch Offset ---
         double leftGamepadThresh = 0.4;
         if (this.gamepad2.left_stick_y > leftGamepadThresh) {
             if (!gamepad2LeftStickToggleLock) {
@@ -473,6 +471,13 @@ public class SkystoneTeleOp extends OpMode {
         }
         else {
             gamepad2LeftStickToggleLock = false;
+        }
+
+        // --- Left Stick Press: Reset Winch Offset ---
+        if (this.gamepad2.left_stick_button) {
+            winchMotorSteps[0] = foundationHeight;
+            genWinchIndices();
+            updateWinchPositions();
         }
 
         // Winch position telemetry
