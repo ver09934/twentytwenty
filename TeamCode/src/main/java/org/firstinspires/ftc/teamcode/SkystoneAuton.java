@@ -632,7 +632,6 @@ public class SkystoneAuton extends LinearOpMode {
     public void gotoDegreesRampingv2(double maxPower, double targetAngle, boolean forceDirection, String direction) {
 
         // Direction is either "ccw" or "cw", else don't force direction
-        // If we've been within a tolerance of the angle for some time (say 200 ms), then return
 
         double angleTolerance = 2;
         double timeUnderToleance = 200;
@@ -644,6 +643,22 @@ public class SkystoneAuton extends LinearOpMode {
 
             double tmpAngle = getIMUAngleConverted();
             double angle = getAngleDifference(tmpAngle, targetAngle);
+
+            if (forceDirection) {
+
+                // Don't worry about it
+                if (Math.abs(angle) == 180) {
+                    angle = Math.copySign(179, angle);
+                }
+
+                if (!direction.equals(getShortestDirection(tmpAngle, targetAngle))) {
+                    if (angle > 0) {
+                        angle = -(360 - angle);
+                    } else {
+                        angle = 360 + angle;
+                    }
+                }
+            }
 
             if (Math.abs(angle) < angleTolerance) {
                 if (!inTolerance) {
@@ -715,6 +730,15 @@ public class SkystoneAuton extends LinearOpMode {
             else {
                 return 360 + angleDiff;
             }
+        }
+    }
+
+    public String getShortestDirection(double currentAngle, double targetAngle) {
+        if (getAngleDifference(currentAngle, targetAngle) < 0) {
+            return "cw";
+        }
+        else {
+            return "ccw";
         }
     }
 
