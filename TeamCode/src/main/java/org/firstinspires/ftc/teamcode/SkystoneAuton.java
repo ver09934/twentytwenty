@@ -625,6 +625,52 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
+    public void gotoDegreesRampingv2(double maxPower, double targetAngle) {
+        gotoDegreesRampingv2(maxPower, targetAngle, false, "");
+    }
+
+    public void gotoDegreesRampingv2(double maxPower, double targetAngle, boolean forceDirection, String direction) {
+
+        // Direction is either "ccw" or "cw", else don't force direction
+        // If we've been within a tolerance of the angle for some time (say 200 ms), then return
+
+        double angleTolerance = 2;
+        double timeUnderToleance = 200;
+        boolean inTolerance = false;
+
+        ElapsedTime timer = new ElapsedTime();
+
+        while (!isStopRequested()) {
+
+            double tmpAngle = getIMUAngleConverted();
+            double angle = getAngleDifference(tmpAngle, targetAngle);
+
+            if (Math.abs(angle) < angleTolerance) {
+                if (!inTolerance) {
+                    timer.reset();
+                }
+                inTolerance = true;
+                if (timer.milliseconds() > timeUnderToleance) {
+                    break;
+                }
+            }
+            else {
+                inTolerance = false;
+            }
+
+            double k = 0.04;
+            double correction = angle * k;
+
+            double motorPower = Math.min(correction, maxPower);
+
+            lfMotor.setPower(motorPower);
+            rfMotor.setPower(motorPower);
+            lbMotor.setPower(motorPower);
+            rbMotor.setPower(motorPower);
+        }
+        setAllMotorPowers(0);
+    }
+
     // ----- ANGLE UTILS -----
 
     public double getNearestMultipleOf90() {
