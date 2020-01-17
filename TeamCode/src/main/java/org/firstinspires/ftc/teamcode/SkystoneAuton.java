@@ -23,8 +23,6 @@ import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
-    // TODO: Add optional direction forcing to angle turn method
-
     private ElapsedTime runtime;
 
     @Override
@@ -56,10 +54,17 @@ public class SkystoneAuton extends LinearOpMode {
         // angleHoldingTest();
 
         while (opModeIsActive()) {
-            // telemetry.addData("Runtime", runtime.toString());
-            // telemetry.update();
+            telemetry.addData("Runtime", runtime.toString());
+            telemetry.update();
             idle();
         }
+    }
+
+    // ----- TESTS -----
+
+    public void angleHoldingTest() {
+        holdAngle(0.85, 100, 0);
+        // holdAngle(0.85, 300, 0);
     }
 
     // ----- META-METHODS -----
@@ -76,73 +81,49 @@ public class SkystoneAuton extends LinearOpMode {
     public void plateAuton() {
 
         double bigpow = 0.85;
-        double medbigpow = 0.6;
-        double medpow = 0.5;
+        double medpow = 0.6;
         double pow = 0.35;
         double littlepow = 0.1;
 
         plateServosUp();
-
         moveCardinal(bigpow, inchesToCm(8), 180);
-
         moveCardinal(bigpow, inchesToCm(26), 90);
         moveCardinal(littlepow, inchesToCm(5), 90);
-
         plateServosDown();
-
         moveCardinal(littlepow, inchesToCm(1.5), 90);
-
         sleep(500);
 
         if (allianceColor == allianceColor.BLUE) {
-            gotoDegreesRamping(medbigpow, 270);
+            gotoDegreesRamping(medpow, 270);
         }
         else if (allianceColor == allianceColor.RED) {
-            gotoDegreesRamping(medbigpow, 90);
+            gotoDegreesRamping(medpow, 90);
         }
-        gotoDegreesRamping(medbigpow, 180);
+        gotoDegreesRamping(medpow, 180);
 
-        moveCardinal(medbigpow, inchesToCm(2), 90);
-
-        // moveCardinal(bigpow, inchesToCm(12), 90);
-
+        moveCardinal(medpow, inchesToCm(2), 90);
         plateServosUp();
-
         moveCardinal(pow, inchesToCm(1), 270);
-
-        makeStraight();
-
         moveCardinal(bigpow, inchesToCm(30), 180);
-
-        makeStraight();
-
         moveCardinal(bigpow, inchesToCm(28), 90);
-
-        makeStraight();
-
         moveCardinal(bigpow, inchesToCm(18), 180);
     }
 
     public void bothBlocksAuton() {
 
-        // double bigpow = 0.925;
         double bigpow = 0.85;
         double medpow = 0.7;
         double pow = 0.35;
         double tinypow = 0.2;
 
-        // moveCardinal(medpow, inchesToCm(27), 270);
         moveCardinal(medpow, inchesToCm(25), 270);
 
         ArrayList values = new ArrayList<Double>();
 
         // Scan blocks
         for (int i = 0; i < 3; i++) {
-
             sleep(500);
-
             values.add(getHSV()[2]);
-
             if (i < 2) {
                 moveCardinal(pow, inchesToCm(8), 180);
             }
@@ -178,14 +159,11 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
         retractSkystoneGrabber();
 
-        makeStraight(); // Align
-
         // double extraDistTwo = 1;
         double extraDistTwo = 0;
 
         // Go back to other block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
-        makeStraight(); // Align
         moveCardinal(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
@@ -194,66 +172,12 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(tinypow, inchesToCm(blockGetPart2Dist), 270);
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
-        makeStraight(); // Align
-
         // Go to other side of field and release block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
         retractSkystoneGrabber();
 
         // Park
         moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
-    }
-
-    // ----- TEST META-METHODS -----
-
-    public void sharedPrefsTest() {
-        if (allianceColor == AllianceColor.BLUE) {
-            moveCardinal(0.5, 12, 90);
-        }
-        else if (allianceColor == AllianceColor.RED) {
-            moveCardinal(0.5, 12, 270);
-        }
-
-        sleep(500);
-
-        if (autonType == AutonType.TWOSKYSTONES) {
-            moveCardinal(0.5, 12, 0);
-        }
-        else if (autonType == AutonType.FOUNDATION) {
-            moveCardinal(0.5, 12, 180);
-        }
-    }
-
-    public void testMoveOne() {
-        for (int j = 0; j < 1; j++) {
-            for (int i = 0; i < 360; i += 90) {
-                gotoDegreesRamping(0.5, i);
-                sleep(1000);
-            }
-        }
-
-        while (opModeIsActive()) {
-            // makeStraight(0.5);
-            makeStraight();
-            sleep(5000);
-        }
-    }
-
-    public void testMoveTwo() {
-        for (int i = 0; i < 360; i += 90) {
-            moveCardinal(1, inchesToCm(30), i);
-            sleep(1000);
-        }
-
-        for (int i = 0; i < 360; i += 90) {
-            moveCardinal(0.5, inchesToCm(12), i);
-            sleep(1000);
-        }
-
-        for (int i = 0; i < 360; i += 90) {
-            moveCardinal(0.3, inchesToCm(4), i);
-            sleep(1000);
-        }
     }
 
     // ----- ANDROID SHARED PREFERENCES -----
@@ -515,12 +439,13 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void moveCardinal(double power, double distance, int direction) {
 
-        holdAngle(power, direction, distance);
+        holdAngle(power, distance, direction);
 
+        /*
         // Empirically determine a reasonable number of rampup ticks for the given power
-        // double rampupTicks = 600 * power;
-
-        // moveCardinal(power, distance, direction, true, rampupTicks);
+        double rampupTicks = 600 * power;
+        moveCardinal(power, distance, direction, true, rampupTicks);
+        */
     }
 
     public void moveCardinal(double power, double distance, int direction, boolean ramping, double rampupTicks) {
@@ -619,9 +544,6 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- ROTATIONAL MOVEMENT -----
 
-    public void makeStraight() {}
-
-    /*
     public void makeStraight() {
 
         double currentAngle = getIMUAngleConverted();
@@ -647,7 +569,6 @@ public class SkystoneAuton extends LinearOpMode {
 
         gotoDegreesRamping(power, potentialValues[minIndex], true);
     }
-     */
 
     public void gotoDegreesRamping(double power, double targetAngle) {
         gotoDegreesRamping(power, targetAngle, false);
@@ -720,6 +641,28 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- ANGLE UTILS -----
 
+    public double getNearestMultipleOf90() {
+        double currentAngle = getIMUAngleConverted();
+
+        double[] potentialValues = {0, 90, 180, 270};
+
+        double[] diffs = new double[potentialValues.length];
+
+        for (int i = 0; i < potentialValues.length; i++) {
+            diffs[i] = Math.abs(getAngleDifference(currentAngle, potentialValues[i]));
+        }
+
+        ArrayList<Double> diffsArrayList = new ArrayList<>();
+        for(double diff : diffs) {
+            diffsArrayList.add(diff);
+        }
+
+        double min = Collections.min(diffsArrayList);
+        int minIndex = diffsArrayList.indexOf(min);
+
+        return potentialValues[minIndex];
+    }
+
     public static double getAngleDifference(double currentAngle, double targetAngle) {
 
         currentAngle = currentAngle % 360;
@@ -759,33 +702,13 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- LINEAR MOVEMENT WITH ANGLE CORRECTING -----
 
-    public void holdAngle(double motorPower, int direction, double distance) {
-
-        // NOTE: Make power small so correction can actually add something
-
-        double currentAngle = getIMUAngleConverted();
-
-        double[] potentialValues = {0, 90, 180, 270};
-
-        double[] diffs = new double[potentialValues.length];
-
-        for (int i = 0; i < potentialValues.length; i++) {
-            diffs[i] = Math.abs(getAngleDifference(currentAngle, potentialValues[i]));
-        }
-
-        ArrayList<Double> diffsArrayList = new ArrayList<>();
-        for(double diff : diffs) {
-            diffsArrayList.add(diff);
-        }
-
-        double min = Collections.min(diffsArrayList);
-        int minIndex = diffsArrayList.indexOf(min);
+    public void holdAngle(double motorPower, double distance, int direction) {
 
         if (allianceColor == AllianceColor.RED) {
             direction = (int) reflectAngle(direction);
         }
 
-        double angleHold = potentialValues[minIndex];
+        double angleHold = getNearestMultipleOf90();
 
         resetAllEncoders();
 
@@ -818,7 +741,6 @@ public class SkystoneAuton extends LinearOpMode {
         double targetTicks = distanceToEncoderTicks(distance);
         int averageMotorTicks = 0;
 
-        // double maxPower = 1;
         double maxCorrection = 0;
 
         while (averageMotorTicks < targetTicks && !isStopRequested()) {
@@ -830,19 +752,11 @@ public class SkystoneAuton extends LinearOpMode {
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
             double tmpAngle = getIMUAngleConverted();
-            // double angle = getAngleDifference(tmpAngle, direction);
-            double angle = getAngleDifference(tmpAngle, angleHold); // TODO: Pass this in
+            double angle = getAngleDifference(tmpAngle, angleHold);
 
-            // double k = 0.012;
-            // double k = 0.02;
             double k = 0.04;
 
             double correction = angle * k;
-
-            /*
-            Potential fixes: increase k value when motor power is high
-            Drop down raw motor power when motor power is high and correction pushes speed > 1
-             */
 
             double[] motorPowers = {
                 motorPower * motorDirections[0],
@@ -872,12 +786,6 @@ public class SkystoneAuton extends LinearOpMode {
             lbMotor.setPower(motorPowers[2]);
             rbMotor.setPower(motorPowers[3]);
 
-            /*
-            lfMotor.setPower(motorPower * motorDirections[0] / maxPower + correction);
-            rfMotor.setPower(motorPower * motorDirections[1] / maxPower + correction);
-            lbMotor.setPower(motorPower * motorDirections[2] / maxPower + correction);
-            rbMotor.setPower(motorPower * motorDirections[3] / maxPower + correction);
-             */
 
             if (correction > maxCorrection) {
                 maxCorrection = correction;
@@ -894,16 +802,10 @@ public class SkystoneAuton extends LinearOpMode {
         setAllMotorPowers(0);
     }
 
-    public void angleHoldingTest() {
-        // holdAngle(0.85, 0, 30);
-        holdAngle(0.85, 0, 300);
-    }
-
     public class SimpleTimer {
 
         private long startTime;
 
-        // Calling the default constructor starts the timer
         public SimpleTimer() {
             reset();
         }
