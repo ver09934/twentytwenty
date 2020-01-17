@@ -66,9 +66,9 @@ public class SkystoneAuton extends LinearOpMode {
         // holdAngle(0.85, 100, 0);
         // holdAngle(0.85, 300, 0);
         int count = 1;
-        for (double i = 0.2; i <= 1; i += 0.1) {
+        for (double i = 0.3; i <= 1; i += 0.1) {
             int angle = (90 * count) % 360;
-            holdAngle(1, angle, 0);
+            holdAngle(i, 100, angle);
             count++;
         }
     }
@@ -708,7 +708,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- LINEAR MOVEMENT WITH ANGLE CORRECTING -----
 
-    public void holdAngle(double motorPower, double distance, int direction) {
+    public void holdAngle(double power, double distance, int direction) {
 
         if (allianceColor == AllianceColor.RED) {
             direction = (int) reflectAngle(direction);
@@ -748,7 +748,7 @@ public class SkystoneAuton extends LinearOpMode {
         int averageMotorTicks = 0;
 
         boolean useRamping = true;
-        double rampupTicks = 600 * motorPower;
+        double rampupTicks = 500 * power;
         if (targetTicks / 2 < rampupTicks) {
             rampupTicks = targetTicks / 2;
         }
@@ -761,16 +761,22 @@ public class SkystoneAuton extends LinearOpMode {
             int rbt = Math.abs(rbMotor.getCurrentPosition());
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
-            double powerOffsetStart = 0.1;
-            double powerOffsetEnd = 0.1;
+            double motorPower = power;
 
             if (useRamping) {
-                motorPower = Math.max(motorPower, Math.max(powerOffsetEnd, powerOffsetStart));
+                double powerOffsetStart = 0.05;
+                double powerOffsetEnd = 0.05;
+
+                motorPower = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
+
                 if (averageMotorTicks < rampupTicks) {
-                    motorPower = powerOffsetStart + (motorPower - powerOffsetStart) * (averageMotorTicks / rampupTicks);
+                    motorPower = powerOffsetStart + (power - powerOffsetStart) * (averageMotorTicks / rampupTicks);
                 }
                 else if (averageMotorTicks > targetTicks - rampupTicks) {
-                    motorPower = powerOffsetEnd + (motorPower - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks;
+                    motorPower = powerOffsetEnd + (power - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks;
+                }
+                else {
+                    motorPower = power;
                 }
             }
 
