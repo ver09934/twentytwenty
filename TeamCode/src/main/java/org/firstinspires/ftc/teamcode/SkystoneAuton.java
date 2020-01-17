@@ -50,8 +50,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        mainAuton();
-        // angleHoldingTest();
+        // mainAuton();
+        angleHoldingTest();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -63,8 +63,14 @@ public class SkystoneAuton extends LinearOpMode {
     // ----- TESTS -----
 
     public void angleHoldingTest() {
-        holdAngle(0.85, 100, 0);
+        // holdAngle(0.85, 100, 0);
         // holdAngle(0.85, 300, 0);
+        int count = 1;
+        for (double i = 0.2; i <= 1; i += 0.1) {
+            int angle = (90 * count) % 360;
+            holdAngle(1, angle, 0);
+            count++;
+        }
     }
 
     // ----- META-METHODS -----
@@ -741,7 +747,11 @@ public class SkystoneAuton extends LinearOpMode {
         double targetTicks = distanceToEncoderTicks(distance);
         int averageMotorTicks = 0;
 
-        double maxCorrection = 0;
+        boolean useRamping = true;
+        double rampupTicks = 600 * motorPower;
+        if (targetTicks / 2 < rampupTicks) {
+            rampupTicks = targetTicks / 2;
+        }
 
         while (averageMotorTicks < targetTicks && !isStopRequested()) {
 
@@ -751,11 +761,23 @@ public class SkystoneAuton extends LinearOpMode {
             int rbt = Math.abs(rbMotor.getCurrentPosition());
             averageMotorTicks = (lft + rft + lbt + rbt) / 4;
 
+            double powerOffsetStart = 0.1;
+            double powerOffsetEnd = 0.1;
+
+            if (useRamping) {
+                motorPower = Math.max(motorPower, Math.max(powerOffsetEnd, powerOffsetStart));
+                if (averageMotorTicks < rampupTicks) {
+                    motorPower = powerOffsetStart + (motorPower - powerOffsetStart) * (averageMotorTicks / rampupTicks);
+                }
+                else if (averageMotorTicks > targetTicks - rampupTicks) {
+                    motorPower = powerOffsetEnd + (motorPower - powerOffsetEnd) * (targetTicks - averageMotorTicks) / rampupTicks;
+                }
+            }
+
             double tmpAngle = getIMUAngleConverted();
             double angle = getAngleDifference(tmpAngle, angleHold);
 
             double k = 0.04;
-
             double correction = angle * k;
 
             double[] motorPowers = {
@@ -786,15 +808,9 @@ public class SkystoneAuton extends LinearOpMode {
             lbMotor.setPower(motorPowers[2]);
             rbMotor.setPower(motorPowers[3]);
 
-
-            if (correction > maxCorrection) {
-                maxCorrection = correction;
-            }
-
             /*
             telemetry.addData("Angle", angle);
             telemetry.addData("Correction", correction);
-            telemetry.addData("Max correction", maxCorrection);
             telemetry.update();
              */
         }
