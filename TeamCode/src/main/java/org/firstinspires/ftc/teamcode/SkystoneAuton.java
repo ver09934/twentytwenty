@@ -551,29 +551,9 @@ public class SkystoneAuton extends LinearOpMode {
     // ----- ROTATIONAL MOVEMENT -----
 
     public void makeStraight() {
-
-        double currentAngle = getIMUAngleConverted();
-
-        double[] potentialValues = {0, 90, 180, 270};
-
-        double[] diffs = new double[potentialValues.length];
-
-        for (int i = 0; i < potentialValues.length; i++) {
-            diffs[i] = Math.abs(getAngleDifference(currentAngle, potentialValues[i]));
-        }
-
-        ArrayList<Double> diffsArrayList = new ArrayList<>();
-        for(double diff : diffs) {
-            diffsArrayList.add(diff);
-        }
-
-        double min = Collections.min(diffsArrayList);
-        int minIndex = diffsArrayList.indexOf(min);
-
-        // Empirically set a reasonable motor power for turning
-        double power = Math.max(0.1, min / 50);
-
-        gotoDegreesRamping(power, potentialValues[minIndex], true);
+        double mult90 = getNearestMultipleOf90();
+        double power = Math.max(0.1, getAngleDifference(getIMUAngleConverted(), mult90) / 50);
+        gotoDegreesRamping(power, mult90, true);
     }
 
     public void gotoDegreesRamping(double power, double targetAngle) {
