@@ -56,7 +56,8 @@ public class SkystoneTeleOp extends OpMode {
     private boolean driveDirectionReverse = false;
     private boolean winchesPowered = false;
     private boolean plateServosUp = false;
-    private boolean blockServoOpen = false;
+    private boolean blockServoOpen = true;
+    boolean blockServosInAutonPositions = true;
     private boolean gulpersForwards = false;
     private boolean gulpersReverse = false;
 
@@ -196,9 +197,10 @@ public class SkystoneTeleOp extends OpMode {
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
         autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
 
-        blockServoOpen = false;
+        blockServoOpen = true;
         // blockServoLeft.setPosition(blockServoLeftClosedPosition);
         // blockServoRight.setPosition(blockServoRightClosedPosition);
+        blockServosInAutonPositions = true;
         blockServoLeft.setPosition(blockServoLeftAutonPosition);
         blockServoRight.setPosition(blockServoRightAutonPosition);
 
@@ -222,8 +224,8 @@ public class SkystoneTeleOp extends OpMode {
         runtime.reset();
         powerWinches();
         updateWinchPositions();
-        blockServoLeft.setPosition(blockServoLeftClosedPosition);
-        blockServoRight.setPosition(blockServoRightClosedPosition);
+        // blockServoLeft.setPosition(blockServoLeftClosedPosition);
+        // blockServoRight.setPosition(blockServoRightClosedPosition);
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
@@ -504,6 +506,7 @@ public class SkystoneTeleOp extends OpMode {
         if (this.gamepad2.b && !runningSkystoneDeploy) {
             if (!gamepad2BToggleLock) {
                 gamepad2BToggleLock = true;
+                blockServosInAutonPositions = false;
                 blockServoOpen = !blockServoOpen;
             }
         }
@@ -514,6 +517,7 @@ public class SkystoneTeleOp extends OpMode {
         // --- Y: Deploy block before skystone ---
         if (this.gamepad2.y) {
             if (!runningSkystoneDeploy) {
+                blockServosInAutonPositions = false;
                 runningSkystoneDeploy = true;
                 skystoneDeplyStepsCompleted = new boolean[]{false, false, false};
                 skystoneDeployTimer.reset();
@@ -537,7 +541,11 @@ public class SkystoneTeleOp extends OpMode {
             }
         }
 
-        if (blockServoOpen) {
+        if (blockServosInAutonPositions) {
+            blockServoLeft.setPosition(blockServoLeftAutonPosition);
+            blockServoRight.setPosition(blockServoRightAutonPosition);
+        }
+        else if (blockServoOpen) {
             blockServoLeft.setPosition(blockServoLeftOpenPosition);
             blockServoRight.setPosition(blockServoRightOpenPosition);
         }
