@@ -13,6 +13,8 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
+
+    // TODO: Create branch with direction reverse on two separate buttons
     
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
