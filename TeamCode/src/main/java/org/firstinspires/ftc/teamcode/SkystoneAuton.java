@@ -170,7 +170,7 @@ public class SkystoneAuton extends LinearOpMode {
 
     public void bothBlocksAuton() {
 
-        double bigpow = 0.85;
+        double bigpow = 0.9;
         double medpow = 0.7;
         double pow = 0.35;
         double tinypow = 0.2;
@@ -198,7 +198,7 @@ public class SkystoneAuton extends LinearOpMode {
         double extraDistOne = 0;
         moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
-        double blockGetPart1Dist = 2;
+        double blockGetPart1Dist = 5;
         double blockGetPart2Dist = 3.5; // This used to be 3
         double backupDistance = 7.5; // TODO: THIS WAS GREAT ON BLUE AT 5
         /*
@@ -230,7 +230,7 @@ public class SkystoneAuton extends LinearOpMode {
         retractSkystoneGrabber();
 
         // double extraDistTwo = 1;
-        double extraDistTwo = 0;
+        double extraDistTwo = 0.5;
 
         // Go back to other block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance1 + (3 + minIndex) * blockSize + extraDistTwo), 180);
