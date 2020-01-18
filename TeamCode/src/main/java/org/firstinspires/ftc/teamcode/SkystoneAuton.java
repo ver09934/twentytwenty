@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
-import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
-
 import android.graphics.Color;
 
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -20,8 +18,9 @@ import java.util.Collections;
 
 import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
 
-@Autonomous(name = "Skystone Auton")
-public class SkystoneAuton extends LinearOpMode {
+// @Disabled
+// @Autonomous(name = "Skystone Test Auton")
+public abstract class SkystoneAuton extends LinearOpMode {
 
     // TODO: Back up *very* slightly after placing second stone
     // TODO: Second block tends to get rammed when approaching...
@@ -31,43 +30,6 @@ public class SkystoneAuton extends LinearOpMode {
     // TODO: Use distance sensors / accelerometers to maintain distance / get correct distance to blocks
 
     private ElapsedTime runtime;
-
-    @Override
-    public void runOpMode() {
-
-        // ----- INIT SECTION -----
-
-        telemetry.addData("Status", "Initialized");
-        telemetry.update();
-
-        runtime = new ElapsedTime();
-
-        initMotors();
-        initServos();
-        initColorSensors();
-        initIMU();
-        initSharedPreferences();
-
-        while (!this.isStarted()) {
-            telemetry.addData("Status", "Waiting for start");
-            telemetry.addData("Runtime", runtime.toString());
-            telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
-            telemetry.update();
-        }
-
-        // ----- RUN SECTION -----
-
-        mainAuton();
-        // angleHoldingTest();
-        // angleForcingTest1();
-        // angleForcingTest2();
-
-        while (opModeIsActive()) {
-            telemetry.addData("Runtime", runtime.toString());
-            telemetry.update();
-            idle();
-        }
-    }
 
     // ----- TESTS -----
 
@@ -108,6 +70,35 @@ public class SkystoneAuton extends LinearOpMode {
         sleep(3000);
         gotoDegreesRampingv2(1, 0);
         sleep(3000);
+    }
+
+    // ----- INIT AND END -----
+
+    public void initThings() {
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        runtime = new ElapsedTime();
+
+        initMotors();
+        initServos();
+        initColorSensors();
+        initIMU();
+
+        while (!this.isStarted()) {
+            telemetry.addData("Status", "Waiting for start");
+            telemetry.addData("Runtime", runtime.toString());
+            telemetry.addData("IMU calibration status", imu.getCalibrationStatus().toString());
+            telemetry.update();
+        }
+    }
+
+    public void endTelemetry() {
+        while (opModeIsActive()) {
+            telemetry.addData("Runtime", runtime.toString());
+            telemetry.update();
+            idle();
+        }
     }
 
     // ----- META-METHODS -----
@@ -261,48 +252,33 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- ANDROID SHARED PREFERENCES -----
 
-    private static SharedPreferences sharedPrefs;
+    public AllianceColor allianceColor;
+    public AutonType autonType;
 
-    private static AllianceColor allianceColor;
-    private static AutonType autonType;
-
-    public void initSharedPreferences() {
-        sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this.hardwareMap.appContext);
-
-        String color = sharedPrefs.getString("alliance_color", "ERROR");
-        String type = sharedPrefs.getString("auton_type", "ERROR");
-
-        if (color.equals("BLUE")) {
-            allianceColor = AllianceColor.BLUE;
-        }
-        else if (color.equals("RED")) {
-            allianceColor = AllianceColor.RED;
-        }
-
-        if (type.equals("TWOSKYSTONES")) {
-            autonType = AutonType.TWOSKYSTONES;
-        }
-        else if (type.equals("FOUNDATION")) {
-            autonType = AutonType.FOUNDATION;
-        }
+    public void setAllianceColor(AllianceColor allianceColor) {
+        this.allianceColor = allianceColor;
     }
 
-    private enum AllianceColor {
+    public void setAutonType(AutonType autonType) {
+        this.autonType = autonType;
+    }
+
+    public enum AllianceColor {
         BLUE, RED
     }
 
-    private enum AutonType {
+    public enum AutonType {
         TWOSKYSTONES, FOUNDATION
     }
 
     // ----- SERVO STUFF -----
 
-    private Servo blockServoLeft;
-    private Servo blockServoRight;
-    private Servo plateServoLeft;
-    private Servo plateServoRight;
-    private Servo autonGrabberLeft;
-    private Servo autonGrabberRight;
+    public Servo blockServoLeft;
+    public Servo blockServoRight;
+    public Servo plateServoLeft;
+    public Servo plateServoRight;
+    public Servo autonGrabberLeft;
+    public Servo autonGrabberRight;
 
     public void initServos() {
         blockServoLeft = hardwareMap.servo.get("blockServoLeft");
@@ -317,17 +293,17 @@ public class SkystoneAuton extends LinearOpMode {
         blockServoJamOpen();
     }
 
-    private void blockServoJamOpen() {
+    public void blockServoJamOpen() {
         blockServoLeft.setPosition(blockServoLeftAutonPosition);
         blockServoRight.setPosition(blockServoRightAutonPosition);
     }
 
-    private void plateServosUp() {
+    public void plateServosUp() {
         plateServoLeft.setPosition(plateServoLeftUp);
         plateServoRight.setPosition(plateServoRightUp);
     }
 
-    private void plateServosDown() {
+    public void plateServosDown() {
         plateServoLeft.setPosition(plateServoLeftDown);
         plateServoRight.setPosition(plateServoRightDown);
     }
@@ -457,10 +433,10 @@ public class SkystoneAuton extends LinearOpMode {
 
     // ----- MOTOR STUFF -----
 
-    private DcMotor lfMotor;
-    private DcMotor rfMotor;
-    private DcMotor lbMotor;
-    private DcMotor rbMotor;
+    public DcMotor lfMotor;
+    public DcMotor rfMotor;
+    public DcMotor lbMotor;
+    public DcMotor rbMotor;
 
     public void initMotors() {
         lfMotor = hardwareMap.dcMotor.get("lfMotor");
