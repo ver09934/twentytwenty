@@ -50,9 +50,9 @@ public class SkystoneAuton extends LinearOpMode {
 
         // ----- RUN SECTION -----
 
-        // mainAuton();
+        mainAuton();
         // angleHoldingTest();
-        angleForcingTest();
+        // angleForcingTest();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -112,31 +112,54 @@ public class SkystoneAuton extends LinearOpMode {
 
         double bigpow = 0.85;
         double medpow = 0.6;
-        double pow = 0.35;
         double littlepow = 0.1;
 
         plateServosUp();
+        // Strafe sideways to start
         moveCardinal(bigpow, inchesToCm(8), 180);
+
+        // Move forwarads and get plate
         moveCardinal(bigpow, inchesToCm(26), 90);
         moveCardinal(littlepow, inchesToCm(5), 90);
         plateServosDown();
         moveCardinal(littlepow, inchesToCm(1.5), 90);
         sleep(500);
 
+        // Pull plate back
+        moveCardinal(medpow, inchesToCm(6), 270);
+
+        // Rotate with plate
         if (allianceColor == allianceColor.BLUE) {
-            gotoDegreesRamping(medpow, 270);
+            gotoDegreesRampingv2(medpow, 270);
         }
         else if (allianceColor == allianceColor.RED) {
-            gotoDegreesRamping(medpow, 90);
+            gotoDegreesRampingv2(medpow, 90);
         }
-        gotoDegreesRamping(medpow, 180);
 
+        // Push plate towards center of field
         moveCardinal(medpow, inchesToCm(2), 90);
+
+        // Keep rotating
+        gotoDegreesRampingv2(medpow, 180);
+        if (allianceColor == allianceColor.BLUE) {
+            gotoDegreesRampingv2(medpow, 90);
+        }
+        else if (allianceColor == allianceColor.RED) {
+            gotoDegreesRampingv2(medpow, 270);
+        }
+
+        // Push plate forwards
+        moveCardinal(medpow, inchesToCm(4), 90);
+
+        // Strafe towards wall with plate
+        moveCardinal(medpow, inchesToCm(29), 180);
         plateServosUp();
-        moveCardinal(pow, inchesToCm(1), 270);
-        moveCardinal(bigpow, inchesToCm(30), 180);
-        moveCardinal(bigpow, inchesToCm(28), 90);
-        moveCardinal(bigpow, inchesToCm(18), 180);
+
+        // Strafe towards wall without plate
+        moveCardinal(medpow, inchesToCm(8), 180);
+
+        // Go to center of field
+        moveCardinal(medpow, inchesToCm(36), 270);
     }
 
     public void bothBlocksAuton() {
@@ -146,7 +169,7 @@ public class SkystoneAuton extends LinearOpMode {
         double pow = 0.35;
         double tinypow = 0.2;
 
-        moveCardinal(medpow, inchesToCm(25), 270);
+        moveCardinal(medpow, inchesToCm(26), 270);
 
         ArrayList values = new ArrayList<Double>();
 
@@ -170,12 +193,15 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
         double blockGetPart1Dist = 1;
-        double blockGetPart2Dist = 3;
+        // double blockGetPart2Dist = 3;
+        double blockGetPart2Dist = 4;
         double backupDistance = 5;
 
         double middleDistance = 23;
-        double otherSideDistance = 25;
-        double totalOtherSideDistance = middleDistance + otherSideDistance;
+        double otherSideDistance1 = 21;
+        double otherSideDistance2 = 18;
+        double totalOtherSideDistance1 = middleDistance + otherSideDistance1;
+        double totalOtherSideDistance2 = middleDistance + otherSideDistance2;
 
         double blockSize = 8;
 
@@ -186,14 +212,14 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + minIndex * blockSize), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance1 + minIndex * blockSize), 0);
         retractSkystoneGrabber();
 
         // double extraDistTwo = 1;
         double extraDistTwo = 0;
 
         // Go back to other block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 180);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance1 + (3 + minIndex) * blockSize + extraDistTwo), 180);
         moveCardinal(bigpow, inchesToCm(backupDistance), 270);
 
         // Get block and back up
@@ -203,11 +229,11 @@ public class SkystoneAuton extends LinearOpMode {
         moveCardinal(bigpow, inchesToCm(blockGetPart1Dist + blockGetPart2Dist + backupDistance), 90);
 
         // Go to other side of field and release block
-        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance + (3 + minIndex) * blockSize + extraDistTwo), 0);
+        moveCardinal(bigpow, inchesToCm(totalOtherSideDistance2 + (3 + minIndex) * blockSize + extraDistTwo), 0);
         retractSkystoneGrabber();
 
         // Park
-        moveCardinal(bigpow, inchesToCm(otherSideDistance), 180);
+        moveCardinal(bigpow, inchesToCm(otherSideDistance2), 180);
     }
 
     // ----- ANDROID SHARED PREFERENCES -----
