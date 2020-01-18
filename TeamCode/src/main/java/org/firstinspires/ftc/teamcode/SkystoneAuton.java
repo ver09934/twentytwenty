@@ -201,6 +201,15 @@ public class SkystoneAuton extends LinearOpMode {
         double blockGetPart1Dist = 2;
         double blockGetPart2Dist = 3.5; // This used to be 3
         double backupDistance = 7.5; // TODO: THIS WAS GREAT ON BLUE AT 5
+        /*
+        double backupDistance;
+        if (allianceColor == AllianceColor.BLUE) {
+            backupDistance = 5;
+        }
+        else if (allianceColor == AllianceColor.RED) {
+            backupDistance = 7.5;
+        }
+        */
 
         double middleDistance = 23;
         double otherSideDistance1 = 18; // This used to be 21
