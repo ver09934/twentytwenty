@@ -52,7 +52,8 @@ public class SkystoneAuton extends LinearOpMode {
 
         mainAuton();
         // angleHoldingTest();
-        // angleForcingTest();
+        // angleForcingTest1();
+        // angleForcingTest2();
 
         while (opModeIsActive()) {
             telemetry.addData("Runtime", runtime.toString());
@@ -74,27 +75,32 @@ public class SkystoneAuton extends LinearOpMode {
         }
     }
 
-    public void angleForcingTest() {
+    public void angleForcingTest1() {
         for (int i = 0; i < 3; i++) {
             gotoDegreesRampingv2(1, 90, true, "cw");
             sleep(3000);
             gotoDegreesRampingv2(1, 0, true, "ccw");
             sleep(3000);
-            /*
-            gotoDegreesRampingv2(1, 90, false, "cw");
-            sleep(3000);
-            gotoDegreesRampingv2(1, 0, false, "ccw");
-            sleep(3000);
-            gotoDegreesRampingv2(1, 90, false, "cw");
-            sleep(3000);
-            gotoDegreesRampingv2(1, 180, false, "ccw");
-            sleep(3000);
-            gotoDegreesRampingv2(1, 270, false, "cw");
-            sleep(3000);
-            gotoDegreesRampingv2(1, 0, false, "ccw");
-            sleep(3000);
-             */
         }
+    }
+
+    public void angleForcingTest2() {
+        gotoDegreesRampingv2(1, 90);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 0);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 90);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 0);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 90);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 180);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 270);
+        sleep(3000);
+        gotoDegreesRampingv2(1, 0);
+        sleep(3000);
     }
 
     // ----- META-METHODS -----
