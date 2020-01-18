@@ -230,7 +230,8 @@ public class SkystoneAuton extends LinearOpMode {
         retractSkystoneGrabber();
 
         // double extraDistTwo = 1;
-        double extraDistTwo = 0.5;
+        // double extraDistTwo = 0.5;
+        double extraDistTwo = 0;
 
         // Go back to other block
         moveCardinal(bigpow, inchesToCm(totalOtherSideDistance1 + (3 + minIndex) * blockSize + extraDistTwo), 180);
