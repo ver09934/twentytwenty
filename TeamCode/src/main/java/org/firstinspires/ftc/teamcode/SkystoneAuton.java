@@ -697,13 +697,12 @@ public class SkystoneAuton extends LinearOpMode {
         while (!isStopRequested()) {
 
             double tmpAngle = getIMUAngleConverted();
-            double angle;
-
-            angle = getAngleDifference(tmpAngle, targetAngle);
+            double angle = getAngleDifference(tmpAngle, targetAngle);
+            double angleDir = getAngleDifferenceInDirection(direction, tmpAngle, targetAngle);
 
             if (forceDirection) {
-                if (Math.abs(angle) >= 180) {
-                    angle = getAngleDifferenceInDirection(direction, tmpAngle, targetAngle);
+                if (Math.abs(angleDir) >= 180) {
+                    angle = angleDir;
                 }
             }
 
