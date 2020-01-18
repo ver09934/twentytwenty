@@ -524,12 +524,12 @@ public class SkystoneTeleOp extends OpMode {
                 blockServoOpen = true;
                 skystoneDeplyStepsCompleted[0] = true;
             }
-            if (time >= 200 && !skystoneDeplyStepsCompleted[1]) {
-                // currentWinchIndex += 1;
-                // updateWinchPositions();
+            if (time >= 150 && !skystoneDeplyStepsCompleted[1]) {
+                currentWinchIndex += 1;
+                updateWinchPositions();
                 skystoneDeplyStepsCompleted[1] = true;
             }
-            if (time >= 400 && !skystoneDeplyStepsCompleted[2]) {
+            if (time >= 300 && !skystoneDeplyStepsCompleted[2]) {
                 blockServoOpen = false;
                 skystoneDeplyStepsCompleted[2] = true;
                 runningSkystoneDeploy = false;
