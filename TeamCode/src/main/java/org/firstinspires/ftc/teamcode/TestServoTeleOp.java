@@ -12,7 +12,6 @@ public class TestServoTeleOp extends OpMode {
     private Servo testServo;
 
     private boolean servoHigh = false;
-
     private double lowPosition = 0;
     private double highPosition = 1;
 
@@ -24,6 +23,7 @@ public class TestServoTeleOp extends OpMode {
     private boolean bToggleLock = false;
 
     private boolean ayToggleLock = false;
+    private boolean xPressed = false;
 
     private double getIncrement() {
         if (this.gamepad1.left_trigger > 0.5 || this.gamepad2.right_trigger > 0.5) {
@@ -38,7 +38,7 @@ public class TestServoTeleOp extends OpMode {
         return Math.round(value * Math.pow(10, places)) / Math.pow(10, places);
     }
 
-    String[] servos = {
+    private String[] servos = {
         "blockServoLeft",
         "blockServoRight",
         "plateServoLeft",
@@ -46,20 +46,44 @@ public class TestServoTeleOp extends OpMode {
         "autonGrabberLeft",
         "autonGrabberRight"
     };
-    String servoString;
+    private String servoString;
+
+    private int currentIndex = 0;
+    private String selector = ">>>";
+    private String selectorSpaces = "";
+    private int selectorSpaceCount = 6;
+
+    private void genSpaces() {
+        for (int i = 0; i < selectorSpaceCount; i++) {
+            selectorSpaces += " ";
+        }
+    }
+
+    private void initServo(boolean writeTelemetry) {
+        servoString = servos[currentIndex];
+        testServo = hardwareMap.servo.get(servoString);
+        if (writeTelemetry) {
+            telemetry.addData("Servo selected", servoString);
+            telemetry.update();
+        }
+    }
+
+    private void setServoLow() {
+        servoHigh = false;
+        testServo.setPosition(lowPosition);
+    }
 
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
+        genSpaces();
+    }
 
-        int currentIndex = 0;
-        String selector = ">>>";
-        String selectorSpaces = "";
-        for (int i = 0; i < selector.length(); i++) {
-            selectorSpaces += " ";
-        }
+    // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
+    @Override
+    public void init_loop() {
 
-        while (true) {
+        if (!xPressed) {
 
             if (this.gamepad1.y) {
                 if (!ayToggleLock) {
@@ -87,10 +111,6 @@ public class TestServoTeleOp extends OpMode {
                 ayToggleLock = false;
             }
 
-            if (this.gamepad1.x) {
-                break;
-            }
-
             telemetry.addLine("Select a servo:");
             for (int i = 0; i < servos.length; i++) {
                 String prefix;
@@ -103,24 +123,21 @@ public class TestServoTeleOp extends OpMode {
                 telemetry.addLine(prefix + " " + servos[i]);
             }
             telemetry.update();
+
+            if (this.gamepad1.x) {
+                xPressed = true;
+                initServo(true);
+            }
         }
-
-        servoString = servos[currentIndex];
-        telemetry.addData("Servo selected", servoString);
-
-        testServo = hardwareMap.servo.get(servoString);
-
-        servoHigh = false;
-        testServo.setPosition(lowPosition);
     }
-
-    // Code to run REPEATEDLY after the driver hits INIT, but before they hit PLAY
-    @Override
-    public void init_loop() {}
 
     // Code to run ONCE when the driver hits PLAY
     @Override
     public void start() {
+        if (!xPressed) {
+            initServo(false);
+        }
+        setServoLow();
         runtime.reset();
     }
 
@@ -202,7 +219,6 @@ public class TestServoTeleOp extends OpMode {
         telemetry.addData("High Position", highPosition);
         telemetry.addData("Servo Position", testServo.getPosition());
         telemetry.addData("Target Position: ", servoHigh ? highPosition : lowPosition);
-
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();
     }
