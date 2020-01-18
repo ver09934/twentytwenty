@@ -148,6 +148,11 @@ public class SkystoneTeleOp extends OpMode {
         autonGrabberRight.setPosition(autonGrabberRightPassive);
     }
 
+    // Ricky stuff
+    ElapsedTime skystoneDeployTimer = new ElapsedTime();
+    boolean runningSkystoneDeploy = false;
+    boolean[] skystoneDeplyStepsCompleted = {false, false, false};
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
@@ -495,7 +500,7 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Winch 2 Current", winchMotor2.getCurrentPosition());
 
         // --- B Button: Block Gripper Servo ---
-        if (this.gamepad2.b) {
+        if (this.gamepad2.b && !runningSkystoneDeploy) {
             if (!gamepad2BToggleLock) {
                 gamepad2BToggleLock = true;
                 blockServoOpen = !blockServoOpen;
@@ -504,6 +509,33 @@ public class SkystoneTeleOp extends OpMode {
         else {
             gamepad2BToggleLock = false;
         }
+
+        // --- Y: Deploy block before skystone ---
+        if (this.gamepad2.y) {
+            if (!runningSkystoneDeploy) {
+                runningSkystoneDeploy = true;
+                skystoneDeplyStepsCompleted = new boolean[]{false, false, false};
+                skystoneDeployTimer.reset();
+            }
+        }
+        if (runningSkystoneDeploy) {
+            double time = skystoneDeployTimer.milliseconds();
+            if (time >= 0 && !skystoneDeplyStepsCompleted[0]) {
+                blockServoOpen = true;
+                skystoneDeplyStepsCompleted[0] = true;
+            }
+            if (time >= 200 && !skystoneDeplyStepsCompleted[1]) {
+                // currentWinchIndex += 1;
+                // updateWinchPositions();
+                skystoneDeplyStepsCompleted[1] = true;
+            }
+            if (time >= 400 && !skystoneDeplyStepsCompleted[2]) {
+                blockServoOpen = false;
+                skystoneDeplyStepsCompleted[2] = true;
+                runningSkystoneDeploy = false;
+            }
+        }
+
         if (blockServoOpen) {
             blockServoLeft.setPosition(blockServoLeftOpenPosition);
             blockServoRight.setPosition(blockServoRightOpenPosition);
