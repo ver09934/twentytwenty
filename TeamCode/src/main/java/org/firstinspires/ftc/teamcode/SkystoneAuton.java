@@ -192,14 +192,13 @@ public class SkystoneAuton extends LinearOpMode {
         double extraDistOne = 0;
         moveCardinal(pow, inchesToCm(extraDistOne + (values.size() - minIndex - 1) * 8), 0);
 
-        // TODO
         double blockGetPart1Dist = 2;
-        double blockGetPart2Dist = 3;
-        double backupDistance = 5;
+        double blockGetPart2Dist = 3.5; // This used to be 3
+        double backupDistance = 6.5; // TODO: THIS WAS GREAT ON BLUE AT 5
 
         double middleDistance = 23;
-        double otherSideDistance1 = 21;
-        double otherSideDistance2 = 18;
+        double otherSideDistance1 = 18; // This used to be 21
+        double otherSideDistance2 = 15; // This used to be 18
         double totalOtherSideDistance1 = middleDistance + otherSideDistance1;
         double totalOtherSideDistance2 = middleDistance + otherSideDistance2;
 
