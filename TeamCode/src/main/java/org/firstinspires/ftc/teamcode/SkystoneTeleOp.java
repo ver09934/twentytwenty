@@ -191,8 +191,10 @@ public class SkystoneTeleOp extends OpMode {
         autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
 
         blockServoOpen = false;
-        blockServoLeft.setPosition(blockServoLeftClosedPosition);
-        blockServoRight.setPosition(blockServoRightClosedPosition);
+        // blockServoLeft.setPosition(blockServoLeftClosedPosition);
+        // blockServoRight.setPosition(blockServoRightClosedPosition);
+        blockServoLeft.setPosition(blockServoLeftAutonPosition);
+        blockServoRight.setPosition(blockServoRightAutonPosition);
 
         plateServosUp = false;
         plateServoLeft.setPosition(plateServoLeftDown);
@@ -214,6 +216,8 @@ public class SkystoneTeleOp extends OpMode {
         runtime.reset();
         powerWinches();
         updateWinchPositions();
+        blockServoLeft.setPosition(blockServoLeftClosedPosition);
+        blockServoRight.setPosition(blockServoRightClosedPosition);
     }
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
