@@ -891,7 +891,7 @@ public class SkystoneAuton extends LinearOpMode {
                 double powerOffsetStart = 0.05;
                 double powerOffsetEnd = 0.05;
 
-                motorPower = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
+                power = Math.max(power, Math.max(powerOffsetEnd, powerOffsetStart));
 
                 if (averageMotorTicks < rampupTicks) {
                     motorPower = powerOffsetStart + (power - powerOffsetStart) * (averageMotorTicks / rampupTicks);
