@@ -15,7 +15,8 @@ import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
 public class SkystoneTeleOp extends OpMode {
 
     // TODO: Create branch with direction reverse on two separate buttons
-    
+    // TODO: Only un-autonify the grabbers after first press of "b" instead of on start
+
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
     private DriverFunction driverFunction;

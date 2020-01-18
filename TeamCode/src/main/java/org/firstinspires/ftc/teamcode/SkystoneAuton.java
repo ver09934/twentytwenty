@@ -23,6 +23,13 @@ import static org.firstinspires.ftc.teamcode.SkystoneTeleOp.*;
 @Autonomous(name = "Skystone Auton")
 public class SkystoneAuton extends LinearOpMode {
 
+    // TODO: Back up *very* slightly after placing second stone
+    // TODO: Second block tends to get rammed when approaching...
+    // TODO: Make an auton that only does the further skystone (this might be a good time for an l-shape path)
+    // TODO: Subclass the auton and have these call the specific methods (no more  shared preferences)
+    // TODO: Test plate auton and turning with direction forcing
+    // TODO: Use distance sensors / accelerometers to maintain distance / get correct distance to blocks
+
     private ElapsedTime runtime;
 
     @Override
