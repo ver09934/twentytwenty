@@ -11,9 +11,14 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.teamcode.util.AxesSigns;
+import org.firstinspires.ftc.teamcode.util.BNO055IMUUtil;
 import org.firstinspires.ftc.teamcode.util.LynxModuleUtil;
 import org.openftc.revextensions2.ExpansionHubEx;
 import org.openftc.revextensions2.ExpansionHubMotor;
@@ -24,10 +29,18 @@ import org.openftc.revextensions2.RevBulkData;
  * trajectory following performance with moderate additional complexity.
  */
 public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
-    private ExpansionHubEx hub;
+    private ExpansionHubEx hubleft;
+    private ExpansionHubEx hubright;
     private ExpansionHubMotor leftFront, leftRear, rightRear, rightFront;
-    private List<ExpansionHubMotor> motors;
+    private List<ExpansionHubMotor> leftMotors;
+    private List<ExpansionHubMotor> rightMotors;
     private BNO055IMU imu;
+    private BNO055IMU imuright;
+
+    public List<ExpansionHubMotor> getAllMotors() {
+        List<ExpansionHubMotor> allMotors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        return allMotors;
+    }
 
     public SampleMecanumDriveREVOptimized(HardwareMap hardwareMap) {
         super();
@@ -37,25 +50,34 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
         // TODO: adjust the names of the following hardware devices to match your configuration
         // for simplicity, we assume that the desired IMU and drive motors are on the same hub
         // if your motors are split between hubs, **you will need to add another bulk read**
-        hub = hardwareMap.get(ExpansionHubEx.class, "hub");
+        hubleft = hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
+        hubright = hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
+
         BNO055IMU.Parameters parameters = new BNO055IMU.Parameters();
         parameters.angleUnit = BNO055IMU.AngleUnit.RADIANS;
         imu.initialize(parameters);
 
         // TODO: if your hub is mounted vertically, remap the IMU axes so that the z-axis points
         // upward (normal to the floor) using a command like the following:
-        // BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
+        BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
-        leftFront = hardwareMap.get(ExpansionHubMotor.class, "leftFront");
-        leftRear = hardwareMap.get(ExpansionHubMotor.class, "leftRear");
-        rightRear = hardwareMap.get(ExpansionHubMotor.class, "rightRear");
-        rightFront = hardwareMap.get(ExpansionHubMotor.class, "rightFront");
+        leftFront = hardwareMap.get(ExpansionHubMotor.class, "lfMotor");
+        leftRear = hardwareMap.get(ExpansionHubMotor.class, "lbmotor");
+        rightRear = hardwareMap.get(ExpansionHubMotor.class, "rbmotor");
+        rightFront = hardwareMap.get(ExpansionHubMotor.class, "rfmotor");
 
-        motors = Arrays.asList(leftFront, leftRear, rightRear, rightFront);
+        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        rightFront.setDirection(DcMotor.Direction.FORWARD);
+        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        leftRear.setDirection(DcMotor.Direction.REVERSE);
 
-        for (ExpansionHubMotor motor : motors) {
+        leftMotors = Arrays.asList(leftFront, leftRear);
+        rightMotors = Arrays.asList(rightRear, rightFront);
+
+
+        for (ExpansionHubMotor motor : leftMotors) {
             if (RUN_USING_ENCODER) {
                 motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
@@ -80,7 +102,7 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
 
     @Override
     public void setPIDCoefficients(DcMotor.RunMode runMode, PIDCoefficients coefficients) {
-        for (ExpansionHubMotor motor : motors) {
+        for (ExpansionHubMotor motor : leftMotors) {
             motor.setPIDFCoefficients(runMode, new PIDFCoefficients(
                     coefficients.kP, coefficients.kI, coefficients.kD, getMotorVelocityF()
             ));
@@ -90,33 +112,43 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
     @NonNull
     @Override
     public List<Double> getWheelPositions() {
-        RevBulkData bulkData = hub.getBulkInputData();
+        RevBulkData bulkDataLeft = hubleft.getBulkInputData();
+        RevBulkData bulkDataRight = hubright.getBulkInputData();
 
-        if (bulkData == null) {
+        if (bulkDataLeft == null && bulkDataRight == null) {
             return Arrays.asList(0.0, 0.0, 0.0, 0.0);
         }
 
         List<Double> wheelPositions = new ArrayList<>();
-        for (ExpansionHubMotor motor : motors) {
-            wheelPositions.add(encoderTicksToInches(bulkData.getMotorCurrentPosition(motor)));
+        for (ExpansionHubMotor motor : leftMotors) {
+            wheelPositions.add(encoderTicksToInches(bulkDataLeft.getMotorCurrentPosition(motor)));
+        }
+        for (ExpansionHubMotor motor : rightMotors) {
+            wheelPositions.add(encoderTicksToInches(bulkDataRight.getMotorCurrentPosition(motor)));
         }
         return wheelPositions;
     }
 
     @Override
     public List<Double> getWheelVelocities() {
-        RevBulkData bulkData = hub.getBulkInputData();
+        RevBulkData bulkDataLeft = hubleft.getBulkInputData();
+        RevBulkData bulkDataRight = hubright.getBulkInputData();
 
-        if (bulkData == null) {
+        if (bulkDataLeft == null && bulkDataRight == null) {
             return Arrays.asList(0.0, 0.0, 0.0, 0.0);
         }
 
         List<Double> wheelVelocities = new ArrayList<>();
-        for (ExpansionHubMotor motor : motors) {
-            wheelVelocities.add(encoderTicksToInches(bulkData.getMotorVelocity(motor)));
+        for (ExpansionHubMotor motor : leftMotors) {
+            wheelVelocities.add(encoderTicksToInches(bulkDataLeft.getMotorVelocity(motor)));
         }
+        for (ExpansionHubMotor motor : rightMotors) {
+            wheelVelocities.add(encoderTicksToInches(bulkDataRight.getMotorVelocity(motor)));
+        }
+
         return wheelVelocities;
     }
+
 
     @Override
     public void setMotorPowers(double v, double v1, double v2, double v3) {
