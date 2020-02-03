@@ -1,0 +1,17 @@
+{
+  "files": {
+    "main.css": "/dash/static/css/main.35621e47.chunk.css",
+    "main.js": "/dash/static/js/main.eaf8e021.chunk.js",
+    "main.js.map": "/dash/static/js/main.eaf8e021.chunk.js.map",
+    "runtime~main.js": "/dash/static/js/runtime~main.4e412c0e.js",
+    "runtime~main.js.map": "/dash/static/js/runtime~main.4e412c0e.js.map",
+    "static/js/2.909f7f0f.chunk.js": "/dash/static/js/2.909f7f0f.chunk.js",
+    "static/js/2.909f7f0f.chunk.js.map": "/dash/static/js/2.909f7f0f.chunk.js.map",
+    "index.html": "/dash/index.html",
+    "precache-manifest.d8f66a055a779d6d4dc91c24d6beadf3.js": "/dash/precache-manifest.d8f66a055a779d6d4dc91c24d6beadf3.js",
+    "service-worker.js": "/dash/service-worker.js",
+    "static/css/main.35621e47.chunk.css.map": "/dash/static/css/main.35621e47.chunk.css.map",
+    "static/media/index.css": "/dash/static/media/wifi_off.d8944708.svg",
+    "static/media/field.png": "/dash/static/media/field.1f32ba9a.png"
+  }
+}

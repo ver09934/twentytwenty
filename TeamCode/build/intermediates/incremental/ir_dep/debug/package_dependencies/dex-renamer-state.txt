@@ -1,0 +1,7 @@
+#Mon Feb 03 15:49:58 EST 2020
+base.1=/home/kalin/IdeaProjects/twentytwenty/TeamCode/build/intermediates/transforms/dexMerger/debug/10
+path.1=classes2.dex
+base.0=/home/kalin/IdeaProjects/twentytwenty/TeamCode/build/intermediates/transforms/dexMerger/debug/10
+renamed.1=classes2.dex
+renamed.0=classes.dex
+path.0=classes.dex
