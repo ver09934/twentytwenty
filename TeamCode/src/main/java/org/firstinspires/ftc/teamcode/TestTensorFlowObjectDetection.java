@@ -38,7 +38,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer.Came
 import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -63,6 +65,7 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
     public static final double NORMAL_SPEED_RATIO = 0.3;
     public static final double MEDIUM_SPEED_RATIO = 0.5;
     public static final double FAST_SPEED_RATIO = 0.7;
+    public int skyPos;
 
     public static final long MOVE_DELAY_MS = 50;
     public static final long LONG_DELAY_MS = 300;
@@ -79,6 +82,8 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
     private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
+
+    private HashMap<String, Float> leftPositions = new HashMap<>();
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -153,15 +158,39 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
                         for (Recognition recognition : updatedRecognitions) {
+                            i++;
+                            ArrayList<Pair> sort = new ArrayList<Pair>();
                             telemetry.addData(String.format("label (%d)", i), recognition.getLabel());
                             telemetry.addData(String.format("  left,top (%d)", i), "%.03f , %.03f",
                                     recognition.getLeft(), recognition.getTop());
                             telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                     recognition.getRight(), recognition.getBottom());
 
+
                             if (recognition.getLabel() == "Skystone") {
+                                leftPositions.put("Skystone" + String.valueOf(i), recognition.getLeft());
                                 telemetry.addData("Center", Math.round(recognition.getRight() - recognition.getLeft()) + " " + Math.round(recognition.getTop() - recognition.getBottom()));
+                                sort.add(new Pair("Skystone", recognition.getLeft()));
                             }
+                            if (recognition.getLabel() == "Stone") {
+                                leftPositions.put("Stone" + String.valueOf(i), recognition.getLeft());
+                                sort.add(new Pair("Stone", recognition.getLeft()));
+                            }
+
+                            Collections.sort(sort);
+                            System.out.println(sort);
+                            if (sort.get(0).toString().equals("Skystone")) {
+                                skyPos = 1;
+                            } else if (sort.get(1).toString().equals("Skystone")) {
+                                skyPos = 2;
+                            } else if (sort.get(2).toString().equals("Skystone")) {
+                                skyPos = 3;
+                            } else {
+                                skyPos = 5321;
+                            }
+
+                            telemetry.addData("Skystone Position: ", skyPos);
+
                         }
 
                         telemetry.update();
@@ -206,3 +235,31 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
 }
+
+class Pair implements Comparable<Pair>{
+    private Float afloat;
+    private String string;
+
+    public Pair(String str, Float flt) {
+        string = str;
+        afloat = flt;
+    }
+
+    public Float getFloat() {
+        return afloat;
+    }
+
+    public String getString() {
+        return string;
+    }
+    public String toString() {
+        return string + ", " + afloat;
+    }
+
+    @Override
+    public int compareTo(Pair x) {
+        return (int) (this.afloat - x.getFloat());
+    }
+
+}
+
