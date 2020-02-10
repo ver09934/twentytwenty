@@ -15,11 +15,31 @@ public class TestDriveTeleOp extends OpMode {
     public DcMotor lbMotor;
     public DcMotor rbMotor;
 
-    double x = 0;
-    double y = 0;
+    public boolean xToggleLock = false;
+    public boolean bToggleLock = false;
 
-    double turnSpeed = 0;
-    double driveSpeed = 0;
+    public boolean xyMethod = false;
+    public boolean turnMethod = false;
+
+    public double getMin(double[] arr) {
+        double min = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] < min) {
+                min = arr[i];
+            }
+        }
+        return min;
+    }
+
+    public double getMax(double[] arr) {
+        double max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
 
     public void setAllRunModes(DcMotor.RunMode runMode) {
         lfMotor.setMode(runMode);
@@ -57,22 +77,51 @@ public class TestDriveTeleOp extends OpMode {
         runtime.reset();
     }
 
+    /*
+    Input parameters:
+    - x velocity (-1 to 1)
+    - y velocity (-1 to 1)
+    - turning speed (-1 to 1)
+    - speed scale (0 to 1)
+
+    double maxPossiblePower = Math.sqrt(2);
+    driveAngle = Math.atan2(xInput, yInput);
+    driveSpeed = Math.sqrt(Math.pow(xInput, 2) + Math.pow(yInput, 2));
+    double x = Math.cos(driveAngle);
+    double y = Math.sin(driveAngle);
+
+    double powerLF = x - y;
+    double powerRF = x + y;
+    double powerLB = -x - y;
+    double powerRB = -x + y;
+    */
+
+    double x = 0;
+    double y = 0;
+    double turnSpeed = 0;
+
     @Override
     public void loop() {
 
-        /*
-        Input parameters:
-        - x velocity (-1 to 1)
-        - y velocity (-1 to 1)
-        - turning speed (-1 to 1)
-        - speed scale (0 to 1)
-         */
+        if (gamepad1.x) {
+            if (!xToggleLock) {
+                xToggleLock = true;
+                xyMethod = !xyMethod;
+            }
+        }
+        else {
+            xToggleLock = false;
+        }
 
-        // double maxPossiblePower = Math.sqrt(2);
-        // driveAngle = Math.atan2(xInput, yInput);
-        // driveSpeed = Math.sqrt(Math.pow(xInput, 2) + Math.pow(yInput, 2));
-        // double x = Math.cos(driveAngle);
-        // double y = Math.sin(driveAngle);
+        if (gamepad1.b) {
+            if (!bToggleLock) {
+                bToggleLock = true;
+                turnMethod = !turnMethod;
+            }
+        }
+        else {
+            bToggleLock = false;
+        }
 
         double activation_thresh = 0.01;
 
@@ -91,15 +140,74 @@ public class TestDriveTeleOp extends OpMode {
             x = 0;
             y = 0;
         }
-        driveSpeed = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 
-        /*
-        double powerLF = x - y;
-        double powerRF = x + y;
-        double powerLB = -x - y;
-        double powerRB = -x + y;
-        */
+        double driveSpeed = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
 
+        double driveAngle = Math.atan2(y, x);
+        double maxDriveSpeed = 0; // TODO
+
+        if (!xyMethod) {
+
+            // Speed scaling option 1:
+            // Divide by max possible speed
+            x /= Math.sqrt(2);
+            y /= Math.sqrt(2);
+
+        }
+        else {
+
+            // Speed scaling option 2:
+            // Scale speeds by current x and y
+            x /= maxDriveSpeed;
+            y /= maxDriveSpeed;
+
+        }
+
+        double[] motorPowers = {
+            x - y,
+            x + y,
+            -x - y,
+            -x + y
+        };
+
+        if (!turnMethod) {
+
+            // Turn incorporation option 1:
+            // Scale such that max turn weight is 0.5
+
+
+
+        }
+        else {
+
+            // Turn incorporation option 2:
+            // Prioritize turning
+
+            double minPower = getMin(motorPowers);
+            double maxPower = getMax(motorPowers);
+
+            double tempMax = Math.max(Math.abs(minPower), Math.abs(maxPower));
+            double tempCorrectedMax = Math.max(Math.abs(minPower + turnSpeed), Math.abs(maxPower + turnSpeed));
+
+            if (tempCorrectedMax > 1) {
+                for (int i = 0; i < motorPowers.length; i++) {
+                    motorPowers[i] *= (1 - Math.abs(turnSpeed)) / tempMax;
+                }
+            }
+
+            for (int i = 0; i < motorPowers.length; i++) {
+                motorPowers[i] += turnSpeed;
+            }
+
+        }
+
+        lfMotor.setPower(motorPowers[0]);
+        rfMotor.setPower(motorPowers[1]);
+        lbMotor.setPower(motorPowers[2]);
+        rbMotor.setPower(motorPowers[3]);
+
+        telemetry.addData("XY Method", !xyMethod ? "1" : "2");
+        telemetry.addData("Turn Method", !turnMethod ? "1" : "2");
         telemetry.addData("Runtime", runtime.toString());
         telemetry.update();
     }
