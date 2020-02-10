@@ -67,7 +67,7 @@ public class SkystoneTeleOp extends OpMode {
     private int winchMotorsInitialPosition = 0;
     private int foundationHeight = 500;
     private int winchMotorStep = 725;
-    private double slideK = 0.57;
+    private double slideK = 1;
     private int[] winchMotorSteps = {
         (int) Math.round(foundationHeight * slideK),
         (int) Math.round(winchMotorStep * slideK),
