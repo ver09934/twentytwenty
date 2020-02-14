@@ -149,12 +149,12 @@ public class TestDriveTeleOp extends OpMode {
         if (driveSpeed > 1) {
             driveSpeed = Math.min(driveSpeed, 1);
             x = driveSpeed * Math.cos(Math.toRadians(driveAngle));
-            y = driveSpeed * Math.sin(Math.toRadians(driveAngle))
+            y = driveSpeed * Math.sin(Math.toRadians(driveAngle));
         }
         
-        double maxX = Math.abs(Math.cos(Math.toRadians(driveAngle)))
-        double maxY = Math.abs(Math.sin(Math.toRadians(driveAngle)));
-        double maxPower = maxX + maxY;
+        // double maxX = Math.abs(Math.cos(Math.toRadians(driveAngle)));
+        // double maxY = Math.abs(Math.sin(Math.toRadians(driveAngle)));
+        // double maxPower = maxX + maxY;
 
         x /= Math.sqrt(2);
         y /= Math.sqrt(2);
