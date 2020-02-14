@@ -29,8 +29,7 @@ import org.openftc.revextensions2.RevBulkData;
  * trajectory following performance with moderate additional complexity.
  */
 public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
-    private ExpansionHubEx hubleft;
-    private ExpansionHubEx hubright;
+    private ExpansionHubEx hubleft, hubright;;
     private ExpansionHubMotor leftFront, leftRear, rightRear, rightFront;
     private List<ExpansionHubMotor> leftMotors;
     private List<ExpansionHubMotor> rightMotors;
@@ -50,8 +49,8 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
         // TODO: adjust the names of the following hardware devices to match your configuration
         // for simplicity, we assume that the desired IMU and drive motors are on the same hub
         // if your motors are split between hubs, **you will need to add another bulk read**
-        hubleft = hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 1");
-        hubright = hardwareMap.get(ExpansionHubEx.class, "Expansion Hub 2");
+        //hubleft = hardwareMap.get(ExpansionHubEx.class, "Hub1");
+        hubright = hardwareMap.get(ExpansionHubEx.class, "Hub2");
 
         imu = hardwareMap.get(BNO055IMU.class, "imu");
 
@@ -64,20 +63,19 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
         BNO055IMUUtil.remapAxes(imu, AxesOrder.XYZ, AxesSigns.NPN);
 
         leftFront = hardwareMap.get(ExpansionHubMotor.class, "lfMotor");
-        leftRear = hardwareMap.get(ExpansionHubMotor.class, "lbmotor");
-        rightRear = hardwareMap.get(ExpansionHubMotor.class, "rbmotor");
-        rightFront = hardwareMap.get(ExpansionHubMotor.class, "rfmotor");
+        leftRear = hardwareMap.get(ExpansionHubMotor.class, "lbMotor");
+        rightRear = hardwareMap.get(ExpansionHubMotor.class, "rbMotor");
+        rightFront = hardwareMap.get(ExpansionHubMotor.class, "rfMotor");
 
-        leftFront.setDirection(DcMotor.Direction.FORWARD);
+        leftFront.setDirection(DcMotor.Direction.REVERSE);
         rightFront.setDirection(DcMotor.Direction.FORWARD);
-        rightRear.setDirection(DcMotor.Direction.REVERSE);
+        rightRear.setDirection(DcMotor.Direction.FORWARD);
         leftRear.setDirection(DcMotor.Direction.REVERSE);
 
         leftMotors = Arrays.asList(leftFront, leftRear);
         rightMotors = Arrays.asList(rightRear, rightFront);
 
-
-        for (ExpansionHubMotor motor : leftMotors) {
+        for (ExpansionHubMotor motor : getAllMotors()) {
             if (RUN_USING_ENCODER) {
                 motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             }
@@ -114,24 +112,35 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
     public List<Double> getWheelPositions() {
         RevBulkData bulkDataLeft = hubleft.getBulkInputData();
         RevBulkData bulkDataRight = hubright.getBulkInputData();
-
         if (bulkDataLeft == null && bulkDataRight == null) {
             return Arrays.asList(0.0, 0.0, 0.0, 0.0);
         }
 
         List<Double> wheelPositions = new ArrayList<>();
-        for (ExpansionHubMotor motor : leftMotors) {
-            wheelPositions.add(encoderTicksToInches(bulkDataLeft.getMotorCurrentPosition(motor)));
+        for (ExpansionHubMotor motorL : getAllMotors()) {
+            wheelPositions.add(encoderTicksToInches(bulkDataLeft.getMotorCurrentPosition(motorL)));
         }
-        for (ExpansionHubMotor motor : rightMotors) {
-            wheelPositions.add(encoderTicksToInches(bulkDataRight.getMotorCurrentPosition(motor)));
+        for (ExpansionHubMotor motorR : rightMotors) {
+            wheelPositions.add(encoderTicksToInches(bulkDataRight.getMotorCurrentPosition(motorR)));
         }
         return wheelPositions;
     }
 
     @Override
     public List<Double> getWheelVelocities() {
-        RevBulkData bulkDataLeft = hubleft.getBulkInputData();
+        RevBulkData bulkData = hubleft.getBulkInputData();
+
+        if (bulkData == null) {
+            return Arrays.asList(0.0, 0.0, 0.0, 0.0);
+        }
+
+        List<Double> wheelVelocities = new ArrayList<>();
+        for (ExpansionHubMotor motor : getAllMotors()) {
+            wheelVelocities.add(encoderTicksToInches(bulkData.getMotorVelocity(motor)));
+        }
+        return wheelVelocities;
+
+        /*RevBulkData bulkDataLeft = hubleft.getBulkInputData();
         RevBulkData bulkDataRight = hubright.getBulkInputData();
 
         if (bulkDataLeft == null && bulkDataRight == null) {
@@ -140,13 +149,12 @@ public class SampleMecanumDriveREVOptimized extends SampleMecanumDriveBase {
 
         List<Double> wheelVelocities = new ArrayList<>();
         for (ExpansionHubMotor motor : leftMotors) {
-            wheelVelocities.add(encoderTicksToInches(bulkDataLeft.getMotorVelocity(motor)));
+            wheelPositions.add(encoderTicksToInches(bulkDataLeft.getMotorCurrentPosition(motor)));
         }
         for (ExpansionHubMotor motor : rightMotors) {
-            wheelVelocities.add(encoderTicksToInches(bulkDataRight.getMotorVelocity(motor)));
+            wheelPositions.add(encoderTicksToInches(bulkDataRight.getMotorCurrentPosition(motor)));
         }
-
-        return wheelVelocities;
+        return wheelVelocities;*/
     }
 
 
