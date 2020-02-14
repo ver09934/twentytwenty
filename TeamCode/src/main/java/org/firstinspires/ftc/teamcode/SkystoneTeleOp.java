@@ -133,10 +133,17 @@ public class SkystoneTeleOp extends OpMode {
     public static final double blockServoRightAutonPosition = 0.16;
 
     // Build plate servo positions
+    /*
     public static final double plateServoLeftDown = 0.07;
     public static final double plateServoLeftUp = 0.67;
     public static final double plateServoRightDown = 0;
     public static final double plateServoRightUp = 0.53;
+    */
+
+    public static final double plateServoLeftDown = 0.9;
+    public static final double plateServoLeftUp = 0.4;
+    public static final double plateServoRightDown = 0.08;
+    public static final double plateServoRightUp = 0.85;
 
     // Auton grabber positions
     public static final double autonGrabberLeftPassive = 0;
