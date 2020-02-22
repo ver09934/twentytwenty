@@ -155,6 +155,20 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                         ArrayList<Pair> sort = new ArrayList<Pair>();
+                        try {
+                            if (updatedRecognitions.get(0).getLabel().equals("Skystone")) {
+                                skyPos = 1;
+                            } else if (updatedRecognitions.get(1).getLabel().equals("Skystone")) {
+                                skyPos = 2;
+                            } else if (updatedRecognitions.get(2).getLabel().equals("Skystone")) {
+                                skyPos = 3;
+                            } else {
+                                skyPos = 5321;
+                            }
+                        } catch (Exception e) {
+
+                        }
+                        telemetry.addData("Skystone Position: ", skyPos);
 
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
@@ -175,7 +189,7 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                                 sort.add(new Pair("Stone", recognition.getLeft()));
                             }
 
-                            Collections.sort(sort);
+                            /* Collections.sort(sort);
                             try {
                                 if (sort.get(0).getString().equals("Skystone")) {
                                     skyPos = 1;
@@ -187,10 +201,10 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                                     skyPos = 5321;
                                 }
                             } catch (IndexOutOfBoundsException e) {
-                                
+
                             }
 
-                            telemetry.addData("Skystone Position: ", skyPos);
+                            telemetry.addData("Skystone Position: ", skyPos); */
 
                         }
 
