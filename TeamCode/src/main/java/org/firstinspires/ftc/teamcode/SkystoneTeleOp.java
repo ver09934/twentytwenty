@@ -39,6 +39,7 @@ public class SkystoneTeleOp extends OpMode {
     private Servo plateServoRight;
     private Servo autonGrabberLeft;
     private Servo autonGrabberRight;
+    private Servo capstoneServo;
 
     // Gamepad 1 Toggle locks
     private boolean gamepad1XToggleLock = false;
@@ -51,6 +52,7 @@ public class SkystoneTeleOp extends OpMode {
     private boolean gamepad2RightBumperToggleLock = false;
     private boolean gamepad2LeftBumperToggleLock = false;
     private boolean gamepad2LeftStickToggleLock = false;
+    private boolean gamepad2XToggleLock;
 
     // Boolean state variables
     private boolean driveDirectionReverse = false;
@@ -59,6 +61,7 @@ public class SkystoneTeleOp extends OpMode {
     private boolean blockServoOpen = false;
     private boolean gulpersForwards = false;
     private boolean gulpersReverse = false;
+    private boolean capstoneDeploy = false;
 
     // Winch values
     private double winchPower = 0.6;
@@ -162,6 +165,10 @@ public class SkystoneTeleOp extends OpMode {
     boolean runningSkystoneDeploy = false;
     boolean[] skystoneDeplyStepsCompleted = {false, false, false};
 
+    // Skystone Servo positions
+    public static final double capstoneServoClosed = 1;
+    public static final double capstoneServoOpen = 0.45;
+
     // Code to run ONCE when the driver hits INIT
     @Override
     public void init() {
@@ -203,6 +210,7 @@ public class SkystoneTeleOp extends OpMode {
         plateServoRight = hardwareMap.servo.get("plateServoRight");
         autonGrabberLeft = hardwareMap.servo.get("autonGrabberLeft");
         autonGrabberRight = hardwareMap.servo.get("autonGrabberRight");
+        capstoneServo = hardwareMap.servo.get("testServo");
 
         blockServoOpen = false;
         // blockServoLeft.setPosition(blockServoLeftClosedPosition);
@@ -215,6 +223,9 @@ public class SkystoneTeleOp extends OpMode {
         plateServoRight.setPosition(plateServoRightDown);
 
         retractBothAutonGrabbers();
+
+        capstoneDeploy = false;
+        capstoneServo.setPosition(capstoneServoClosed);
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -554,6 +565,22 @@ public class SkystoneTeleOp extends OpMode {
             blockServoRight.setPosition(blockServoRightClosedPosition);
         }
         telemetry.addData("Block Servo Opened", blockServoOpen);
+
+        if (this.gamepad2.x) {
+            if (!gamepad2XToggleLock) {
+                gamepad2XToggleLock = true;
+                capstoneDeploy = !capstoneDeploy;
+            }
+        }
+        else {
+            gamepad2XToggleLock = false;
+        }
+        if (capstoneDeploy) {
+            capstoneServo.setPosition(capstoneServoOpen);
+        }
+        else {
+            capstoneServo.setPosition(capstoneServoClosed);
+        }
 
         // Finish steering, putting power into hardware
         steering.finishSteering();

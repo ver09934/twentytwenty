@@ -39,6 +39,7 @@ public class TestServoTeleOp extends OpMode {
     }
 
     private String[] servos = {
+        "testServo", // Actually the capstone servo, at least for now
         "blockServoLeft",
         "blockServoRight",
         "plateServoLeft",
