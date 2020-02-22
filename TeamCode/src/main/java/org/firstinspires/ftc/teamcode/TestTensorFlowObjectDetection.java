@@ -179,14 +179,18 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
 
                             Collections.sort(sort);
                             System.out.println(sort);
-                            if (sort.get(0).toString().equals("Skystone")) {
-                                skyPos = 1;
-                            } else if (sort.get(1).toString().equals("Skystone")) {
-                                skyPos = 2;
-                            } else if (sort.get(2).toString().equals("Skystone")) {
-                                skyPos = 3;
-                            } else {
-                                skyPos = 5321;
+                            try {
+                                if (sort.get(0).toString().equals("Skystone")) {
+                                    skyPos = 1;
+                                } else if (sort.get(1).toString().equals("Skystone")) {
+                                    skyPos = 2;
+                                } else if (sort.get(2).toString().equals("Skystone")) {
+                                    skyPos = 3;
+                                } else {
+                                    skyPos = 5321;
+                                }
+                            } catch (IndexOutOfBoundsException e) {
+                                
                             }
 
                             telemetry.addData("Skystone Position: ", skyPos);
