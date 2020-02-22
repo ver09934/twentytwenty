@@ -96,9 +96,9 @@ public class TestDriveTeleOp extends OpMode {
     double powerRB = -x + y;
     */
 
+    double turnSpeed = 0;
     double x = 0;
     double y = 0;
-    double turnSpeed = 0;
 
     @Override
     public void loop() {
@@ -125,32 +125,35 @@ public class TestDriveTeleOp extends OpMode {
             bToggleLock = false;
         }
 
-        double activation_thresh = 0.01;
+        double activationThresh = 0.01;
 
-        if (Math.abs(gamepad1.right_stick_x) > activation_thresh) {
+        if (Math.abs(gamepad1.right_stick_x) > activationThresh) {
             turnSpeed = gamepad1.right_stick_x;
         }
         else {
             turnSpeed = 0;
         }
 
-        if (Math.abs(gamepad1.left_stick_x) > activation_thresh || Math.abs(gamepad1.left_stick_y) > activation_thresh) {
-            x = -gamepad1.left_stick_x;
-            y = gamepad1.left_stick_y;
+        if (Math.abs(gamepad1.left_stick_x) > activationThresh) {
+            x = gamepad1.left_stick_x;
         }
         else {
             x = 0;
+        }
+
+        if (Math.abs(gamepad1.left_stick_y) > activationThresh) {
+            y = -gamepad1.left_stick_y;
+        }
+        else {
             y = 0;
         }
 
         double driveSpeed = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         double driveAngle = Math.atan2(y, x);
 
-        if (driveSpeed > 1) {
-            driveSpeed = Math.min(driveSpeed, 1);
-            x = driveSpeed * Math.cos(Math.toRadians(driveAngle));
-            y = driveSpeed * Math.sin(Math.toRadians(driveAngle));
-        }
+        driveSpeed = Math.min(driveSpeed, 1);
+        x = driveSpeed * Math.cos(driveAngle);
+        y = driveSpeed * Math.sin(driveAngle);
         
         // double maxX = Math.abs(Math.cos(Math.toRadians(driveAngle)));
         // double maxY = Math.abs(Math.sin(Math.toRadians(driveAngle)));
@@ -179,10 +182,10 @@ public class TestDriveTeleOp extends OpMode {
         */
 
         double[] motorPowers = {
-            x - y,
-            x + y,
             -x - y,
-            -x + y
+            -x + y,
+            x - y,
+            x + y
         };
 
         if (!turnMethod) {
@@ -191,7 +194,7 @@ public class TestDriveTeleOp extends OpMode {
             // Scale such that max turn weight is 0.5
 
             for (int i = 0; i < motorPowers.length; i++) {
-                motorPowers[i] += turnSpeed;
+                motorPowers[i] -= turnSpeed;
             }
             double maxSpeed = getMax(motorPowers);
             if (maxSpeed > 1) {
@@ -219,7 +222,7 @@ public class TestDriveTeleOp extends OpMode {
             }
 
             for (int i = 0; i < motorPowers.length; i++) {
-                motorPowers[i] += turnSpeed;
+                motorPowers[i] -= turnSpeed;
             }
 
         }
@@ -232,6 +235,12 @@ public class TestDriveTeleOp extends OpMode {
         // telemetry.addData("XY Method (X Button)", !xyMethod ? "1" : "2");
         telemetry.addData("Turn Method (B Button)", !turnMethod ? "1" : "2");
         telemetry.addData("Runtime", runtime.toString());
+        telemetry.addData("Drive Speed", driveSpeed);
+        telemetry.addData("Drive Angle", driveAngle);
+        telemetry.addData("LF Power", motorPowers[0]);
+        telemetry.addData("RF Power", motorPowers[1]);
+        telemetry.addData("LB Power", motorPowers[2]);
+        telemetry.addData("RB Power", motorPowers[3]);
         telemetry.update();
     }
 }
