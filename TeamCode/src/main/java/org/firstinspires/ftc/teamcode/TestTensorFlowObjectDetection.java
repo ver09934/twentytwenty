@@ -83,7 +83,6 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
-    ArrayList<Pair> sort = new ArrayList<Pair>();
 
     /*
      * IMPORTANT: You need to obtain your own license key to use Vuforia. The string below with which
@@ -154,6 +153,8 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                     List<Recognition> updatedRecognitions = tfod.getUpdatedRecognitions();
                     if (updatedRecognitions != null) {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
+
+                        ArrayList<Pair> sort = new ArrayList<Pair>();
 
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
