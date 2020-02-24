@@ -8,8 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 // import static org.firstinspires.ftc.teamcode.DriverFunction.MIN_SPEED_RATIO;
-import static org.firstinspires.ftc.teamcode.DriverFunction.NORMAL_SPEED_RATIO;
-import static org.firstinspires.ftc.teamcode.DriverFunction.MAX_SPEED_RATIO;
+
 
 @TeleOp(name="Skystone Tele-Op", group="TeleOp OpMode")
 public class SkystoneTeleOp extends OpMode {
@@ -19,12 +18,12 @@ public class SkystoneTeleOp extends OpMode {
 
     // Important things
     private ElapsedTime runtime = new ElapsedTime();
-    private DriverFunction driverFunction;
-    private DriverFunction.Steering steering;
+    // private DriverFunction driverFunction;
+    // private DriverFunction.Steering steering;
 
     // Driving variables
-    private final static double TURNING_SPEED_BOOST = 0.3;
-    private final static double MIN_SPEED_RATIO = 0.1;
+    // private final static double TURNING_SPEED_BOOST = 0.3;
+    // private final static double MIN_SPEED_RATIO = 0.1;
 
     // DC Motors
     DcMotor gulperMotor1;
@@ -173,8 +172,10 @@ public class SkystoneTeleOp extends OpMode {
     @Override
     public void init() {
 
-        driverFunction = new DriverFunction(hardwareMap, telemetry);
-        steering = driverFunction.getSteering();
+        // driverFunction = new DriverFunction(hardwareMap, telemetry);
+        // steering = driverFunction.getSteering();
+
+        initDriveMotors();
 
         gulperMotor1 = hardwareMap.dcMotor.get("intake1");
         gulperMotor2 = hardwareMap.dcMotor.get("intake2");
@@ -245,6 +246,58 @@ public class SkystoneTeleOp extends OpMode {
         blockServoRight.setPosition(blockServoRightClosedPosition);
     }
 
+    public DcMotor lfMotor;
+    public DcMotor rfMotor;
+    public DcMotor lbMotor;
+    public DcMotor rbMotor;
+
+    public void setAllRunModes(DcMotor.RunMode runMode) {
+        lfMotor.setMode(runMode);
+        rfMotor.setMode(runMode);
+        lbMotor.setMode(runMode);
+        rbMotor.setMode(runMode);
+    }
+
+    public void setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior zeroPowerBehavior) {
+        lfMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        rfMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        lbMotor.setZeroPowerBehavior(zeroPowerBehavior);
+        rbMotor.setZeroPowerBehavior(zeroPowerBehavior);
+    }
+
+    public void initDriveMotors() {
+        lfMotor = hardwareMap.dcMotor.get("lfMotor");
+        rfMotor = hardwareMap.dcMotor.get("rfMotor");
+        lbMotor = hardwareMap.dcMotor.get("lbMotor");
+        rbMotor = hardwareMap.dcMotor.get("rbMotor");
+        setAllRunModes(DcMotor.RunMode.RUN_USING_ENCODER);
+        setAllZeroPowerBehaviors(DcMotor.ZeroPowerBehavior.BRAKE);
+    }
+
+    public double getMin(double[] arr) {
+        double min = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] < min) {
+                min = arr[i];
+            }
+        }
+        return min;
+    }
+
+    public double getMax(double[] arr) {
+        double max = arr[0];
+        for (int i = 1; i < arr.length; i++) {
+            if (arr[i] > max) {
+                max = arr[i];
+            }
+        }
+        return max;
+    }
+
+    double turnSpeed = 0;
+    double x = 0;
+    double y = 0;
+
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
     @Override
     public void loop() {
@@ -285,6 +338,7 @@ public class SkystoneTeleOp extends OpMode {
         }
         telemetry.addData("Direction Reverse", driveDirectionReverse);
 
+        /*
         // D-Pad: Compass rose drive
         if (!driveDirectionReverse) {
             if (this.gamepad1.dpad_right) {
@@ -351,6 +405,94 @@ public class SkystoneTeleOp extends OpMode {
         else {
             telemetry.addData("Angle", 0);
         }
+        */
+
+        // TODO: Have bumpers force drive speed, stick only controls angle
+        // (but only if above some activation thresh - will need to think about this a bit)
+
+        // TODO: D-pad at max speed or something less - may want bumpers to also affect this
+
+        double activationThresh = 0.01;
+
+        if (Math.abs(gamepad1.right_stick_x) > activationThresh) {
+            turnSpeed = gamepad1.right_stick_x;
+        }
+        else {
+            turnSpeed = 0;
+        }
+
+        if (Math.abs(gamepad1.left_stick_x) > activationThresh) {
+            x = gamepad1.left_stick_x;
+        }
+        else {
+            x = 0;
+        }
+
+        if (Math.abs(gamepad1.left_stick_y) > activationThresh) {
+            y = -gamepad1.left_stick_y;
+        }
+        else {
+            y = 0;
+        }
+
+        double driveSpeed = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+        double driveAngle = Math.atan2(y, x);
+
+        driveSpeed = Math.min(driveSpeed, 1);
+        x = driveSpeed * Math.cos(driveAngle);
+        y = driveSpeed * Math.sin(driveAngle);
+
+        x /= Math.sqrt(2);
+        y /= Math.sqrt(2);
+
+        // D-Pad: Compass rose drive
+        if (this.gamepad1.dpad_right) {
+            x = 1;
+            y = 0;
+        }
+        else if (this.gamepad1.dpad_up) {
+            x = 0;
+            y = 1;
+        }
+        else if (this.gamepad1.dpad_left) {
+            x = -1;
+            y = 0;
+        }
+        else if (this.gamepad1.dpad_down) {
+            x = 0;
+            y = -1;
+        }
+        
+        if (driveDirectionReverse) {
+            x *= -1;
+            y *= -1;
+        }
+
+        double[] motorPowers = {
+            -x - y,
+            -x + y,
+            x - y,
+            x + y
+        };
+
+        for (int i = 0; i < motorPowers.length; i++) {
+            motorPowers[i] -= turnSpeed;
+        }
+        double maxSpeed = getMax(motorPowers);
+        if (maxSpeed > 1) {
+            for (int i = 0; i < motorPowers.length; i++) {
+                motorPowers[i] /= maxSpeed;
+            }
+        }
+
+        lfMotor.setPower(motorPowers[0]);
+        rfMotor.setPower(motorPowers[1]);
+        lbMotor.setPower(motorPowers[2]);
+        rbMotor.setPower(motorPowers[3]);
+
+        telemetry.addData("Strafe Speed (0 to 1)", driveSpeed);
+        telemetry.addData("Strafe Angle (-pi to pi)", driveAngle);
+        telemetry.addData("Turn Speed (-1 to 1)", turnSpeed);
 
         // --------------------------------------------------
         // ---------- Gamepad 2: Gunner Functions -----------
@@ -583,15 +725,17 @@ public class SkystoneTeleOp extends OpMode {
         }
 
         // Finish steering, putting power into hardware
-        steering.finishSteering();
+        // steering.finishSteering();
 
         // Motor position telemetry for testing
+        /*
         telemetry.addLine("-----------------------------");
         telemetry.addData("LF Position", driverFunction.lf.getPosition());
         telemetry.addData("LB Position", driverFunction.lb.getPosition());
         telemetry.addData("RF Position", driverFunction.rf.getPosition());
         telemetry.addData("RB Position", driverFunction.rb.getPosition());
         telemetry.addLine("-----------------------------");
+        */
 
         // Update telemetry
         telemetry.addData("Runtime", runtime.toString());
@@ -601,7 +745,7 @@ public class SkystoneTeleOp extends OpMode {
     // Code to run ONCE after the driver hits STOP
     @Override
     public void stop() {
-        driverFunction.resetAllEncoders();
+        // driverFunction.resetAllEncoders();
     }
 
 }
