@@ -79,7 +79,7 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
     private static final int CV_ITERATIONS = 5;
     private static final long CV_LOOP_DELAY = 200;
 
-    private static final String TFOD_MODEL_ASSET = "Skystone.tflite";
+    private static final String TFOD_MODEL_ASSET = "detect.tflite";
     private static final String LABEL_FIRST_ELEMENT = "Stone";
     private static final String LABEL_SECOND_ELEMENT = "Skystone";
 
@@ -155,19 +155,26 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                         telemetry.addData("# Object Detected", updatedRecognitions.size());
 
                         ArrayList<Pair> sort = new ArrayList<Pair>();
+                        sort.clear();
+                        for (Recognition i : updatedRecognitions) {
+                            sort.add(new Pair(i.getLabel(), i.getLeft()));
+                        }
+                        Collections.sort(sort);
+
                         try {
-                            if (updatedRecognitions.get(0).getLabel().equals("Skystone")) {
+                            if (sort.get(0).getString().equals("Skystone")) {
                                 skyPos = 1;
-                            } else if (updatedRecognitions.get(1).getLabel().equals("Skystone")) {
+                            } else if (sort.get(1).getString().equals("Skystone)")) {
                                 skyPos = 2;
-                            } else if (updatedRecognitions.get(2).getLabel().equals("Skystone")) {
+                            } else if (sort.get(2).getString().equals("Skystone)")) {
                                 skyPos = 3;
                             } else {
-                                skyPos = 5321;
+                                skyPos = 54321;
                             }
                         } catch (Exception e) {
 
                         }
+
                         telemetry.addData("Skystone Position: ", skyPos);
 
                         // step through the list of recognitions and display boundary info.
@@ -245,7 +252,7 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
         int tfodMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
                 "tfodMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         TFObjectDetector.Parameters tfodParameters = new TFObjectDetector.Parameters(tfodMonitorViewId);
-        tfodParameters.minimumConfidence = 0.4;
+        tfodParameters.minimumConfidence = 0.85;
         tfod = ClassFactory.getInstance().createTFObjectDetector(tfodParameters, vuforia);
         tfod.loadModelFromAsset(TFOD_MODEL_ASSET, LABEL_FIRST_ELEMENT, LABEL_SECOND_ELEMENT);
     }
