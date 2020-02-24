@@ -175,7 +175,11 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
 
                         }
 
-                        telemetry.addData("Skystone Position: ", skyPos);
+                        try {
+                            telemetry.addData("Skystone Position: ", skyPos + "  " + sort.get(skyPos - 1));
+                        } catch (Exception e) {
+
+                        }
 
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
@@ -280,7 +284,7 @@ class Pair implements Comparable<Pair>{
 
     @Override
     public int compareTo(Pair x) {
-        return (int) (this.afloat - x.getFloat());
+        return afloat.compareTo(x.getFloat());
     }
 
 }
