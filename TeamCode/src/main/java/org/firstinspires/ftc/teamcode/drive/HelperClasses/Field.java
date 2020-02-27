@@ -9,6 +9,7 @@ public class Field {
     int coordinatesQuadrant;
     public static double TILE_LENGTH = 24;
     public ArrayList<Block> blocks = new ArrayList<>();
+    public int[] skystoneIndexes = new int[2];
     Robot rb;
 
     public Field(int coordinatesQuadrant) {
@@ -23,6 +24,17 @@ public class Field {
         for (int index = 0; index < 6; index++) {
             blocks.add(Block.fromStartPoint(index));
         }
+    }
+
+    public void setSkystones(int firstSkystone) {
+        firstSkystone = firstSkystone - 1;
+        int secondSkystone = firstSkystone + 3;
+        this.skystoneIndexes = new int[] {firstSkystone, secondSkystone};
+
+        Block skystone1 = blocks.get(firstSkystone);
+        Block skystone2 = blocks.get(secondSkystone);
+        skystone1.setSkystone();
+        skystone2.setSkystone();
     }
 
     /*
@@ -55,15 +67,31 @@ public class Field {
            return new Coord(-1 * coord.get_y(), coord.get_x());
        }
    */
-    public void moveRobotTouchingPt(Coord otherPt, Robot.SIDE) {
+    public void mvRbToBlock(int index) {
+        Block bl = blocks.get(index);
+        Coord midptBack = bl.getMidptOfBack();
 
+        Coord nextToBlockCoord = new Coord(bl.getXCoordOfSide() - Robot.HALF_L, midptBack.get_y() + Robot.HALF_L);
+        Trajectory trajectory = rb.drive.trajectoryBuilder().splineTo(
+                new Pose2d(nextToBlockCoord.get_x(), midptBack.get_y(), Math.toRadians(270))).build();
+        rb.drive.followTrajectorySync(trajectory);
+
+        double distShift = nextToBlockCoord.xDist(midptBack);
+        Coord ptBehindBlock = new Coord(midptBack.get_x(), midptBack.get_y() + Robot.HALF_L);
+        trajectory = rb.drive.trajectoryBuilder().strafeLeft(distShift).build();    //Move in a straight line 12 inches left
+        rb.drive.followTrajectorySync(trajectory);
+        if (index == 0) {
+            shiftBlocks(new int[]{0}, distShift);
+        } else {
+            shiftBlocks(new int[]{index - 1, index}, distShift);
+        }
     }
 
     public Robot getRb() {
         return rb;
     }
 
-    public void shiftBlocks(int[] blockIndexes, int numUnits) {
+    public void shiftBlocks(int[] blockIndexes, double numUnits) {
         for (int index : blockIndexes) {
             Block tempBlock = blocks.get(index);
             // TODO get distance to midpoint
@@ -82,4 +110,6 @@ public class Field {
             tempBlock.translate(new Coord(distToMidpt, 0));
         }
     }
+
+
 }

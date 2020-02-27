@@ -26,4 +26,19 @@ public class Block extends Rectangle {
         return new Block(new Coord[]{topLeft, topRight, bottomLeft, bottomRight});
     }
 
+    public double getXCoordOfSide() {
+        return getCorners()[0].get_x();
+    }
+
+    public Coord getMidptOfBack() {
+        Coord[] corners = getCorners();
+        Coord topLeft = corners[0];
+        Coord topRight = corners[1];
+        return topLeft.midpoint(topRight);
+    }
+
+    public void setSkystone() {
+        this.isSkystone = true;
+    }
+
 }

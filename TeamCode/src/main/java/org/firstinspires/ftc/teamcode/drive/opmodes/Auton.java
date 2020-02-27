@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Field;
+import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.Coord;
+import org.firstinspires.ftc.teamcode.drive.HelperClasses.Robot;
 import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveBase;
 import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveREV;
 
@@ -14,7 +16,6 @@ import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveREV;
 @Autonomous(group = "drive")
 public class Auton extends LinearOpMode {
     public static double CURRENT_ANGLE = 90; // deg
-    public static double HALF_ROBOT_L = 9; // half the width/length of the robot
     public static double GRABBER_OFFSET_FROM_CENTER_LEN = 6 + 1.5;
     public static double BLOCK_MOVE_FORWARD_DIST_GRAB = 1.5;
 
@@ -49,8 +50,17 @@ public class Auton extends LinearOpMode {
         // Starting cv coord = (-36, -48)
 
         // Start at starting coord offset
+        Coord startingCoordOffset = new Coord(-72 + Robot.HALF_L, -24 + Robot.HALF_L);
+
         // Go to CV scanning coord
+
         // Get block index
+        for (int skystoneNum = 0; skystoneNum < 2; skystoneNum++) {
+            int firstSkystoneIndex = field.skystoneIndexes[skystoneNum];
+            field.mvRbToBlock(firstSkystoneIndex);
+
+        }
+
         // Get block cord
         // Move to block coord center
         // Engage sucker
@@ -60,7 +70,7 @@ public class Auton extends LinearOpMode {
         // Move to build zone
         // Spit block
         // Get coordinate for next block
-        Path path = new PathBuilder(new Pose2d())
+
 
 
     }

@@ -80,14 +80,14 @@ public class TestMoveMethods extends LinearOpMode {
 
     public void testZigZag() {
         // Test straight lines
-        Coord startPoint = new Coord(-72 + HALF_ROBOT_L, -72 + HALF_ROBOT_L);
+        Coord startPoint = new Coord(-72 + Robot.HALF_L, -72 + Robot.HALF_L);
         Trajectory trajectory;
         rb.updatePosition(startPoint);
         int forwardDist = 3;
-        for (int currDist = 0; currDist < 24 - HALF_ROBOT_L; currDist += forwardDist) {
+        for (int currDist = 0; currDist < 24 - Robot.HALF_L; currDist += forwardDist) {
             drive.trajectoryBuilder().forward(forwardDist);
             rb.updatePosition(rb.desiredPosition.get_x() + forwardDist, rb.desiredPosition.get_y());
-            double distance = Field.TILE_LENGTH * 6 - HALF_ROBOT_L;
+            double distance = Field.TILE_LENGTH * 6 - Robot.HALF_L;
             if (currDist % 2 == 0) {
                 trajectory = drive.trajectoryBuilder().strafeLeft(distance).build();
                 rb.updatePosition(0, distance);

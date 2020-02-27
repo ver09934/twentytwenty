@@ -10,6 +10,8 @@ public class Robot extends Rectangle {
     public Coord desiredPosition;
     public double rotation;
     public SampleMecanumDriveBase drive;
+    public static double HALF_L = 9; // half the width/length of the robot
+
 
     RobotSide deposit;
     RobotSide cam;
