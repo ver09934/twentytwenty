@@ -9,10 +9,14 @@ public class Field {
     int coordinatesQuadrant;
     public static double TILE_LENGTH = 24;
     public ArrayList<Block> blocks = new ArrayList<>();
-    Robot rb = new Robot();
+    Robot rb;
 
     public Field(int coordinatesQuadrant) {
         this.coordinatesQuadrant = coordinatesQuadrant;
+    }
+
+    public void setRb(Robot rb) {
+        this.rb = rb;
     }
 
     public void setBlocks() {
@@ -51,6 +55,14 @@ public class Field {
            return new Coord(-1 * coord.get_y(), coord.get_x());
        }
    */
+    public void moveRobotTouchingPt(Coord otherPt, Robot.SIDE) {
+
+    }
+
+    public Robot getRb() {
+        return rb;
+    }
+
     public void shiftBlocks(int[] blockIndexes, int numUnits) {
         for (int index : blockIndexes) {
             Block tempBlock = blocks.get(index);
@@ -68,7 +80,6 @@ public class Field {
             Coord edgeMidpt = backEdge.getPt1().midpoint(backEdge.getPt2());
             double distToMidpt = rb.grab.midptDistance(edgeMidpt);
             tempBlock.translate(new Coord(distToMidpt, 0));
-
         }
     }
 }
