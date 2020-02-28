@@ -165,8 +165,8 @@ public class SkystoneTeleOp extends OpMode {
     boolean[] skystoneDeplyStepsCompleted = {false, false, false};
 
     // Skystone Servo positions
-    public static final double capstoneServoClosed = 0.6; // 1
-    public static final double capstoneServoOpen = 0.09; // 0.45
+    public static final double capstoneServoClosed = 0.09; // 1
+    public static final double capstoneServoOpen = 0.6; // 0.45
 
     // Code to run ONCE when the driver hits INIT
     @Override
@@ -444,6 +444,8 @@ public class SkystoneTeleOp extends OpMode {
 
         x /= Math.sqrt(2);
         y /= Math.sqrt(2);
+        // x /= Math.abs(x) + Math.abs(y);
+        // y /= Math.abs(x) + Math.abs(y);
 
         // D-Pad: Compass rose drive
         if (this.gamepad1.dpad_right) {
@@ -493,6 +495,11 @@ public class SkystoneTeleOp extends OpMode {
         telemetry.addData("Strafe Speed (0 to 1)", driveSpeed);
         telemetry.addData("Strafe Angle (-pi to pi)", driveAngle);
         telemetry.addData("Turn Speed (-1 to 1)", turnSpeed);
+
+        telemetry.addData("LF Power", motorPowers[0]);
+        telemetry.addData("RF Power", motorPowers[1]);
+        telemetry.addData("LB Power", motorPowers[2]);
+        telemetry.addData("RB Power", motorPowers[3]);
 
         // --------------------------------------------------
         // ---------- Gamepad 2: Gunner Functions -----------
@@ -723,6 +730,7 @@ public class SkystoneTeleOp extends OpMode {
         else {
             capstoneServo.setPosition(capstoneServoClosed);
         }
+        telemetry.addData("Capstone Servo Opened", capstoneDeploy);
 
         // Finish steering, putting power into hardware
         // steering.finishSteering();
