@@ -1,25 +1,19 @@
 package org.firstinspires.ftc.teamcode.drive.opmodes;
 
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.roadrunner.geometry.Pose2d;
-import com.acmerobotics.roadrunner.path.PathBuilder;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Field;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Robot;
-import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveBase;
-import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveREV;
 
 @Config
 @Autonomous(group = "drive")
 public class Auton extends LinearOpMode {
-    public static double CURRENT_ANGLE = 90; // deg
-    public static double GRABBER_OFFSET_FROM_CENTER_LEN = 6 + 1.5;
-    public static double BLOCK_MOVE_FORWARD_DIST_GRAB = 1.5;
+    Field field = new Field(hardwareMap);
+    Robot rb = field.getRb();
 
-    Field field = new Field(3);
     /*
         FIELD NOTES:
             1 block is 8 x 4 inches
@@ -30,35 +24,21 @@ public class Auton extends LinearOpMode {
             1 tile is 2 x 2 feet
             The field is 12 x 12 feet
             robot dimensions 18 x 18 x 14 inches
-
-        FUNCTIONS NEEDED:
-            generate path to block
-            get block position
-            get block from cv
-            Robot size
-        CLASSES
-            Quadrant class (converts coord based on quadrant)
     */
     @Override
     public void runOpMode() throws InterruptedException {
-        SampleMecanumDriveBase drive = new SampleMecanumDriveREV(hardwareMap);
         waitForStart();
-        // TODO see how to do actions while moving
         if (isStopRequested()) return;
-        // THESE ARE ALL IN TERMS OF THE Q4 coordinates in the path designer
-        // Starting coord offset = (-15, -64)
-        // Starting cv coord = (-36, -48)
-
-        // Start at starting coord offset
-        Coord startingCoordOffset = new Coord(-72 + Robot.HALF_L, -24 + Robot.HALF_L);
-
         // Go to CV scanning coord
 
         // Get block index
         for (int skystoneNum = 0; skystoneNum < 2; skystoneNum++) {
-            int firstSkystoneIndex = field.skystoneIndexes[skystoneNum];
-            field.mvRbToBlock(firstSkystoneIndex);
-
+            int skystoneIndex = field.skystoneIndexes[skystoneNum];
+            rb.mvNextToBlock(skystoneIndex);
+            rb.mvToBlock(skystoneIndex);
+            rb.gulpBlock();
+            rb.moveToBridgePos();
+            rb.ejectBlock();
         }
 
         // Get block cord

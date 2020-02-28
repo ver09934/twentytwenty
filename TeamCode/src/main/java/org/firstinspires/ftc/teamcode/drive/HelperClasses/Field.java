@@ -1,23 +1,30 @@
 package org.firstinspires.ftc.teamcode.drive.HelperClasses;
 
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.Trajectory;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.teamcode.drive.DriveConstants;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.LineSegment;
+import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveBase;
+import org.firstinspires.ftc.teamcode.drive.mecanum.SampleMecanumDriveREV;
 
 import java.util.ArrayList;
 
 public class Field {
-    int coordinatesQuadrant;
+    public static final Coord parkPosition = new Coord(0, 24 + Robot.HALF_L);
+    public static final Coord startPosition = new Coord(-24 + Robot.HALF_L, 72 - Robot.HALF_L);
     public static double TILE_LENGTH = 24;
+
     public ArrayList<Block> blocks = new ArrayList<>();
     public int[] skystoneIndexes = new int[2];
     Robot rb;
 
-    public Field(int coordinatesQuadrant) {
-        this.coordinatesQuadrant = coordinatesQuadrant;
-    }
-
-    public void setRb(Robot rb) {
-        this.rb = rb;
+    public Field(HardwareMap hardwareMap) {
+        rb = new Robot(hardwareMap, this, new Coord(0, 0));
     }
 
     public void setBlocks() {
@@ -29,7 +36,7 @@ public class Field {
     public void setSkystones(int firstSkystone) {
         firstSkystone = firstSkystone - 1;
         int secondSkystone = firstSkystone + 3;
-        this.skystoneIndexes = new int[] {firstSkystone, secondSkystone};
+        this.skystoneIndexes = new int[]{firstSkystone, secondSkystone};
 
         Block skystone1 = blocks.get(firstSkystone);
         Block skystone2 = blocks.get(secondSkystone);
@@ -67,25 +74,7 @@ public class Field {
            return new Coord(-1 * coord.get_y(), coord.get_x());
        }
    */
-    public void mvRbToBlock(int index) {
-        Block bl = blocks.get(index);
-        Coord midptBack = bl.getMidptOfBack();
 
-        Coord nextToBlockCoord = new Coord(bl.getXCoordOfSide() - Robot.HALF_L, midptBack.get_y() + Robot.HALF_L);
-        Trajectory trajectory = rb.drive.trajectoryBuilder().splineTo(
-                new Pose2d(nextToBlockCoord.get_x(), midptBack.get_y(), Math.toRadians(270))).build();
-        rb.drive.followTrajectorySync(trajectory);
-
-        double distShift = nextToBlockCoord.xDist(midptBack);
-        Coord ptBehindBlock = new Coord(midptBack.get_x(), midptBack.get_y() + Robot.HALF_L);
-        trajectory = rb.drive.trajectoryBuilder().strafeLeft(distShift).build();    //Move in a straight line 12 inches left
-        rb.drive.followTrajectorySync(trajectory);
-        if (index == 0) {
-            shiftBlocks(new int[]{0}, distShift);
-        } else {
-            shiftBlocks(new int[]{index - 1, index}, distShift);
-        }
-    }
 
     public Robot getRb() {
         return rb;
@@ -94,8 +83,6 @@ public class Field {
     public void shiftBlocks(int[] blockIndexes, double numUnits) {
         for (int index : blockIndexes) {
             Block tempBlock = blocks.get(index);
-            // TODO get distance to midpoint
-
             // Gets the first edge midpoint of the block and then compare to the grabber midpoint and get the dist
             Block blockBeforeDesired;
             if (index == 0) {

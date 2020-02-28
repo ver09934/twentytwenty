@@ -4,6 +4,9 @@ package org.firstinspires.ftc.teamcode.drive.mecanum;
 import android.support.annotation.NonNull;
 
 import com.acmerobotics.roadrunner.control.PIDCoefficients;
+import com.acmerobotics.roadrunner.geometry.Pose2d;
+import com.acmerobotics.roadrunner.trajectory.TrajectoryBuilder;
+import com.acmerobotics.roadrunner.trajectory.constraints.DriveConstraints;
 import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -83,6 +86,10 @@ public class SampleMecanumDriveREV extends SampleMecanumDriveBase {
     public PIDCoefficients getPIDCoefficients(DcMotor.RunMode runMode) {
         PIDFCoefficients coefficients = leftFront.getPIDFCoefficients(runMode);
         return new PIDCoefficients(coefficients.p, coefficients.i, coefficients.d);
+    }
+
+    public TrajectoryBuilder trajectoryBuilder(Pose2d startPose, DriveConstraints driveConstraints) {
+        return new TrajectoryBuilder(startPose, driveConstraints);
     }
 
     @Override

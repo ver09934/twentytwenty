@@ -15,15 +15,13 @@ import java.util.ArrayList;
 
 @Config
 @Autonomous(group = "drive")
-public class TestMoveMethods extends LinearOpMode {
+public class CustomTestMoves extends LinearOpMode {
     public static double CURRENT_ANGLE = 90; // deg
     public static double HALF_ROBOT_L = 9; // half the width/length of the robot
     public static double GRABBER_OFFSET_FROM_CENTER_LEN = 6 + 1.5;
     public static double BLOCK_MOVE_FORWARD_DIST_GRAB = 1.5;
-
-    Field field = new Field(3);
-    Robot rb;
-    SampleMecanumDriveBase drive = null;
+    Field field = new Field(hardwareMap);
+    Robot rb = field.getRb();
     /*
         FIELD NOTES:
             1 block is 8 x 4 inches
@@ -45,10 +43,6 @@ public class TestMoveMethods extends LinearOpMode {
     */
     @Override
     public void runOpMode() throws InterruptedException {
-        drive = new SampleMecanumDriveREV(hardwareMap);
-        assert drive != null;
-        rb = new Robot(drive);
-
         waitForStart();
         if (isStopRequested()) return;
 
@@ -85,22 +79,23 @@ public class TestMoveMethods extends LinearOpMode {
         rb.updatePosition(startPoint);
         int forwardDist = 3;
         for (int currDist = 0; currDist < 24 - Robot.HALF_L; currDist += forwardDist) {
-            drive.trajectoryBuilder().forward(forwardDist);
-            rb.updatePosition(rb.desiredPosition.get_x() + forwardDist, rb.desiredPosition.get_y());
+            rb.drive.trajectoryBuilder().forward(forwardDist);
+            rb.updatePosition(rb.position.getX() + forwardDist, rb.position.getY());
             double distance = Field.TILE_LENGTH * 6 - Robot.HALF_L;
             if (currDist % 2 == 0) {
-                trajectory = drive.trajectoryBuilder().strafeLeft(distance).build();
+                trajectory = rb.drive.trajectoryBuilder().strafeLeft(distance).build();
                 rb.updatePosition(0, distance);
             } else {
-                trajectory = drive.trajectoryBuilder().strafeRight(distance).build();
+                trajectory = rb.drive.trajectoryBuilder().strafeRight(distance).build();
                 rb.updatePosition(0, -1*distance);
             }
-            drive.followTrajectorySync(trajectory);
+            rb.drive.followTrajectorySync(trajectory);
         }
     }
 
     public void testSplineCorners() {
         Coord startPoint = new Coord(-72 + HALF_ROBOT_L, -72 + HALF_ROBOT_L);
+        rb.drive.setPoseEstimate(new Pose2d(startPoint.getX(), startPoint.getY(), Math.toRadians(0)));
         double heading = 0;
         int numTrials = 5;
 
@@ -122,20 +117,20 @@ public class TestMoveMethods extends LinearOpMode {
         for (int round = 0; round < numTrials; round++) {
             for (Coord[] moves : movements) {
                 for (Coord coord : moves) {
-                    trajectory = drive.trajectoryBuilder().splineTo(new Pose2d(coord.get_x(), coord.get_y(), heading)).build();
-                    drive.followTrajectorySync(trajectory);
+                    trajectory = rb.drive.trajectoryBuilder().splineTo(new Pose2d(coord.getX(), coord.getY(), heading)).build();
+                    rb.drive.followTrajectorySync(trajectory);
                 }
                 sleep(3000);
             }
 
         }
-        Pose2d poseEstimate = drive.getPoseEstimate();
+        Pose2d poseEstimate = rb.drive.getPoseEstimate();
         telemetry.addData("Robot position estimate X: ", poseEstimate.getX());
         telemetry.addData("Robot position estimate Y: ", poseEstimate.getY());
-        telemetry.addData("Desired X: ", center.get_x());
-        telemetry.addData("Desired Y: ", center.get_y());
-        double percErrorX = 100 * (poseEstimate.getX() - center.get_x())/center.get_y();
-        double percErrorY = 100* (poseEstimate.getX() - center.get_x())/center.get_y();
+        telemetry.addData("Desired X: ", center.getX());
+        telemetry.addData("Desired Y: ", center.getY());
+        double percErrorX = 100 * (poseEstimate.getX() - center.getX())/center.getY();
+        double percErrorY = 100* (poseEstimate.getX() - center.getX())/center.getY();
         telemetry.addData("Accumulated Percent Error X: ", percErrorX);
         telemetry.addData("Accumulated Percent Error Y: ", percErrorY);
 

@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.drive.HelperClasses;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.Coord;
 import org.firstinspires.ftc.teamcode.drive.HelperClasses.Geometry.LineSegment;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RobotSide extends LineSegment {
     public Robot.SIDE type;
@@ -11,7 +15,6 @@ public class RobotSide extends LineSegment {
         super(seg.getPt1(), seg.getPt2());
         this.type = type;
         this.facingDir = facingDir;
-
     }
 
     public Coord midPoint() {

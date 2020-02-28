@@ -22,18 +22,18 @@ public class Line {
 
     //WILL NOT CHECK IF LINE IS VERTICAL
     double getSlope() {
-        double diff_x = pt1.get_x() - pt2.get_x();
-        double diff_y = pt1.get_y() - pt2.get_y();
+        double diff_x = pt1.getX() - pt2.getX();
+        double diff_y = pt1.getY() - pt2.getY();
         return diff_x / diff_y;
     }
 
     //WILL NOT CHECK IF LINE IS VERTICAL
     double getYIntercept() {
-        return pt1.get_y() - getSlope() * pt1.get_x();
+        return pt1.getY() - getSlope() * pt1.getX();
     }
 
     boolean isParallel(Line other_ln) {
-        if (isUndefined(this) && isUndefined(other_ln) && pt1.get_x() != other_ln.pt1.get_x()) {
+        if (isUndefined(this) && isUndefined(other_ln) && pt1.getX() != other_ln.pt1.getX()) {
             return true;
         } else if (hasNoSlope(this) && hasNoSlope(other_ln)) {
             return true;
@@ -43,15 +43,15 @@ public class Line {
     }
 
     boolean isOn(Coord a) {
-        return ((this.getSlope() * a.get_x() + this.getYIntercept()) == a.get_y());
+        return ((this.getSlope() * a.getX() + this.getYIntercept()) == a.getY());
     }
 
     static boolean isUndefined(Line a) {
-        return a.pt1.get_x() == a.pt2.get_x();
+        return a.pt1.getX() == a.pt2.getX();
     }
 
     static boolean hasNoSlope(Line a) {
-        return a.pt1.get_y() == a.pt2.get_y();
+        return a.pt1.getY() == a.pt2.getY();
     }
 
     static Line[] getUndefinedLines(Line[] lines) {
@@ -72,8 +72,8 @@ public class Line {
             throw new RuntimeException("Lines do not intersect");
         } else if (isUndefined(A) || isUndefined(B)) {
             Line undefined = getUndefinedLines(new Line[]{A, B})[0];
-            double y_value = A.getSlope() * undefined.pt1.get_x() + A.getYIntercept();
-            return new Coord(undefined.pt1.get_x(), y_value);
+            double y_value = A.getSlope() * undefined.pt1.getX() + A.getYIntercept();
+            return new Coord(undefined.pt1.getX(), y_value);
         } else {
             double x = (A.getYIntercept() - B.getYIntercept()) / (B.getSlope() - A.getSlope());
             double y = B.getSlope() * (x) + B.getYIntercept();
@@ -83,10 +83,10 @@ public class Line {
 
     public boolean coordOnLine(Coord A) {
         if (isUndefined(this)) {
-            return A.get_x() == pt1.get_x();
+            return A.getX() == pt1.getX();
         } else {
-            double expected_y = getSlope() * A.get_x() + getYIntercept();
-            return A.get_y() == expected_y;
+            double expected_y = getSlope() * A.getX() + getYIntercept();
+            return A.getY() == expected_y;
         }
     }
 

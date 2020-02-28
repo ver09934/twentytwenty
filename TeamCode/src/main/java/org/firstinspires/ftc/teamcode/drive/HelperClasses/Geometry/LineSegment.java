@@ -9,8 +9,8 @@ public class LineSegment extends Line implements Comparable<LineSegment>{
     }
 
     private double calculateLength() {
-        double x_part = Math.pow(pt1.get_x() - pt2.get_x(), 2);
-        double y_part = Math.pow(pt1.get_y() - pt2.get_y(), 2);
+        double x_part = Math.pow(pt1.getX() - pt2.getX(), 2);
+        double y_part = Math.pow(pt1.getY() - pt2.getY(), 2);
         return Math.sqrt(x_part + y_part);
     }
 
@@ -20,10 +20,10 @@ public class LineSegment extends Line implements Comparable<LineSegment>{
 
     // TODO Probably a better way, too lazy to fix
     public boolean onSegment(Coord a) {
-        boolean in_x_bounds_1 = a.get_x() >= pt1.get_x() && a.get_x() <= pt2.get_x();
-        boolean in_x_bounds_2 = a.get_x() <= pt1.get_x() && a.get_x() >= pt2.get_x();
-        boolean in_y_bounds_1 = a.get_y() >= pt1.get_y() && a.get_y() <= pt2.get_y();
-        boolean in_y_bounds_2 = a.get_y() <= pt1.get_y() && a.get_y() >= pt2.get_y();
+        boolean in_x_bounds_1 = a.getX() >= pt1.getX() && a.getX() <= pt2.getX();
+        boolean in_x_bounds_2 = a.getX() <= pt1.getX() && a.getX() >= pt2.getX();
+        boolean in_y_bounds_1 = a.getY() >= pt1.getY() && a.getY() <= pt2.getY();
+        boolean in_y_bounds_2 = a.getY() <= pt1.getY() && a.getY() >= pt2.getY();
 
         return (in_x_bounds_1 || in_x_bounds_2) && (in_y_bounds_1 || in_y_bounds_2);
     }

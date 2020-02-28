@@ -14,10 +14,10 @@ public class Rectangle {
     }
 
     public static Coord[] genCoords(Coord start, double len) {
-        Coord topLeft = new Coord(start.get_x(), start.get_y());
-        Coord topRight = new Coord(topLeft.get_x() + len, topLeft.get_y());
-        Coord bottomLeft = new Coord(topLeft.get_x(), topLeft.get_y() + len);
-        Coord bottomRight = new Coord(topRight.get_x(), bottomLeft.get_y());
+        Coord topLeft = new Coord(start.getX(), start.getY());
+        Coord topRight = new Coord(topLeft.getX() + len, topLeft.getY());
+        Coord bottomLeft = new Coord(topLeft.getX(), topLeft.getY() + len);
+        Coord bottomRight = new Coord(topRight.getX(), bottomLeft.getY());
         Coord[] points = new Coord[] {topLeft, topRight, bottomLeft, bottomRight};
         return points;
     }
@@ -62,16 +62,16 @@ public class Rectangle {
         Coord[] points = getCorners();
         for (int i = 0; i < 4; i++) {
             Coord point = points[i];
-            double x = point.get_x() * factor;
-            double y = point.get_y() * factor;
-            points[i] = new Coord(x - ((x-point.get_x())/2), y - ((y-point.get_y())/2));
+            double x = point.getX() * factor;
+            double y = point.getY() * factor;
+            points[i] = new Coord(x - ((x-point.getX())/2), y - ((y-point.getY())/2));
         }
         return new Rectangle(points);
 
     }
     public boolean coordInRectangle(Coord pt) {
-        boolean in_x_bounds = pt.get_x() < b.get_x() && pt.get_x() > a.get_x();
-        boolean in_y_bounds = pt.get_y() < a.get_y() && pt.get_y() > c.get_y();
+        boolean in_x_bounds = pt.getX() < b.getX() && pt.getX() > a.getX();
+        boolean in_y_bounds = pt.getY() < a.getY() && pt.getY() > c.getY();
         return in_x_bounds && in_y_bounds;
     }
 
