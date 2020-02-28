@@ -165,8 +165,8 @@ public class SkystoneTeleOp extends OpMode {
     boolean[] skystoneDeplyStepsCompleted = {false, false, false};
 
     // Skystone Servo positions
-    public static final double capstoneServoClosed = 1;
-    public static final double capstoneServoOpen = 0.45;
+    public static final double capstoneServoClosed = 0.6; // 1
+    public static final double capstoneServoOpen = 0.09; // 0.45
 
     // Code to run ONCE when the driver hits INIT
     @Override
