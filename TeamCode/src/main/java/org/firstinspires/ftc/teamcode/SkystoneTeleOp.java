@@ -442,10 +442,12 @@ public class SkystoneTeleOp extends OpMode {
         x = driveSpeed * Math.cos(driveAngle);
         y = driveSpeed * Math.sin(driveAngle);
 
+        double maxDriveSpeed = Math.abs(Math.cos(driveAngle)) + Math.abs(Math.sin(driveAngle));
+
         x /= Math.sqrt(2);
         y /= Math.sqrt(2);
-        // x /= Math.abs(x) + Math.abs(y);
-        // y /= Math.abs(x) + Math.abs(y);
+        // x /= maxDriveSpeed;
+        // y /= maxDriveSpeed;
 
         // D-Pad: Compass rose drive
         if (this.gamepad1.dpad_right) {
