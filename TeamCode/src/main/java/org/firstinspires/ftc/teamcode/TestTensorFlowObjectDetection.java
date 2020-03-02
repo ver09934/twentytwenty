@@ -39,8 +39,6 @@ import org.firstinspires.ftc.robotcore.external.tfod.Recognition;
 import org.firstinspires.ftc.robotcore.external.tfod.TFObjectDetector;
 
 import java.util.*;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This 2019-2020 OpMode illustrates the basics of using the TensorFlow Object Detection API to
@@ -118,6 +116,11 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
 
         // Initial telemetry
         telemetry.addData("Status", "Initialized");
+        try {
+            telemetry.addData("Runtime:", runtime.toString());
+        } catch (Exception e) {
+
+        }
         telemetry.update();
 
         // Initialize utilities
@@ -156,8 +159,8 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
 
                         ArrayList<Pair> sort = new ArrayList<Pair>();
                         sort.clear();
-                        for (Recognition i : updatedRecognitions) {
-                            sort.add(new Pair(i.getLabel(), i.getLeft()));
+                        /*for (Recognition j : updatedRecognitions) {
+                            sort.add(new Pair(j.getLabel(), j.getLeft()));
                         }
                         Collections.sort(sort);
 
@@ -168,18 +171,12 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                                 skyPos = 2;
                             } else if (sort.get(2).getString().equals("Skystone)")) {
                                 skyPos = 3;
-                            } else {
-                                skyPos = 54321;
                             }
                         } catch (Exception e) {
 
-                        }
+                        }*/
 
-                        try {
-                            telemetry.addData("Skystone Position: ", skyPos + "  " + sort.get(skyPos - 1));
-                        } catch (Exception e) {
-
-                        }
+                        //telemetry.addData("Skystone Position: ", skyPos);
 
                         // step through the list of recognitions and display boundary info.
                         int i = 0;
@@ -190,17 +187,14 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                                     recognition.getLeft(), recognition.getTop());
                             telemetry.addData(String.format("  right,bottom (%d)", i), "%.03f , %.03f",
                                     recognition.getRight(), recognition.getBottom());
+                            sort.add(new Pair(recognition.getLabel(), recognition.getLeft()));
 
 
-                            if (recognition.getLabel() == "Skystone") {
-                                telemetry.addData("Center", Math.round(recognition.getRight() - recognition.getLeft()) + " " + Math.round(recognition.getTop() - recognition.getBottom()));
-                                sort.add(new Pair("Skystone", recognition.getLeft()));
-                            }
-                            if (recognition.getLabel() == "Stone") {
-                                sort.add(new Pair("Stone", recognition.getLeft()));
-                            }
+                            //if (recognition.getLabel() == "Skystone") {
+                             //   telemetry.addData("Center", Math.round(recognition.getRight() - recognition.getLeft()) + " " + Math.round(recognition.getTop() - recognition.getBottom()));
+                            //}
 
-                            /* Collections.sort(sort);
+                            Collections.sort(sort);
                             try {
                                 if (sort.get(0).getString().equals("Skystone")) {
                                     skyPos = 1;
@@ -208,14 +202,12 @@ public class TestTensorFlowObjectDetection extends LinearOpMode {
                                     skyPos = 2;
                                 } else if (sort.get(2).getString().equals("Skystone")) {
                                     skyPos = 3;
-                                } else {
-                                    skyPos = 5321;
                                 }
                             } catch (IndexOutOfBoundsException e) {
 
                             }
 
-                            telemetry.addData("Skystone Position: ", skyPos); */
+                            telemetry.addData("Skystone Position: ", skyPos);
 
                         }
 
