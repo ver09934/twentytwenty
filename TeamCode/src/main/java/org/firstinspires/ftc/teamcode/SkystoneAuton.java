@@ -455,6 +455,18 @@ public class SkystoneAuton extends LinearOpMode {
         return angle;
     }
 
+    public double getLinearPosition(double movementDirection) {
+        if (movementDirection == 0 || movementDirection == 180) {
+            return imu.getPosition().x;
+        }
+        else if (movementDirection == 90 || movementDirection == 270) {
+            return imu.getPosition().y;
+        }
+        else {
+            throw new RuntimeException("Direction must be -1 or 1");
+        }
+    }
+
     // ----- MOTOR STUFF -----
 
     private DcMotor lfMotor;

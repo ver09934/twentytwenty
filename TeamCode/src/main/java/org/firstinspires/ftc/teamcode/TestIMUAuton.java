@@ -4,10 +4,7 @@ import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
+import org.firstinspires.ftc.robotcore.external.navigation.*;
 
 @Autonomous(name = "Test IMU Auton")
 public class TestIMUAuton extends LinearOpMode {
@@ -62,14 +59,27 @@ public class TestIMUAuton extends LinearOpMode {
         while (opModeIsActive()) {
             Orientation angles = imu.getAngularOrientation(AxesReference.INTRINSIC, AxesOrder.ZYX, AngleUnit.DEGREES);
 
+            Position position = imu.getPosition();
+
             double legitAngle = angles.firstAngle;
-            double LEGITANGLE = legitAngle < 0 ? legitAngle + 360 : legitAngle;
+            double LEGIT_ANGLE = legitAngle < 0 ? legitAngle + 360 : legitAngle;
 
             telemetry.addData("Status", "Running");
             telemetry.addData("Runtime", runtime.toString());
+
+            telemetry.addData("Position", position);
+            telemetry.addData("Position units", position.unit);
+            telemetry.addData("Position x", position.x);
+            telemetry.addData("Position y", position.y);
+            telemetry.addData("Position z", position.z);
+
+            telemetry.addLine();
+            telemetry.addLine();
+
             telemetry.addLine(angles.toString());
             telemetry.addData("Legit angle", legitAngle);
-            telemetry.addData("LEGIT ANGLE", LEGITANGLE);
+            telemetry.addData("LEGIT ANGLE", LEGIT_ANGLE);
+
             telemetry.update();
         }
     }
