@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='yes' ?>
+<Robot type="FirstInspires-FTC">
+    <LynxUsbDevice name="Expansion Hub Portal 1" serialNumber="DQ3DFUHD" parentModuleAddress="1">
+        <LynxModule name="Expansion Hub 1" port="1">
+            <TetrixMotor name="intake2" port="0" />
+            <TetrixMotor name="lbMotor" port="1" />
+            <TetrixMotor name="lfMotor" port="2" />
+            <TetrixMotor name="winch2" port="3" />
+            <Servo name="testServo" port="0" />
+            <Servo name="plateServoLeft" port="1" />
+            <Servo name="autonGrabberLeft" port="2" />
+            <Servo name="blockServoLeft" port="3" />
+            <Servo name="blockServoRight" port="4" />
+            <AdafruitBNO055IMU name="imu" port="0" bus="0" />
+            <LynxColorSensor name="leftColorSensor" port="1" bus="0" />
+            <REV_VL53L0X_RANGE_SENSOR name="leftDistanceSensor" port="0" bus="2" />
+        </LynxModule>
+        <LynxModule name="Expansion Hub 2" port="2">
+            <TetrixMotor name="intake1" port="0" />
+            <TetrixMotor name="rbMotor" port="1" />
+            <TetrixMotor name="rfMotor" port="2" />
+            <TetrixMotor name="winch1" port="3" />
+            <Servo name="plateServoRight" port="0" />
+            <Servo name="autonGrabberRight" port="1" />
+            <REV_VL53L0X_RANGE_SENSOR name="rightDistanceSensor" port="0" bus="2" />
+            <LynxEmbeddedIMU name="imu 1" port="0" bus="0" />
+            <LynxColorSensor name="rightColorSensor" port="1" bus="0" />
+        </LynxModule>
+    </LynxUsbDevice>
+</Robot>
