@@ -297,6 +297,8 @@ public class SkystoneTeleOp extends OpMode {
     double turnSpeed = 0;
     double x = 0;
     double y = 0;
+    double cartesianSpeedMultiplier = 1;
+    double rotationSpeedMultiplier = 1;
 
     // Code to run REPEATEDLY after the driver hits PLAY but before they hit STOP
     @Override
@@ -435,6 +437,15 @@ public class SkystoneTeleOp extends OpMode {
             y = 0;
         }
 
+        if (gamepad1.right_bumper) {
+            cartesianSpeedMultiplier = 0.5;
+            rotationSpeedMultiplier = 0.5;
+        }
+        else {
+            cartesianSpeedMultiplier = 1;
+            rotationSpeedMultiplier = 1;
+        }
+
         double driveSpeed = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
         double driveAngle = Math.atan2(y, x);
 
@@ -444,10 +455,10 @@ public class SkystoneTeleOp extends OpMode {
 
         double maxDriveSpeed = Math.abs(Math.cos(driveAngle)) + Math.abs(Math.sin(driveAngle));
 
-        x /= Math.sqrt(2);
-        y /= Math.sqrt(2);
-        // x /= maxDriveSpeed;
-        // y /= maxDriveSpeed;
+        // x /= Math.sqrt(2);
+        // y /= Math.sqrt(2);
+        x /= maxDriveSpeed;
+        y /= maxDriveSpeed;
 
         // D-Pad: Compass rose drive
         if (this.gamepad1.dpad_right) {
@@ -472,6 +483,9 @@ public class SkystoneTeleOp extends OpMode {
             y *= -1;
         }
 
+        x *= cartesianSpeedMultiplier;
+        y *= cartesianSpeedMultiplier;
+
         double[] motorPowers = {
             -x - y,
             -x + y,
@@ -480,7 +494,7 @@ public class SkystoneTeleOp extends OpMode {
         };
 
         for (int i = 0; i < motorPowers.length; i++) {
-            motorPowers[i] -= turnSpeed;
+            motorPowers[i] -= turnSpeed * rotationSpeedMultiplier;
         }
         double maxSpeed = getMax(motorPowers);
         if (maxSpeed > 1) {
